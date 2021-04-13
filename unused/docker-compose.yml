@@ -1,0 +1,26 @@
+version: '2.4'
+
+networks:
+  web:
+
+services:
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr
+    networks:
+      - web
+    depends_on:
+      - sonarr
+      - radarr
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/bazarr/:/config
+      - $DATA/media/:/data
+    labels:
+      caddy: bazarr.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 6767}}"

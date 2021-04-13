@@ -1,0 +1,247 @@
+version: '2.4'
+
+networks:
+  web:
+
+services:
+  caddy:
+    container_name: caddy
+    image: lucaslorentz/caddy-docker-proxy:alpine
+    restart: unless-stopped
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $DATA/caddy_data/:/data
+    labels:
+      caddy.email: $ADMIN_EMAIL
+    ports:
+      - 443:443
+
+  netdata:
+    image: netdata/netdata:v1.30
+    container_name: netdata
+    restart: unless-stopped
+    hostname: netdata.$DOMAIN
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/os-release:/host/etc/os-release:ro
+    environment:
+      - VIRTUALIZATION=$$(systemd-detect-virt -v)
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:2.1.1-alpine
+    restart: unless-stopped
+    command: -H unix:///var/run/docker.sock --admin-password=$PORTAINER_ADMIN_PASSWORD
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $DATA/portainer/:/data
+    networks:
+      - web
+    depends_on:
+      - caddy
+    labels:
+      caddy: portainer.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 9000}}"
+
+  bitwarden:
+    image: bitwardenrs/server:1.20.0-alpine
+    container_name: bitwarden
+    restart: unless-stopped
+    networks:
+      - web
+    volumes:
+      - $DATA/bitwarden/:/data
+    environment:
+      - WEBSOCKET_ENABLED
+      - DOMAIN=https://bitwarden.$DOMAIN
+      - SIGNUPS_ALLOWED
+      - ADMIN_TOKEN
+      - SIGNUPS_VERIFY
+      - INVITATIONS_ALLOWED
+      - SMTP_HOST
+      - SMTP_FROM
+      - SMTP_FROM_NAME
+      - SMTP_PORT
+      - SMTP_SSL
+      - SMTP_USERNAME
+      - SMTP_PASSWORD
+    depends_on:
+      - caddy
+    labels:
+      caddy: bitwarden.$DOMAIN
+      caddy.reverse_proxy_0: "{{upstreams 80}}"
+      caddy.tls: $TLS_EMAIL
+      caddy.encode: gzip
+      caddy.header.X-XSS-Protection: '"1; mode=block;"'
+      caddy.header.X-Frame-Options: "DENY"
+      caddy.header.X-Content-Type-Options: "none"
+      caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
+      caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
+
+  organizr:
+    container_name: organizr
+    image: organizr/organizr:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DATA/organizr/:/config
+    networks:
+      - web
+    environment:
+      - fpm=false
+      - PUID
+      - PGID
+      - TZ
+    depends_on:
+      - caddy
+    labels:
+      caddy: $DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 80}}"
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    networks:
+      - web
+    environment:
+      - LOG_LEVEL=info
+      - CAPTCHA_SOLVER=hcaptcha-solver
+
+  jackett:
+    container_name: jackett
+    image: linuxserver/jackett:latest
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/jackett:/config
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA/media/downloads:/downloads
+    depends_on:
+      - flaresolverr
+      - caddy
+    labels:
+      caddy: jackett.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 9117}}"
+
+  transmission:
+    container_name: transmission
+    restart: unless-stopped
+    image: haugene/transmission-openvpn:latest
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - $DATA/media/:/data
+    environment:
+      - OPENVPN_PROVIDER
+      - OPENVPN_CONFIG
+      - OPENVPN_USERNAME
+      - OPENVPN_PASSWORD
+      - HEALTH_CHECK_HOST
+      - PUID
+      - PGID
+      - TZ
+      - TRANSMISSION_DOWNLOAD_DIR
+      - TRANSMISSION_WEB_UI
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    networks:
+      - web
+    depends_on:
+      - caddy
+    labels:
+      caddy: transmission.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 9091}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    depends_on:
+      - caddy
+      - jackett
+      - transmission
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA/sonarr/:/config
+      - $DATA/media/:/data
+    labels:
+      caddy: sonarr.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8989}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    depends_on:
+      - caddy
+      - jackett
+      - transmission
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA/radarr/:/config
+      - $DATA/media/:/data
+    labels:
+      caddy: radarr.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 7878}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
+    restart: unless-stopped
+    networks:
+      - web
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/jellyfin/:/config
+      - $DATA/media/:/data
+    depends_on:
+      - caddy
+      - sonarr
+      - radarr
+    labels:
+      caddy: jellyfin.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8096}}"
