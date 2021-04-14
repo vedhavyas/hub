@@ -39,6 +39,11 @@ services:
       - VIRTUALIZATION
     networks:
       - web
+    labels:
+      caddy: netdata.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 19999}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   portainer:
     container_name: portainer
