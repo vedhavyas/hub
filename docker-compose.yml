@@ -47,8 +47,6 @@ services:
       - $DATA/portainer/:/data
     networks:
       - web
-    depends_on:
-      - caddy
     labels:
       caddy: portainer.$DOMAIN
       caddy.tls: $TLS_EMAIL
@@ -76,8 +74,6 @@ services:
       - SMTP_SSL
       - SMTP_USERNAME
       - SMTP_PASSWORD
-    depends_on:
-      - caddy
     labels:
       caddy: bitwarden.$DOMAIN
       caddy.reverse_proxy_0: "{{upstreams 80}}"
@@ -88,28 +84,6 @@ services:
       caddy.header.X-Content-Type-Options: "none"
       caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
       caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
-
-  organizr:
-    container_name: organizr
-    image: organizr/organizr:latest
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DATA/organizr/:/config
-    networks:
-      - web
-    environment:
-      - fpm=false
-      - PUID
-      - PGID
-      - TZ
-    depends_on:
-      - caddy
-    labels:
-      caddy: $DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 80}}"
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -137,11 +111,11 @@ services:
       - $DATA/media/downloads:/downloads
     depends_on:
       - flaresolverr
-      - caddy
     labels:
       caddy: jackett.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9117}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   transmission:
     container_name: transmission
@@ -168,8 +142,6 @@ services:
         max-size: 10m
     networks:
       - web
-    depends_on:
-      - caddy
     labels:
       caddy: transmission.$DOMAIN
       caddy.tls: $TLS_EMAIL
@@ -187,7 +159,6 @@ services:
       - PGID
       - TZ
     depends_on:
-      - caddy
       - jackett
       - transmission
     volumes:
@@ -211,7 +182,6 @@ services:
       - PGID
       - TZ
     depends_on:
-      - caddy
       - jackett
       - transmission
     volumes:
@@ -238,10 +208,31 @@ services:
       - $DATA/jellyfin/:/config
       - $DATA/media/:/data
     depends_on:
-      - caddy
       - sonarr
       - radarr
     labels:
       caddy: jellyfin.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8096}}"
+
+  organizr:
+    container_name: organizr
+    image: organizr/organizr:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DATA/organizr/:/config
+    networks:
+      - web
+    environment:
+      - fpm=false
+      - PUID
+      - PGID
+      - TZ
+    depends_on:
+      - jellyfin
+    labels:
+      caddy: $DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 80}}"

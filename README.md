@@ -40,6 +40,7 @@ seperate openvpn to a different container for eaiser re-use than just tranmissio
 
 ### transmission
 - needs to enable basic auth
+- delete files from download that more than an hour old since they are already copied by the service
 ### Sonarr
 - setup and enable auth
 - follow jackett instructions to setup
