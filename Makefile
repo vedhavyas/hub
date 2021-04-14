@@ -8,7 +8,11 @@ down:
 
 up: # spin up the services
 up: init
-	@docker-compose up -d
+	@if ! command -v COMMAND &> /dev/null; then\
+        docker-compose up -d;\
+        exit;\
+    fi
+	@VIRTUALIZATION=$(systemd-detect-virt -v) docker-compose up -d
 
 help: # shows this help
 	@sed -ne '/@sed/!s/# //p' $(MAKEFILE_LIST)
