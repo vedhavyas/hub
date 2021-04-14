@@ -7,7 +7,7 @@ down:
 	@docker-compose down
 
 up: # spin up the services
-up: down init
+up: init
 	@docker-compose up -d
 
 help: # shows this help
