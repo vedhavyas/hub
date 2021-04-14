@@ -36,7 +36,7 @@ services:
       - /etc/os-release:/host/etc/os-release:ro
     environment:
       - DOCKER_USR=root
-      - VIRTUALIZATION=$$(systemd-detect-virt -v)
+      - VIRTUALIZATION
 
   portainer:
     container_name: portainer
