@@ -1,6 +1,6 @@
 init: # create required folder structure under $DATA from .env
 init:
-	@sh ./scripts/create_folder_structure.sh
+	@bash ./scripts/create_folder_structure.sh
 
 down: # spin down the services
 down:
