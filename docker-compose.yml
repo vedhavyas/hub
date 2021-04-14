@@ -37,6 +37,8 @@ services:
     environment:
       - DOCKER_USR=root
       - VIRTUALIZATION
+    networks:
+      - web
 
   portainer:
     container_name: portainer
