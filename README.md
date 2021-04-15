@@ -40,7 +40,8 @@
 
 
 TODO:
-- Cleanup and backup
+- Cleanup and backup: 
+  - Jellyfin: https://github.com/terrelsa13/media_cleaner
 - Checkout Monitorr https://github.com/Monitorr/Monitorr
 - Separate openvpn/wireguard to a different container so that multiple containers can route traffic through VPN
 - Secure Docker socket proxy. It worked but needs to be specific for portainer.

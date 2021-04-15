@@ -223,24 +223,38 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8096}}"
 
-  organizr:
-    container_name: organizr
-    image: organizr/organizr:latest
+  calibre:
+    image: ghcr.io/linuxserver/calibre
+    container_name: calibre
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DATA/organizr/:/config
-    networks:
-      - web
     environment:
-      - fpm=false
       - PUID
       - PGID
       - TZ
-    depends_on:
-      - jellyfin
+    volumes:
+      - $DATA/media/books/calibre:/config
+    networks:
+      - web
+    labels:
+      caddy: calibre.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
+  heimdall:
+    image: ghcr.io/linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/heimdall:/config
+    restart: unless-stopped
+    networks:
+      - web
     labels:
       caddy: $DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 80}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
