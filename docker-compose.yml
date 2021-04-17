@@ -306,3 +306,22 @@ services:
       diun.enable: 'true'
       diun.watch_repo: 'true'
     restart: unless-stopped
+
+  ombi:
+    image: ghcr.io/linuxserver/ombi
+    container_name: ombi
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/ombi/:/config
+    networks:
+      - web
+    restart: unless-stopped
+    labels:
+      diun.enable: 'true'
+      diun.watch_repo: 'true'
+      caddy: ombi.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 3579}}"
