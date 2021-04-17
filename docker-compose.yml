@@ -15,8 +15,6 @@ services:
       - $DATA/caddy_data/:/data
     labels:
       caddy.email: $ADMIN_EMAIL
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
     ports:
       - 443:443
 
@@ -39,6 +37,9 @@ services:
     environment:
       - DOCKER_USR=root
       - VIRTUALIZATION
+    healthcheck:
+      test: curl -f http://netdata:19999 || exit 1
+      interval: 15s
     networks:
       - web
     labels:
@@ -46,8 +47,6 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 19999}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   portainer:
     container_name: portainer
@@ -63,8 +62,6 @@ services:
       caddy: portainer.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9000}}"
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   bitwarden:
     image: bitwardenrs/server:1.20.0-alpine
@@ -88,6 +85,9 @@ services:
       - SMTP_SSL
       - SMTP_USERNAME
       - SMTP_PASSWORD
+    healthcheck:
+      test: curl -f http://bitwarden:80 || exit 1
+      interval: 5s
     labels:
       caddy: bitwarden.$DOMAIN
       caddy.reverse_proxy_0: "{{upstreams 80}}"
@@ -98,8 +98,6 @@ services:
       caddy.header.X-Content-Type-Options: "none"
       caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
       caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -110,9 +108,6 @@ services:
     environment:
       - LOG_LEVEL=info
       - CAPTCHA_SOLVER=hcaptcha-solver
-    labels:
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   jackett:
     container_name: jackett
@@ -130,13 +125,14 @@ services:
       - $DATA/media/downloads:/downloads
     depends_on:
       - flaresolverr
+    healthcheck:
+      test: curl -f http://jackett:9117 || exit 1
+      interval: 15s
     labels:
       caddy: jackett.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9117}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   transmission:
     container_name: transmission
@@ -163,13 +159,14 @@ services:
         max-size: 10m
     networks:
       - web
+    healthcheck:
+      test: curl -f https://google.com || exit 1
+      interval: 15s
     labels:
       caddy: transmission.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9091}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   sonarr:
     container_name: sonarr
@@ -188,13 +185,14 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - $DATA/sonarr/:/config
       - $DATA/media/:/data
+    healthcheck:
+      test: curl -f http://sonarr:8989 || exit 1
+      interval: 15s
     labels:
       caddy: sonarr.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8989}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   radarr:
     container_name: radarr
@@ -213,13 +211,14 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - $DATA/radarr/:/config
       - $DATA/media/:/data
+    healthcheck:
+      test: curl -f http://radarr:7878 || exit 1
+      interval: 15s
     labels:
       caddy: radarr.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 7878}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   jellyfin:
     container_name: jellyfin
@@ -237,12 +236,13 @@ services:
     depends_on:
       - sonarr
       - radarr
+    healthcheck:
+      test: curl -f http://jellyfin:8096 || exit 1
+      interval: 15s
     labels:
       caddy: jellyfin.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8096}}"
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   calibre:
     image: ghcr.io/linuxserver/calibre
@@ -256,13 +256,14 @@ services:
       - $DATA/media/books/calibre:/config
     networks:
       - web
+    healthcheck:
+      test: curl -f http://calibre:8080 || exit 1
+      interval: 20s
     labels:
       caddy: calibre.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8080}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
 
   heimdall:
     image: ghcr.io/linuxserver/heimdall
@@ -276,10 +277,11 @@ services:
     restart: unless-stopped
     networks:
       - web
+    healthcheck:
+      test: curl -f http://heimdall:80 || exit 1
+      interval: 5s
     labels:
       caddy: $DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      diun.enable: 'true'
-      diun.watch_repo: 'true'
