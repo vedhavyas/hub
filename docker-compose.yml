@@ -18,8 +18,24 @@ services:
     ports:
       - 443:443
 
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --interval=3600
+    environment:
+      - WATCHTOWER_NOTIFICATION_EMAIL_FROM
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER
+      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD
+      - WATCHTOWER_NOTIFICATION_EMAIL_DELAY
+
   netdata:
-    image: netdata/netdata:v1.30
+    image: netdata/netdata
     container_name: netdata
     restart: unless-stopped
     hostname: netdata.$DOMAIN
@@ -50,7 +66,7 @@ services:
 
   portainer:
     container_name: portainer
-    image: portainer/portainer-ce:2.1.1-alpine
+    image: portainer/portainer-ce
     restart: unless-stopped
     command: -H unix:///var/run/docker.sock --admin-password=$PORTAINER_ADMIN_PASSWORD
     volumes:
@@ -98,6 +114,7 @@ services:
       caddy.header.X-Content-Type-Options: "none"
       caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
       caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
+      com.centurylinklabs.watchtower.monitor-only: "true"
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest

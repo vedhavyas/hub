@@ -14,7 +14,15 @@ up: init
     fi
 	@VIRTUALIZATION=$(systemd-detect-virt -v) docker-compose up -d
 
+stop: # stops the containers
+stop:
+	@docker-compose stop
+
+start: # starts the containers
+start:
+	@docker-compose start
+
 help: # shows this help
 	@sed -ne '/@sed/!s/# //p' $(MAKEFILE_LIST)
 
-.PHONY: rerun up down create-folder-structure
+.PHONY: rerun up down create-folder-structure stop start
