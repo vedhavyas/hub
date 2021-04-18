@@ -16,6 +16,7 @@ services:
     labels:
       caddy.email: $ADMIN_EMAIL
     ports:
+      - 80:80
       - 443:443
 
   watchtower:
