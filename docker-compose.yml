@@ -1,4 +1,4 @@
-version: '2.4'
+version: '2'
 
 networks:
   web:
@@ -55,7 +55,7 @@ services:
       - DOCKER_USR=root
       - VIRTUALIZATION
     healthcheck:
-      test: curl -f http://netdata:19999 || exit 1
+      test: curl -f http://netdata:19999 &> /dev/null && echo "OK" || exit 1
       interval: 15s
     networks:
       - web
@@ -103,7 +103,7 @@ services:
       - SMTP_USERNAME
       - SMTP_PASSWORD
     healthcheck:
-      test: curl -f http://bitwarden:80 || exit 1
+      test: curl -f http://bitwarden:80 &> /dev/null && echo "OK" || exit 1
       interval: 5s
     labels:
       caddy: bitwarden.$DOMAIN
@@ -144,7 +144,7 @@ services:
     depends_on:
       - flaresolverr
     healthcheck:
-      test: curl -f http://jackett:9117 || exit 1
+      test: curl -f http://jackett:9117 &> /dev/null && echo "OK" || exit 1
       interval: 15s
     labels:
       caddy: jackett.$DOMAIN
@@ -178,7 +178,7 @@ services:
     networks:
       - web
     healthcheck:
-      test: curl -f https://google.com || exit 1
+      test: curl -f https://google.com &> /dev/null && echo "OK" || exit 1
       interval: 15s
     labels:
       caddy: transmission.$DOMAIN
@@ -204,7 +204,7 @@ services:
       - $DATA/sonarr/:/config
       - $DATA/media/:/data
     healthcheck:
-      test: curl -f http://sonarr:8989 || exit 1
+      test: curl -f http://sonarr:8989 &> /dev/null && echo "OK" || exit 1
       interval: 15s
     labels:
       caddy: sonarr.$DOMAIN
@@ -230,7 +230,7 @@ services:
       - $DATA/radarr/:/config
       - $DATA/media/:/data
     healthcheck:
-      test: curl -f http://radarr:7878 || exit 1
+      test: curl -f http://radarr:7878 &> /dev/null && echo "OK" || exit 1
       interval: 15s
     labels:
       caddy: radarr.$DOMAIN
@@ -255,7 +255,7 @@ services:
       - sonarr
       - radarr
     healthcheck:
-      test: curl -f http://jellyfin:8096 || exit 1
+      test: curl -f http://jellyfin:8096 &> /dev/null && echo "OK" || exit 1
       interval: 15s
     labels:
       caddy: jellyfin.$DOMAIN
@@ -275,7 +275,7 @@ services:
     networks:
       - web
     healthcheck:
-      test: curl -f http://calibre:8080 || exit 1
+      test: curl -f http://calibre:8080 &> /dev/null && echo "OK" || exit 1
       interval: 20s
     labels:
       caddy: calibre.$DOMAIN
@@ -296,7 +296,7 @@ services:
     networks:
       - web
     healthcheck:
-      test: curl -f http://heimdall:80 || exit 1
+      test: curl -f http://heimdall:80 &> /dev/null && echo "OK" || exit 1
       interval: 5s
     labels:
       caddy: $DOMAIN
@@ -335,7 +335,7 @@ services:
     networks:
       - web
     healthcheck:
-      test: curl -f http://wallabag:80 || exit 1
+      test: curl -f http://wallabag:80 &> /dev/null && echo "OK" || exit 1
       interval: 5s
     labels:
       caddy: wallabag.$DOMAIN
