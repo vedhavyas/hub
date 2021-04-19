@@ -1,4 +1,4 @@
 /cloud/
 .env
-/cleanup/media_cleaner_config.py
 /venv/
+/cron/media_cleaner_config.py
