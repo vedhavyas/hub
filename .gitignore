@@ -1,2 +1,4 @@
 /cloud/
 .env
+/cleanup/media_cleaner_config.py
+/venv/

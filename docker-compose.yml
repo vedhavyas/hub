@@ -341,3 +341,10 @@ services:
       caddy: wallabag.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 80}}"
+
+  cron:
+    build: ./cron
+    container_name: cron
+    restart: unless-stopped
+    networks:
+      - web
