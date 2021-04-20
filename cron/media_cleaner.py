@@ -301,8 +301,9 @@ def generate_config():
 
 #api call to delete items
 def delete_item(itemID):
-    url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
-    req = request.Request(url,method='DELETE')
+    headers = {'X-Emby-Authorization' : 'Emby UserId="'+ cfg.user_key  +'", Client="media_cleaner", Device="media_cleaner", DeviceId="media_cleaner", Version="0.4", Token=""', 'Content-Type' : 'application/json'}
+    url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
+    req = request.Request(url,method='DELETE', headers=headers)
     if bool(cfg.DEBUG):
         #DEBUG
         print(itemID)
