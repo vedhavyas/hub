@@ -348,3 +348,5 @@ services:
     restart: unless-stopped
     networks:
       - web
+    volumes:
+      - $DATA/media/downloads:/downloads

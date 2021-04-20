@@ -8,7 +8,7 @@ WORKDIR /
 
 COPY . .
 
-RUN chmod +x /entrypoint.sh /media_cleaner.py
+RUN chmod +x /entrypoint.sh /media_cleaner.py /download_cleaner.sh
 
 RUN pip3 install python-dateutil
 
