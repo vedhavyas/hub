@@ -55,7 +55,7 @@ def get_url():
             return(url)
         else:
            #print('No http:// or https:// entered.')
-           url='http://' + url
+           url='https://' + url
            print('Assuming server ip or name is: ' + url)
            return(url)
 
@@ -301,7 +301,7 @@ def generate_config():
 
 #api call to delete items
 def delete_item(itemID):
-    url=cfg.server_url + '/Users/'+ cfg.user_key +'/Items/' + itemID + '?api_key=' + cfg.access_token
+    url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
     req = request.Request(url,method='DELETE')
     if bool(cfg.DEBUG):
         #DEBUG
