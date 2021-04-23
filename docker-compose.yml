@@ -350,3 +350,5 @@ services:
       - web
     volumes:
       - $DATA/media/downloads:/downloads
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
