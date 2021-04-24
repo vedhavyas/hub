@@ -2,6 +2,7 @@ version: '2'
 
 networks:
   web:
+  filerun:
 
 services:
   caddy:
@@ -350,5 +351,78 @@ services:
       - web
     volumes:
       - $DATA/media/downloads:/downloads
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
+
+  filerun-db:
+    image: mariadb:10.5
+    container_name: filerun-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+    volumes:
+      - $DATA/filerun/db:/var/lib/mysql
+    networks:
+      - filerun
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
+
+  filerun:
+    image: afian/filerun
+    container_name: filerun
+    restart: unless-stopped
+    environment:
+      FR_DB_HOST: "filerun-db"
+      FR_DB_PORT: 3306
+      FR_DB_NAME: $MYSQL_DATABASE
+      FR_DB_USER: $MYSQL_USER
+      FR_DB_PASS: $MYSQL_PASSWORD
+      APACHE_RUN_USER: www-data
+      APACHE_RUN_USER_ID: 33
+      APACHE_RUN_GROUP: www-data
+      APACHE_RUN_GROUP_ID: 33
+    depends_on:
+      - filerun-db
+      - tika
+      - elasticsearch
+    networks:
+      - filerun
+      - web
+    volumes:
+      - $DATA/filerun/html:/var/www/html
+      - $DATA/media/drive:/user-files
+    labels:
+      caddy: drive.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 80}}"
+      com.centurylinklabs.watchtower.enable: "false"
+
+  tika:
+    container_name: tika
+    restart: unless-stopped
+    image: logicalspark/docker-tikaserver
+    networks:
+      - filerun
+
+  elasticsearch:
+    image: elasticsearch:7.12.0
+    container_name: elasticsearch
+    restart: unless-stopped
+    environment:
+      - "cluster.name=docker-cluster"
+      - "bootstrap.memory_lock=true"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - filerun
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    volumes:
+      - $DATA/filerun/elasticsearch:/usr/share/elasticsearch/data
     labels:
       com.centurylinklabs.watchtower.enable: "false"

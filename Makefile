@@ -1,13 +1,9 @@
-init: # create required folder structure under $DATA from .env
-init:
-	@bash ./scripts/create_folder_structure.sh
-
 down: # spin down the services
 down:
 	@docker-compose down
 
 up: # spin up the services
-up: init
+up:
 	@if ! command -v systemd-detect-virt &> /dev/null; then\
         docker-compose up -d;\
         exit;\
@@ -26,4 +22,7 @@ start:
 help: # shows this help
 	@sed -ne '/@sed/!s/# //p' $(MAKEFILE_LIST)
 
-.PHONY: rerun up down create-folder-structure stop start
+setup-filerun-cron: # setup filerun index cron job
+	@./scripts/setup_filerun_index_cron.sh
+
+.PHONY: up down stop start setup-filerun-cron
