@@ -25,4 +25,7 @@ help: # shows this help
 setup-filerun-cron: # setup filerun index cron job
 	@./scripts/setup_filerun_index_cron.sh
 
-.PHONY: up down stop start setup-filerun-cron
+setup-folder-structure: # setup folder structure
+	@./scripts/create_folder_structure.sh
+
+.PHONY: up down stop start setup-filerun-cron setup-folder-structure
