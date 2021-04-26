@@ -9,21 +9,6 @@ FROM alpine
 COPY --from=builder /app/caddy /app/
 RUN mkdir -p /data
 
-ENV USER=docker
-ENV UID=1000
-ENV GID=1000
-
-RUN addgroup -S $USER && adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "$(pwd)" \
-    --ingroup "$USER" \
-    --no-create-home \
-    --uid "$UID" \
-    "$USER"
-
-USER $USER
-
 WORKDIR /app
 
 COPY Caddyfile Caddyfile
