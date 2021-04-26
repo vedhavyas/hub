@@ -1,0 +1,9 @@
+{
+    order webdav last
+}
+:8080 {
+    log
+    webdav {
+        root /data
+    }
+}
