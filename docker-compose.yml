@@ -393,3 +393,4 @@ services:
       caddy: drive.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8334}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
