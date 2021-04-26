@@ -20,7 +20,7 @@ ENV USER=docker
 ENV UID=1000
 ENV GID=1000
 
-RUN addgroup -S $USER
+RUN addgroup -g $GID -S $USER
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -30,4 +30,4 @@ RUN adduser \
     --uid "$UID" \
     "$USER"
 
-CMD ["sh", "-c", "chown $USER:$USER /data && ./caddy run -adapter caddyfile -config ./Caddyfile"]
+CMD ["sh", "-c", "chown -R $USER:$GID /data && ./caddy run -adapter caddyfile -config ./Caddyfile"]
