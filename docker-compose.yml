@@ -435,7 +435,7 @@ services:
     networks:
       - web
     volumes:
-      - $DATA/:/data
+      - $DATA/media:/data
     labels:
       com.centurylinklabs.watchtower.enable: "false"
       caddy: webdav.$DOMAIN
