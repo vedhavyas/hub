@@ -380,7 +380,7 @@ services:
     container_name: filestash
     restart: unless-stopped
     environment:
-      - APPLICATION_URL=https://drive.$DOMAIN
+      - APPLICATION_URL=drive.$DOMAIN
       - ONLYOFFICE_URL=http://onlyoffice
     networks:
       - web
