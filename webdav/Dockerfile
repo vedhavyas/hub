@@ -15,4 +15,19 @@ COPY Caddyfile Caddyfile
 
 VOLUME /data
 EXPOSE 8080
-CMD ["sh", "-c", "./caddy run -adapter caddyfile -config ./Caddyfile"]
+
+ENV USER=docker
+ENV UID=1000
+ENV GID=1000
+
+RUN addgroup -S $USER
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "$(pwd)" \
+    --ingroup "$USER" \
+    --no-create-home \
+    --uid "$UID" \
+    "$USER"
+
+CMD ["sh", "-c", "chown $USER:$USER /data && ./caddy run -adapter caddyfile -config ./Caddyfile"]
