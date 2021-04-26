@@ -2,7 +2,6 @@ version: '2'
 
 networks:
   web:
-  filerun:
 
 services:
   caddy:
@@ -354,80 +353,6 @@ services:
     labels:
       com.centurylinklabs.watchtower.enable: "false"
 
-  filerun-db:
-    image: mariadb:10.5
-    container_name: filerun-db
-    restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-    volumes:
-      - $DATA/filerun/db:/var/lib/mysql
-    networks:
-      - filerun
-    labels:
-      com.centurylinklabs.watchtower.enable: "false"
-
-  filerun:
-    image: afian/filerun
-    container_name: filerun
-    restart: unless-stopped
-    environment:
-      FR_DB_HOST: "filerun-db"
-      FR_DB_PORT: 3306
-      FR_DB_NAME: $MYSQL_DATABASE
-      FR_DB_USER: $MYSQL_USER
-      FR_DB_PASS: $MYSQL_PASSWORD
-      APACHE_RUN_USER: docker
-      APACHE_RUN_USER_ID: 1000
-      APACHE_RUN_GROUP: docker
-      APACHE_RUN_GROUP_ID: 100
-    depends_on:
-      - filerun-db
-      - tika
-      - elasticsearch
-    networks:
-      - filerun
-      - web
-    volumes:
-      - $DATA/filerun/html:/var/www/html
-      - $DATA/media/drive:/user-files
-    labels:
-      caddy: drive.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 80}}"
-      com.centurylinklabs.watchtower.enable: "false"
-
-  tika:
-    container_name: tika
-    restart: unless-stopped
-    image: logicalspark/docker-tikaserver
-    networks:
-      - filerun
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
-    container_name: elasticsearch
-    restart: unless-stopped
-    environment:
-      - "cluster.name=docker-cluster"
-      - "bootstrap.memory_lock=true"
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "discovery.type=single-node"
-    networks:
-      - filerun
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    mem_limit: 1g
-    volumes:
-      - $DATA/elasticsearch:/usr/share/elasticsearch/data
-    labels:
-      com.centurylinklabs.watchtower.enable: "false"
-
   webdav:
     build: ./webdav
     container_name: webdav
@@ -442,3 +367,29 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8080}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
+  onlyoffice:
+    container_name: onlyoffice
+    image: onlyoffice/documentserver
+    restart: unless-stopped
+    networks:
+      - web
+
+  filestash:
+    container_name: filestash
+    image: machines/filestash
+    restart: unless-stopped
+    environment:
+      - APPLICATION_URL=https://drive.$DOMAIN
+      - ONLYOFFICE_URL=http://onlyoffice
+    networks:
+      - web
+    depends_on:
+      - webdav
+      - onlyoffice
+    volumes:
+      - $DATA/filestash:/app/data/state
+    labels:
+      caddy: drive.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8334}}"
