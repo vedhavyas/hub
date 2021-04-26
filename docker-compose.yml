@@ -376,8 +376,8 @@ services:
       - web
 
   filestash:
+    build: ./filestash
     container_name: filestash
-    image: machines/filestash
     restart: unless-stopped
     environment:
       - APPLICATION_URL=https://drive.$DOMAIN
