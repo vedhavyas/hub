@@ -374,30 +374,17 @@ services:
       caddy.reverse_proxy: "{{upstreams 8080}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
-  onlyoffice:
-    container_name: onlyoffice
-    image: onlyoffice/documentserver:latest
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser:v2
     restart: unless-stopped
-    networks:
-      - web
-
-  filestash:
-    build: ./filestash
-    container_name: filestash
-    restart: unless-stopped
-    environment:
-      - APPLICATION_URL=drive.$DOMAIN
-      - ONLYOFFICE_URL=http://onlyoffice
-    networks:
-      - web
-    depends_on:
-      - webdav
-      - onlyoffice
     volumes:
-      - $DATA/filestash:/app/data/state
+      - '$DATA/media:/srv'
+      - '$DATA/filebrowser/filebrowser.db:/database.db'
+    networks:
+      - web
+    user: $PUID:$PGID
     labels:
       caddy: drive.$DOMAIN
       caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8334}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-      com.centurylinklabs.watchtower.enable: "false"
+      caddy.reverse_proxy: "{{upstreams 80}}"
