@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 networks:
   web:
@@ -265,6 +265,26 @@ services:
       caddy: jellyfin.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8096}}"
+
+  ombi:
+    image: ghcr.io/linuxserver/ombi
+    container_name: ombi
+    networks:
+      - web
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/ombi/:/config
+    healthcheck:
+      test: curl -f http://ombi:3579 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    restart: unless-stopped
+    labels:
+      caddy: ombi.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 3579}}"
 
   calibre:
     image: ghcr.io/linuxserver/calibre:latest
