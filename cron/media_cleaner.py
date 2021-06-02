@@ -851,7 +851,7 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
 ### Network #######################################################################################
 
     #Check if network's favorite value already exists in dictionary
-    if not item['SeriesStudio'] in isfav_TVessn['networkchannel']:
+    if 'SeriesStudio' in item and not item['SeriesStudio'] in isfav_TVessn['networkchannel']:
         #Store if the channel/network/studio is marked as a favorite
         isfav_TVessn['networkchannel'][item['SeriesStudio']] = get_studio_item_info(server_url, user_key, item['SeriesStudio'], auth_key)['UserData']['IsFavorite']
 
@@ -879,7 +879,7 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
        (isfav_TVessn['episode'][item['Id']]) or
        (isfav_TVessn['season'][item['SeasonId']]) or
        (isfav_TVessn['series'][item['SeriesId']]) or
-       (isfav_TVessn['networkchannel'][item['SeriesStudio']]) #or
+       ('SeriesStudio' in item and isfav_TVessn['networkchannel'][item['SeriesStudio']]) #or
        ):
         #Either the episode, season, series, or network are set as a favorite
         itemisfav_TVepiseasernet=True
