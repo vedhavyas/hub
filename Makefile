@@ -22,7 +22,7 @@ start:
 help: # shows this help
 	@sed -ne '/@sed/!s/# //p' $(MAKEFILE_LIST)
 
-setup-folder-structure: # setup folder structure
+setup: # setup
 	@./scripts/create_folder_structure.sh
 
 .PHONY: up down stop start setup-folder-structure

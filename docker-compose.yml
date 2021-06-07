@@ -2,6 +2,7 @@ version: '3'
 
 networks:
   web:
+  db:
 
 services:
   caddy:
@@ -408,3 +409,50 @@ services:
       caddy: drive.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 80}}"
+
+  postgres:
+    container_name: postgres
+    build: ./postgres
+    restart: unless-stopped
+    volumes:
+      - '$DATA/postgres:/var/lib/postgresql/data'
+    networks:
+      - db
+    user: $PUID:$PGID
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
+
+  planka:
+    image: meltyshev/planka:latest
+    container_name: planka
+    command: >
+      bash -c
+        "for i in `seq 1 30`; do
+          ./start.sh &&
+          s=$$? && break || s=$$?;
+          echo \"Tried $$i times. Waiting 5 seconds...\";
+          sleep 5;
+        done; (exit $$s)"
+    restart: unless-stopped
+    volumes:
+      - '$DATA/planka/user-avatars:/app/public/user-avatars'
+      - '$DATA/planka/project-background-images:/app/public/project-background-images'
+      - '$DATA/planka/attachments:/app/public/attachments'
+    environment:
+      - BASE_URL=https://planka.$DOMAIN
+      - DATABASE_URL=postgresql://planka@postgres/planka
+      - SECRET_KEY=$PLANKA_SECRET_KEY
+    depends_on:
+      - postgres
+      - caddy
+    networks:
+      - db
+      - web
+    user: $PUID:$PGID
+    labels:
+      caddy: planka.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 1337}}"
