@@ -85,6 +85,18 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
+  autoheal:
+    container_name: autoheal
+    image: willfarrell/autoheal
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    networks:
+      - db
+      - web
+
   bitwarden:
     image: bitwardenrs/server:1.21.0-alpine
     container_name: bitwarden
