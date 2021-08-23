@@ -17,8 +17,8 @@ services:
     labels:
       caddy.email: $ADMIN_EMAIL
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
 
   watchtower:
     container_name: watchtower
@@ -99,7 +99,7 @@ services:
       - web
 
   bitwarden:
-    image: bitwardenrs/server:1.21.0-alpine
+    image: vaultwarden/server:alpine
     container_name: bitwarden
     restart: unless-stopped
     networks:
@@ -133,7 +133,6 @@ services:
       caddy.header.X-Content-Type-Options: "none"
       caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
       caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
-      com.centurylinklabs.watchtower.monitor-only: "true"
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
