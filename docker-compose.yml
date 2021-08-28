@@ -471,7 +471,7 @@ services:
 
   mariadb:
     image: ghcr.io/linuxserver/mariadb:latest
-    container_name: hackmd_mariadb
+    container_name: mariadb
     restart: unless-stopped
     volumes:
       - '$DATA/hackmd/db/:/config'
@@ -495,7 +495,7 @@ services:
     volumes:
       - '$DATA/hackmd/data/:/config'
     environment:
-      - DB_HOST
+      - DB_HOST=mariadb
       - DB_USER
       - DB_PASS
       - DB_NAME
