@@ -503,6 +503,8 @@ services:
       - PGID
       - PUID
       - TZ
+      - CMD_ALLOW_ANONYMOUS=false
+      - CMD_ALLOW_EMAIL_REGISTER=false
     networks:
       - db
       - web
