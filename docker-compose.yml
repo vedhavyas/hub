@@ -468,3 +468,45 @@ services:
       caddy: planka.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 1337}}"
+
+  mariadb:
+    image: ghcr.io/linuxserver/mariadb:latest
+    container_name: hackmd_mariadb
+    restart: unless-stopped
+    volumes:
+      - '$DATA/hackmd/db/:/config'
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - PGID
+      - PUID
+      - TZ
+    networks:
+      - db
+
+  hackmd:
+    image: ghcr.io/linuxserver/hedgedoc:latest
+    container_name: hackmd
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    volumes:
+      - '$DATA/hackmd/data/:/config'
+    environment:
+      - DB_HOST
+      - DB_USER
+      - DB_PASS
+      - DB_NAME
+      - DB_PORT=3306
+      - PGID
+      - PUID
+      - TZ
+    networks:
+      - db
+      - web
+    labels:
+      caddy: hackmd.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 3000}}"
