@@ -51,9 +51,6 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      - $DATA/netdata/config:/etc/netdata
-      - $DATA/netdata/lib:/var/lib/netdata
-      - $DATA/netdata/cache:/var/cache/netdata
       - /etc/passwd:/host/etc/passwd:ro
       - /etc/group:/host/etc/group:ro
       - /proc:/host/proc:ro
@@ -63,7 +60,6 @@ services:
     environment:
       - DOCKER_USR=root
       - VIRTUALIZATION
-    user: $PUID:$PGID
     healthcheck:
       test: curl -f http://netdata:19999 &> /dev/null && echo "OK" || exit 1
       interval: 15s

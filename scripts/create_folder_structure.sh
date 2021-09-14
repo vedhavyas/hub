@@ -12,4 +12,3 @@ fi
 sudo chown -R "$PUID":"$PGID" "$DATA"/filebrowser
 sudo chown -R "$PUID":"$PGID" "$DATA"/postgres
 sudo chown -R "$PUID":"$PGID" "$DATA"/planka
-sudo chown -R "$PUID":"$PGID" "$DATA"/netdata
