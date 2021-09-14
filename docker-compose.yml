@@ -508,6 +508,7 @@ services:
       - CMD_DOMAIN=hackmd.$DOMAIN
       - CMD_CSP_ALLOW_FRAMING=false
       - CMD_CSP_ALLOW_PDF_EMBED=false
+      - CMD_USESSL=false
       - CMD_PROTOCOL_USESSL=true
     networks:
       - db
