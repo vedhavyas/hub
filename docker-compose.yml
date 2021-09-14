@@ -505,6 +505,9 @@ services:
       - TZ
       - CMD_ALLOW_ANONYMOUS=false
       - CMD_ALLOW_EMAIL_REGISTER=false
+      - CMD_DOMAIN=hackmd.$DOMAIN
+      - CMD_CSP_ALLOW_FRAMING=false
+      - CMD_CSP_ALLOW_PDF_EMBED=false
     networks:
       - db
       - web
