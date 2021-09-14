@@ -63,6 +63,7 @@ services:
     environment:
       - DOCKER_USR=root
       - VIRTUALIZATION
+    user: $PUID:$PGID
     healthcheck:
       test: curl -f http://netdata:19999 &> /dev/null && echo "OK" || exit 1
       interval: 15s
