@@ -7,7 +7,7 @@ networks:
 services:
   caddy:
     container_name: caddy
-    image: lucaslorentz/caddy-docker-proxy:alpine
+    image: lucaslorentz/caddy-docker-proxy:latest
     restart: unless-stopped
     networks:
       - web
@@ -510,6 +510,7 @@ services:
       - CMD_CSP_ALLOW_PDF_EMBED=false
       - CMD_USESSL=false
       - CMD_PROTOCOL_USESSL=true
+      - CMD_SESSION_SECRET
     networks:
       - db
       - web
