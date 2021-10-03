@@ -257,7 +257,7 @@ services:
 
   readarr:
     container_name: readarr
-    image: linuxserver/readarr
+    image: linuxserver/readarr:nightly
     networks:
       - web
     restart: unless-stopped
