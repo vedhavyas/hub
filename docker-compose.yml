@@ -231,7 +231,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: linuxserver/radarr
+    image: linuxserver/radarr:latest
     networks:
       - web
     restart: unless-stopped
@@ -257,7 +257,7 @@ services:
 
   readarr:
     container_name: readarr
-    image: linuxserver/readarr:latest
+    image: linuxserver/readarr
     networks:
       - web
     restart: unless-stopped
