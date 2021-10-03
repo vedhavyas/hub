@@ -88,7 +88,7 @@ services:
 
   autoheal:
     container_name: autoheal
-    image: willfarrell/autoheal
+    image: willfarrell/autoheal:latest
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -135,7 +135,7 @@ services:
       caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     restart: unless-stopped
     networks:
@@ -255,6 +255,32 @@ services:
       caddy.reverse_proxy: "{{upstreams 7878}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
+  readarr:
+    container_name: readarr
+    image: linuxserver/readarr:latest
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    depends_on:
+      - jackett
+      - transmission
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA/readarr/:/config
+      - $DATA/media/:/data
+    healthcheck:
+      test: curl -f http://readarr:8787 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: readarr.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8787}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
   jellyfin:
     container_name: jellyfin
     image: linuxserver/jellyfin:latest
@@ -280,7 +306,7 @@ services:
       caddy.reverse_proxy: "{{upstreams 8096}}"
 
   ombi:
-    image: ghcr.io/linuxserver/ombi
+    image: linuxserver/ombi:latest
     container_name: ombi
     networks:
       - web
@@ -300,7 +326,7 @@ services:
       caddy.reverse_proxy: "{{upstreams 3579}}"
 
   calibre:
-    image: ghcr.io/linuxserver/calibre:latest
+    image: linuxserver/calibre:latest
     container_name: calibre
     restart: unless-stopped
     environment:
@@ -321,7 +347,7 @@ services:
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   heimdall:
-    image: ghcr.io/linuxserver/heimdall:latest
+    image: linuxserver/heimdall:latest
     container_name: heimdall
     environment:
       - PUID
