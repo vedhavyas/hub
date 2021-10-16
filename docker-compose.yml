@@ -281,6 +281,32 @@ services:
       caddy.reverse_proxy: "{{upstreams 8787}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr:latest
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    depends_on:
+      - sonarr
+      - radarr
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA/bazarr/:/config
+      - $DATA/media/:/data
+    healthcheck:
+      test: curl -f http://bazarr:6767 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: bazarr.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 6767}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
   jellyfin:
     container_name: jellyfin
     image: linuxserver/jellyfin:latest
