@@ -484,7 +484,7 @@ services:
       - web
     volumes:
       - $DATA/calibre-web:/config
-      - '$DATA/media/books/calibre/Calibre\ Library:/books'
+      - '$DATA/media/books/calibre/Calibre Library:/books'
     labels:
       caddy: calibre.$DOMAIN
       caddy.tls: $TLS_EMAIL
