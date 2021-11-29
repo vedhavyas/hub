@@ -53,3 +53,21 @@ If you need to use non-standard database names (hyphens, uppercase letters etc),
 
         environment:
             - POSTGRES_MULTIPLE_DATABASES="DB1","ownerOfDB1": "DB2","ownerOfDB2": ..."DB(n)", "ownerOfDB(n)"
+
+### Example
+```dockerfile
+postgres:
+    container_name: postgres
+    build: ./postgres
+    restart: unless-stopped
+    volumes:
+      - '$DATA/postgres:/var/lib/postgresql/data'
+    networks:
+      - db
+    user: $PUID:$PGID
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
+```
