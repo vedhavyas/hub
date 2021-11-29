@@ -469,3 +469,24 @@ services:
       caddy_1: air.$DOMAIN
       caddy_1.tls: $TLS_EMAIL
       caddy_1.reverse_proxy: "{{upstreams 80}}"
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre
+    restart: unless-stopped
+    environment:
+      - PGID
+      - PUID
+      - TZ
+      - DOCKER_MODS=linuxserver/calibre-web:calibre #optional
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=0 #optional
+    networks:
+      - web
+    volumes:
+      - $DATA/calibre-web:/config
+      - '$DATA/media/books/calibre/Calibre\ Library:/books'
+    labels:
+      caddy: calibre.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8083}}"
+
