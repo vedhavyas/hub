@@ -4,6 +4,10 @@ networks:
   web:
   db:
 
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
 services:
   caddy:
     container_name: caddy
@@ -489,4 +493,49 @@ services:
       caddy: calibre.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8083}}"
+
+  monies:
+    image: vedhavyas/monies:latest
+    container_name: monies
+    restart: unless-stopped
+    networks:
+      - web
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    networks:
+      - web
+    volumes:
+      - $DATA/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    depends_on:
+      - monies
+      - caddy
+    labels:
+      caddy: prometheus.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 9090}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
+  grafana:
+    image: grafana/grafana-enterprise:latest
+    container_name: grafana
+    restart: unless-stopped
+    networks:
+      - web
+    depends_on:
+      - prometheus
+      - caddy
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - $DATA/grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD
+      - GF_USERS_ALLOW_SIGN_UP
+    labels:
+      caddy: grafana.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 3000}}"
 
