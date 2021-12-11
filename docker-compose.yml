@@ -498,6 +498,10 @@ services:
     image: vedhavyas/monies:latest
     container_name: monies
     restart: unless-stopped
+    environment:
+      - ZERODHA_USERNAME
+      - ZERODHA_PWD
+      - ZERODHA_2FA_CODE
     networks:
       - web
 
