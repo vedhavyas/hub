@@ -11,13 +11,9 @@ scrape_configs:
     static_configs:
       - targets: ['monies:8080']
 
-  - job_name: 'netdata'
-    metrics_path: /api/v1/allmetrics
-    scrape_interval: 5s
-    params:
-      format: [ prometheus ]
+  - job_name: 'cloud'
     static_configs:
-      - targets: ['netdata:19999']
+        - targets: ['node-exporter:9100']
 
   - job_name: 'bob'
     static_configs:

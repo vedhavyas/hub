@@ -3,6 +3,7 @@ version: '3'
 networks:
   web:
   db:
+  monitoring:
 
 volumes:
   prometheus_data: {}
@@ -45,35 +46,23 @@ services:
       - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD
       - WATCHTOWER_NOTIFICATION_EMAIL_DELAY
 
-  netdata:
-    image: netdata/netdata:latest
-    container_name: netdata
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
     restart: unless-stopped
-    hostname: netdata.$DOMAIN
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
     volumes:
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/os-release:/host/etc/os-release:ro
-    environment:
-      - DOCKER_USR=root
-      - VIRTUALIZATION
-    healthcheck:
-      test: curl -f http://netdata:19999 &> /dev/null && echo "OK" || exit 1
-      interval: 15s
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - 9100
     networks:
-      - web
-    labels:
-      caddy: netdata.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 19999}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+      - monitoring
 
   portainer:
     container_name: portainer
@@ -505,6 +494,7 @@ services:
       - ZERODHA_2FA_CODE
     networks:
       - web
+      - monitoring
 
   prometheus:
     image: prom/prometheus:latest
@@ -512,6 +502,7 @@ services:
     restart: unless-stopped
     networks:
       - web
+      - monitoring
     volumes:
       - $DATA/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -530,6 +521,7 @@ services:
     restart: unless-stopped
     networks:
       - web
+      - monitoring
     depends_on:
       - prometheus
       - caddy
