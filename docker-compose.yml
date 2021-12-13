@@ -510,8 +510,6 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     restart: unless-stopped
-    environment:
-      - PROMETHEUS_BOB_METRICS_ENDPOINT
     networks:
       - web
     volumes:

@@ -21,4 +21,4 @@ scrape_configs:
 
   - job_name: 'bob'
     static_configs:
-      - targets: ['$PROMETHEUS_BOB_METRICS_ENDPOINT']
+      - targets: ['bob:9100']
