@@ -17,4 +17,8 @@ scrape_configs:
     params:
       format: [ prometheus ]
     static_configs:
-        - targets: ['netdata:19999']
+      - targets: ['netdata:19999']
+
+  - job_name: 'bob'
+    static_configs:
+      - targets: ['$PROMETHEUS_BOB_METRICS_ENDPOINT']
