@@ -372,6 +372,7 @@ services:
       - $DATA/media/downloads:/downloads
     environment:
       - VULTR_API_KEY
+      - VULTR_MAX_SNAPSHOTS
     labels:
       com.centurylinklabs.watchtower.enable: "false"
 
