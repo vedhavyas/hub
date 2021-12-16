@@ -509,6 +509,12 @@ services:
     depends_on:
       - monies
       - caddy
+    command:
+      - '--web.enable-admin-api'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     labels:
       caddy: prometheus.$DOMAIN
       caddy.tls: $TLS_EMAIL
