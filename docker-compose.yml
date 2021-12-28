@@ -492,6 +492,7 @@ services:
       - ZERODHA_USERNAME
       - ZERODHA_PWD
       - ZERODHA_2FA_CODE
+      - LIVE_COIN_WATCH_API_KEY
     networks:
       - web
       - monitoring
