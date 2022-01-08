@@ -172,7 +172,6 @@ services:
       - $DATA/media/:/data
     environment:
       - OPENVPN_PROVIDER
-      - OPENVPN_CONFIG
       - OPENVPN_USERNAME
       - OPENVPN_PASSWORD
       - HEALTH_CHECK_HOST
