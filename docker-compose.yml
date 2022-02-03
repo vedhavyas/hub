@@ -3,7 +3,9 @@ version: '3'
 networks:
   web:
   db:
+    external: false
   monitoring:
+    external: false
   smtp:
     external: false
 
