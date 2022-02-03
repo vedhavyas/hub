@@ -338,13 +338,16 @@ services:
     depends_on:
       - redis
     environment:
-      - 'SYMFONY__ENV__DOMAIN_NAME=https://wallabag.$DOMAIN'
-      - 'SYMFONY__ENV__SERVER_NAME=My bookmarks'
-      - 'SYMFONY__ENV__FOSUSER_REGISTRATION=false'
-      - 'SYMFONY__ENV__FOSUSER_CONFIRMATION=false'
-      - 'SYMFONY__ENV__MAILER_HOST=$SMTP_HOST'
-      - 'SYMFONY__ENV__MAILER_USER=$SMTP_USERNAME'
-      - 'SYMFONY__ENV__MAILER_PASSWORD=$SMTP_PASSWORD'
+      - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.$DOMAIN
+      - SYMFONY__ENV__SERVER_NAME
+      - SYMFONY__ENV__FOSUSER_REGISTRATION
+      - SYMFONY__ENV__FOSUSER_CONFIRMATION
+      - SYMFONY__ENV__MAILER_HOST
+      - SYMFONY__ENV__MAILER_PORT
+      - SYMFONY__ENV__MAILER_AUTH_MODE
+      - SYMFONY__ENV__MAILER_ENCRYPTION
+      - SYMFONY__ENV__MAILER_USER
+      - SYMFONY__ENV__MAILER_PASSWORD
       - SYMFONY__ENV__FROM_EMAIL
     volumes:
       - '$DATA/wallabag/data:/var/www/wallabag/data'
