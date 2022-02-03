@@ -555,7 +555,9 @@ services:
     # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
     ports:
       - "25:25"    # SMTP  (explicit TLS => STARTTLS)
+      - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
       - "465:465"  # ESMTP (implicit TLS)
+      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
       - "993:993"  # IMAP4 (implicit TLS)
     volumes:
       - $DATA/mailserver/mail-data/:/var/mail/
@@ -566,11 +568,6 @@ services:
       - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.crt:/tmp/ssl/cert/public.crt:ro
       - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.key:/tmp/ssl/private/private.key:ro
     env_file: mailserver.env
-#    environment:
-#      - RELAY_HOST
-#      - RELAY_PORT
-#      - RELAY_USER
-#      - RELAY_PASSWORD
     restart: unless-stopped
     stop_grace_period: 1m
     depends_on:
