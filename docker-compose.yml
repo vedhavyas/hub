@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 
 networks:
   web:
@@ -69,6 +69,25 @@ services:
       - 9100
     networks:
       - monitoring
+
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:latest
+    volumes:
+      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+      - '/:/rootfs:ro'
+      - '/var/run:/var/run:rw'
+      - '/sys:/sys:ro'
+      - '/var/lib/docker/:/var/lib/docker:ro'
+    restart: unless-stopped
+    networks:
+      - monitoring
+    expose:
+      - 8080
+    logging:
+      options:
+        max-size: 1g
+
 
   portainer:
     container_name: portainer
