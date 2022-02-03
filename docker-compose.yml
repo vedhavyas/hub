@@ -599,37 +599,6 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.tls.key_type: rsa2048
 
-  autodiscover:
-    image: monogramm/autodiscover-email-settings:latest
-    container_name: autodiscover-$DOMAIN
-    restart: unless-stopped
-    networks:
-      - web
-    depends_on:
-      - caddy
-    environment:
-      - COMPANY_NAME=$DOMAIN
-      - SUPPORT_URL=https://autodiscover.$DOMAIN
-      - DOMAIN=$DOMAIN
-      # IMAP configuration (host mandatory to enable)
-      - IMAP_HOST=imap.$DOMAIN
-      - IMAP_PORT=993
-      - IMAP_SOCKET=SSL
-      # SMTP configuration (host mandatory to enable)
-      - SMTP_HOST=smtp.$DOMAIN
-      - SMTP_PORT=587
-      - SMTP_SOCKET=STARTTLS
-      # MobileSync/ActiveSync configuration (url mandatory to enable)
-      - MOBILESYNC_URL=https://sync.$DOMAIN
-      - MOBILESYNC_NAME=sync.$DOMAIN
-    labels:
-      caddy_0: autoconfig.$DOMAIN
-      caddy_0.tls: $TLS_EMAIL
-      caddy_0.reverse_proxy: "{{upstreams 8000}}"
-      caddy_1: autodiscover.$DOMAIN
-      caddy_1.tls: $TLS_EMAIL
-      caddy_1.reverse_proxy: "{{upstreams 8000}}"
-
 #  radicale:
 #    image: tomsquest/docker-radicale:latest
 #    container_name: radicale
