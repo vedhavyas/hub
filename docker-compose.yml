@@ -579,8 +579,8 @@ services:
       - $DATA/mailserver/mail-logs/:/var/log/mail/
       - $DATA/mailserver/config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
-      - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.crt:/etc/letsencrypt/live/mail.$DOMAIN/fullchain.pem
-      - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.key:/etc/letsencrypt/live/mail.$DOMAIN/privkey.pem
+      - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.crt:/tmp/ssl/cert/public.crt
+      - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.key:/tmp/ssl/private/private.key
     env_file: mailserver.env
     restart: unless-stopped
     stop_grace_period: 1m
