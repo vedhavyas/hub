@@ -4,6 +4,8 @@ networks:
   web:
   db:
   monitoring:
+  smtp:
+    external: false
 
 volumes:
   prometheus_data: {}
@@ -33,6 +35,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
     command: --cleanup --interval=3600
+    networks:
+      - smtp
     environment:
       - WATCHTOWER_NO_STARTUP_MESSAGE=true
       - WATCHTOWER_ROLLING_RESTART=true
@@ -90,6 +94,8 @@ services:
     networks:
       - db
       - web
+      - monitoring
+      - smtp
 
   bitwarden:
     image: vaultwarden/server:alpine
@@ -97,6 +103,7 @@ services:
     restart: unless-stopped
     networks:
       - web
+      - smtp
     volumes:
       - $DATA/bitwarden/:/data
     environment:
@@ -342,6 +349,7 @@ services:
       - '$DATA/wallabag/images:/var/www/wallabag/web/assets/images'
     networks:
       - web
+      - smtp
     healthcheck:
       test: curl -f http://wallabag:80 &> /dev/null && echo "OK" || exit 1
       interval: 5s
@@ -573,7 +581,10 @@ services:
     depends_on:
       - caddy
     networks:
-      - web
+      web:
+      smtp:
+        aliases:
+          - mail.$DOMAIN
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
