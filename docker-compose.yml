@@ -581,8 +581,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.crt:/etc/letsencrypt/live/mail.$DOMAIN/fullchain.pem
       - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN/mail.$DOMAIN.key:/etc/letsencrypt/live/mail.$DOMAIN/privkey.pem
-      - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN_1/mail.$DOMAIN_1.crt:/etc/letsencrypt/live/mail.$DOMAIN_1/fullchain.pem
-      - $DATA/caddy_data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/mail.$DOMAIN_1/mail.$DOMAIN_1.key:/etc/letsencrypt/live/mail.$DOMAIN_1/privkey.pem
     env_file: mailserver.env
     restart: unless-stopped
     stop_grace_period: 1m
@@ -597,12 +595,9 @@ services:
       - NET_ADMIN
       - SYS_PTRACE
     labels:
-      caddy_0: mail.$DOMAIN
-      caddy_0.tls: $TLS_EMAIL
-      caddy_0.tls.key_type: rsa2048
-      caddy_1: mail.$DOMAIN_1
-      caddy_1.tls: $TLS_EMAIL
-      caddy_1.tls.key_type: rsa2048
+      caddy: mail.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.tls.key_type: rsa2048
 
 #  radicale:
 #    image: tomsquest/docker-radicale:latest
