@@ -37,3 +37,16 @@
 TODO:
 - Separate openvpn/wireguard to a different container so that multiple containers can route traffic through VPN
 - Secure Docker socket proxy. It worked but needs to be specific for portainer.
+
+
+# Migration
+- Start new serv
+- Update dns records with new ip
+- Update local ssh config. add new ip under a temporary alias
+- Run the migration
+  - Setup
+  - Migrate
+  - reboot
+- Start
+  - Update the .env file with new docker ui and gid
+  - Start services
