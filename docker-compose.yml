@@ -72,7 +72,6 @@ services:
   cadvisor:
     container_name: cadvisor
     image: gcr.io/cadvisor/cadvisor:latest
-    user: $PUID:$PGID
     volumes:
       - '/var/run/docker.sock:/tmp/docker.sock:ro'
       - '/:/rootfs:ro'
