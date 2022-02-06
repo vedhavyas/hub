@@ -360,7 +360,8 @@ services:
     image: wallabag/wallabag:latest
     container_name: wallabag
     restart: unless-stopped
-    user: $PUID:$PGID
+    # https://github.com/wallabag/docker/issues/233
+    #user: $PUID:$PGID
     depends_on:
       - redis
     environment:
@@ -492,7 +493,8 @@ services:
     image: jacogr/polkadot-js-apps:latest
     container_name: polkadot_apps
     restart: unless-stopped
-    user: $PUID:$PGID
+    # looks like specific user is not set for apps
+    #user: $PUID:$PGID
     networks:
       - web
     healthcheck:
