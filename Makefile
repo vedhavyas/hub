@@ -4,12 +4,7 @@ down:
 
 up: # spin up the services
 up:
-	@if ! command -v systemd-detect-virt &> /dev/null; then\
-        docker-compose up -d --remove-orphans;\
-        exit;\
-    else\
-		VIRTUALIZATION=$(systemd-detect-virt -v) docker-compose up -d --remove-orphans;\
-	fi
+	@docker-compose up -d --remove-orphans
 
 stop: # stops the containers
 stop:

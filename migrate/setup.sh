@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-
 # this needs to run as root
-set -x
-
 apt update
 apt upgrade -y
 apt install zsh -y
@@ -30,7 +27,7 @@ echo "docker-compose installation done"
 apt autoremove
 
 # add admin and docker user and move the ssh keys
-for user in admin docker; do
+for user in docker admin; do
   echo "creating user ${user}..."
   if [ ${user} = 'docker' ]; then
     useradd -M ${user} -g ${user} -s /bin/zsh
@@ -39,12 +36,11 @@ for user in admin docker; do
     useradd -m ${user} -s /bin/zsh
      # add user to docker group
     usermod -aG docker ${user}
+    echo "${user}  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/${user}
+    cp -r /root/.ssh /home/${user}/
+    chmod 700 /home/${user}/.ssh
+    chown -R ${user}:${user} /home/${user}/.ssh
+    chown -R ${user}:${user} /home/${user}/.ssh/authorized_keys
+    chmod 600 /home/${user}/.ssh/authorized_keys
   fi
-
-  echo "${user}  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/${user}
-  cp -r /root/.ssh /home/${user}/
-  chmod 700 /home/${user}/.ssh
-  chown -R ${user}:${user} /home/${user}/.ssh
-  chown -R ${user}:${user} /home/${user}/.ssh/authorized_keys
-  chmod 600 /home/${user}/.ssh/authorized_keys
 done
