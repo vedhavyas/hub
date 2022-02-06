@@ -440,7 +440,6 @@ services:
     image: ghcr.io/linuxserver/mariadb:latest
     container_name: mariadb
     restart: unless-stopped
-    user: $PUID:$PGID
     volumes:
       - '$DATA/hackmd/db/:/config'
     environment:
