@@ -2,6 +2,7 @@ version: '3.8'
 
 networks:
   web:
+    external: true
   db:
     external: false
   monitoring:
