@@ -633,30 +633,35 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.tls.key_type: rsa2048
 
-#  radicale:
-#    image: tomsquest/docker-radicale:latest
-#    container_name: radicale
-#    init: true
-#    read_only: true
-#    networks:
-#      - web
-#    security_opt:
-#      - no-new-privileges:true
-#    cap_drop:
-#      - ALL
-#    cap_add:
-#      - SETUID
-#      - SETGID
-#      - CHOWN
-#      - KILL
-#    healthcheck:
-#      test: curl -f http://127.0.0.1:5232 || exit 1
-#      interval: 30s
-#      retries: 3
-#    restart: unless-stopped
-#    volumes:
-#      - $DATA/radicale/data:/data
-#    labels:
-#      caddy: radicale.$DOMAIN
-#      caddy.tls: $TLS_EMAIL
-#      caddy.reverse_proxy: "{{upstreams 5232}}"
+  radicale:
+    build: ./radicale
+    container_name: radicale
+    init: true
+    read_only: true
+    user: $PUID:$PGID
+    depends_on:
+      - caddy
+    networks:
+      - web
+      - smtp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - KILL
+    healthcheck:
+      test: curl -f http://127.0.0.1:5232 || exit 1
+      interval: 30s
+      retries: 3
+    restart: unless-stopped
+    volumes:
+      - $DATA/radicale/data:/data
+      - ./radicale/config:/config/config
+    labels:
+      caddy: radicale.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 5232}}"
