@@ -286,6 +286,7 @@ services:
     restart: unless-stopped
     networks:
       - web
+      - smtp
     environment:
       - PUID
       - PGID
