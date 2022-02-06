@@ -14,7 +14,6 @@ services:
     container_name: caddy
     image: lucaslorentz/caddy-docker-proxy:latest
     restart: unless-stopped
-    user: $PUID:$PGID
     networks:
       - web
     volumes:
