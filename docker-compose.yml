@@ -550,7 +550,7 @@ services:
       - web
       - monitoring
     volumes:
-      - $DATA/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - $DATA/prometheus/data:/prometheus
     depends_on:
       - monies
@@ -580,7 +580,7 @@ services:
       - prometheus
       - caddy
     volumes:
-      - $DATA/grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
       - $DATA/grafana/data/:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD
