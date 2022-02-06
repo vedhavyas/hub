@@ -458,7 +458,6 @@ services:
     image: ghcr.io/linuxserver/hedgedoc:latest
     container_name: hackmd
     restart: unless-stopped
-    user: $PUID:$PGID
     depends_on:
       - mariadb
     volumes:
