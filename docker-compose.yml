@@ -395,7 +395,6 @@ services:
     build: ./cron
     container_name: cron
     restart: unless-stopped
-    user: $PUID:$PGID
     networks:
       - web
     volumes:
