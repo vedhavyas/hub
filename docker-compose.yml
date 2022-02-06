@@ -162,7 +162,6 @@ services:
     image: flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     restart: unless-stopped
-    user: $PUID:$PGID
     networks:
       - web
     environment:
