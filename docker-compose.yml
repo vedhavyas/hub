@@ -280,30 +280,26 @@ services:
       caddy.reverse_proxy: "{{upstreams 7878}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
-  jellyfin:
-    container_name: jellyfin
-    image: linuxserver/jellyfin:nightly
-    restart: unless-stopped
+  emby:
+    image: emby/embyserver:latest
+    container_name: emby
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - GIDLIST=$PGID
+    volumes:
+      - $DATA/emby/:/config
+      - $DATA/media/:/mnt
+    depends_on:
+      - caddy
     networks:
       - web
       - smtp
-    environment:
-      - PUID
-      - PGID
-      - TZ
-    volumes:
-      - $DATA/jellyfin/:/config
-      - $DATA/media/:/data
-    depends_on:
-      - sonarr
-      - radarr
-    healthcheck:
-      test: curl -f http://jellyfin:8096 &> /dev/null && echo "OK" || exit 1
-      interval: 15s
     labels:
-      caddy: jellyfin.$DOMAIN
+      caddy: emby.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8096}}"
+    restart: unless-stopped
 
   ombi:
     image: linuxserver/ombi:latest
@@ -666,24 +662,3 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 5232}}"
       com.centurylinklabs.watchtower.enable: "false"
-
-  emby:
-    image: emby/embyserver:latest
-    container_name: emby
-    environment:
-      - UID=$PUID
-      - GID=$PGID
-      - GIDLIST=$PGID
-    volumes:
-      - $DATA/emby/:/config
-      - $DATA/media/:/mnt
-    depends_on:
-      - caddy
-    networks:
-      - web
-      - smtp
-    labels:
-      caddy: emby.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8096}}"
-    restart: unless-stopped
