@@ -666,3 +666,23 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 5232}}"
       com.centurylinklabs.watchtower.enable: "false"
+
+  emby:
+    image: emby/embyserver:latest
+    container_name: emby
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - GIDLIST=$PGID
+    volumes:
+      - $DATA/emby/:/config
+      - $DATA/media/:/mnt
+    depends_on:
+      - caddy
+    networks:
+      - web
+    labels:
+      caddy: emby.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8096}}"
+    restart: unless-stopped
