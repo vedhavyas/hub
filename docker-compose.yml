@@ -166,6 +166,27 @@ services:
       - LOG_LEVEL=info
       - CAPTCHA_SOLVER=hcaptcha-solver
 
+  trackarr:
+    container_name: trackarr
+    image: cr.hotio.dev/hotio/trackarr:nightly
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - UMASK=002
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/trackarr:/config
+    depends_on:
+      - flaresolverr
+    labels:
+      caddy: trackarr.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 7337}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
