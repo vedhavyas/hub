@@ -184,7 +184,7 @@ services:
     labels:
       caddy: prowlarr.$DOMAIN
       caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 7337}}"
+      caddy.reverse_proxy: "{{upstreams 9696}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   jackett:
