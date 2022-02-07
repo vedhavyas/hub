@@ -665,3 +665,4 @@ services:
       caddy: radicale.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 5232}}"
+      com.centurylinklabs.watchtower.enable: "false"
