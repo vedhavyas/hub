@@ -89,7 +89,6 @@ services:
       options:
         max-size: 1g
 
-
   portainer:
     container_name: portainer
     image: portainer/portainer-ce:latest
