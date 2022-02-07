@@ -3,8 +3,6 @@ version: '3.8'
 networks:
   web:
     external: false
-  db:
-    external: false
   monitoring:
     external: false
   smtp:
@@ -116,7 +114,6 @@ services:
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all
     networks:
-      - db
       - web
       - monitoring
       - smtp
@@ -432,37 +429,15 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 80}}"
 
-  mariadb:
-    image: ghcr.io/linuxserver/mariadb:latest
-    container_name: mariadb
-    restart: unless-stopped
-    volumes:
-      - '$DATA/hackmd/db/:/config'
-    environment:
-      - MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - PGID
-      - PUID
-      - TZ
-    networks:
-      - db
-
   hackmd:
     image: ghcr.io/linuxserver/hedgedoc:latest
     container_name: hackmd
     restart: unless-stopped
-    depends_on:
-      - mariadb
     volumes:
-      - '$DATA/hackmd/data/:/config'
+      - '$DATA/hackmd/config/:/config'
+      - '$DATA/hackmd/db/:/data'
     environment:
-      - DB_HOST=mariadb
-      - DB_USER
-      - DB_PASS
-      - DB_NAME
-      - DB_PORT=3306
+      - CMD_DB_DIALECT="sqlite:/data/hackmd.db"
       - PGID
       - PUID
       - TZ
@@ -475,7 +450,6 @@ services:
       - CMD_PROTOCOL_USESSL=true
       - CMD_SESSION_SECRET
     networks:
-      - db
       - web
     labels:
       caddy: hackmd.$DOMAIN
