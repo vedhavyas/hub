@@ -187,6 +187,27 @@ services:
       caddy.reverse_proxy: "{{upstreams 9696}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
+  comics:
+    container_name: comics
+    image: cr.hotio.dev/hotio/mylar3:latest
+    networks:
+      - web
+    restart: unless-stopped
+    environment:
+      - UMASK=002
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA/comics:/config
+    depends_on:
+      - flaresolverr
+    labels:
+      caddy: comics.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8090}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
