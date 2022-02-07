@@ -681,6 +681,7 @@ services:
       - caddy
     networks:
       - web
+      - smtp
     labels:
       caddy: emby.$DOMAIN
       caddy.tls: $TLS_EMAIL
