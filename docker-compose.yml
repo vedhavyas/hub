@@ -532,6 +532,7 @@ services:
       - OAUTHLIB_RELAX_TOKEN_SCOPE=0 #optional
     networks:
       - web
+      - smtp
     volumes:
       - $DATA/calibre-web:/config
       - '$DATA/media/books/calibre/Calibre Library:/books'
