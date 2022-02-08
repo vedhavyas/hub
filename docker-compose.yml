@@ -7,6 +7,8 @@ networks:
     external: false
   smtp:
     external: false
+  db:
+    external: false
 
 services:
   caddy:
@@ -700,3 +702,46 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 5232}}"
       com.centurylinklabs.watchtower.enable: "false"
+
+  mysql:
+    image: mysql:latest
+    user: $PUID:$PGID
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+    command: --default-storage-engine innodb
+    restart: unless-stopped
+    volumes:
+      - $DATA/mysql:/var/lib/mysql
+    networks:
+      - db
+    healthcheck:
+      test: mysqladmin -p$$MYSQL_ROOT_PASSWORD ping -h localhost
+      interval: 20s
+      start_period: 10s
+      timeout: 10s
+      retries: 3
+
+  kimai:
+    image: kimai/kimai2:fpm
+    environment:
+      - ADMINMAIL
+      - ADMINPASS
+      - DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE
+      - TRUSTED_HOSTS=caddy,localhost,127.0.0.1
+    depends_on:
+      - caddy
+      - mysql
+    networks:
+      - web
+      - smtp
+      - db
+    volumes:
+      - $DATA/kimai:/opt/kimai
+    restart: unless-stopped
+    labels:
+      caddy: kimai.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8001}}"
