@@ -727,12 +727,12 @@ services:
 
   kimai:
     container_name: kimai
-    image: kimai/kimai2:fpm
+    image: kimai/kimai2:apache
     environment:
       - ADMINMAIL
       - ADMINPASS
       - DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE
-      - TRUSTED_HOSTS=caddy,localhost,127.0.0.1
+      - TRUSTED_HOSTS=kimai.$DOMAIN,localhost,127.0.0.1
     depends_on:
       - caddy
       - mysql
@@ -741,7 +741,7 @@ services:
       - smtp
       - db
     volumes:
-      - $DATA/kimai:/opt/kimai
+      - $DATA/kimai:/opt/kimai/var
     restart: unless-stopped
     labels:
       caddy: kimai.$DOMAIN
