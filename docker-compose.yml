@@ -187,8 +187,8 @@ services:
       caddy.reverse_proxy: "{{upstreams 9696}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
-  comics:
-    container_name: comics
+  mylar3:
+    container_name: mylar3
     image: cr.hotio.dev/hotio/mylar3:latest
     networks:
       - web
@@ -199,15 +199,35 @@ services:
       - PGID
       - TZ
     volumes:
-      - $DATA/comics:/config
+      - $DATA/mylar3:/config
       - $DATA/media/:/data
     depends_on:
       - flaresolverr
     labels:
-      caddy: comics.$DOMAIN
+      caddy: mylar3.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8090}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
+  kavita:
+    image: kizaing/kavita:nightly
+    container_name: kavita
+    networks:
+      - web
+    volumes:
+      - $DATA/media/:/data
+      - $DATA/kavita:/kavita/config
+    restart: unless-stopped
+    healthcheck:
+       test: curl --fail http://localhost:5000 || exit 1
+       interval: 300s
+       retries: 3
+       start_period: 30s
+       timeout: 15s
+    labels:
+      caddy: kavita.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 5000}}"
 
   jackett:
     container_name: jackett
