@@ -214,6 +214,7 @@ services:
     container_name: kavita
     networks:
       - web
+      - smtp
     volumes:
       - $DATA/media/:/data
       - $DATA/kavita:/kavita/config
