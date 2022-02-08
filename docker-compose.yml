@@ -704,6 +704,7 @@ services:
       com.centurylinklabs.watchtower.enable: "false"
 
   mysql:
+    container_name: mysql
     image: mysql:latest
     user: $PUID:$PGID
     environment:
@@ -725,6 +726,7 @@ services:
       retries: 3
 
   kimai:
+    container_name: kimai
     image: kimai/kimai2:fpm
     environment:
       - ADMINMAIL
