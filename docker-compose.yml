@@ -200,6 +200,7 @@ services:
       - TZ
     volumes:
       - $DATA/comics:/config
+      - $DATA/media/:/data
     depends_on:
       - flaresolverr
     labels:
