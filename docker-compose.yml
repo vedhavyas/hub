@@ -740,8 +740,6 @@ services:
       - web
       - smtp
       - db
-    volumes:
-      - $DATA/kimai:/opt/kimai/var
     restart: unless-stopped
     labels:
       caddy: kimai.$DOMAIN
