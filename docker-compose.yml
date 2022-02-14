@@ -790,11 +790,13 @@ services:
       - postgres
       - redis
     networks:
-      - auth
-      - web
-      - smtp
-      - db
-      - monitoring
+      auth:
+        aliases:
+          - auth.$DOMAIN
+      web:
+      smtp:
+      db:
+      monitoring:
     restart: unless-stopped
     command: server
     labels:
