@@ -810,6 +810,7 @@ services:
       - $DATA/geoip/:/geoip
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      - AUTHENTIK_SECRET_KEY
       - AUTHENTIK_POSTGRESQL__HOST=postgres
       - AUTHENTIK_POSTGRESQL__NAME=authentik
       - AUTHENTIK_POSTGRESQL__USER=authentik
@@ -831,5 +832,5 @@ services:
       - $DATA/geoip/:/geoip
     environment:
       - GEOIPUPDATE_EDITION_IDS="GeoLite2-City"
-      - GEOIPUPDATE_FREQUENCY="8"
+      - GEOIPUPDATE_FREQUENCY=8
     restart: unless-stopped
