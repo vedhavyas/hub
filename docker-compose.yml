@@ -750,6 +750,8 @@ services:
     container_name: auth
     image: quay.io/keycloak/keycloak:latest
     user: $PUID:$PGID
+    volumes:
+      - $DATA/auth:/opt/keycloak
     environment:
       - KEYCLOAK_ADMIN
       - KEYCLOAK_ADMIN_PASSWORD
