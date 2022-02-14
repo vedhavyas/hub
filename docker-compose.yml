@@ -761,7 +761,6 @@ services:
   auth:
     container_name: auth-server
     image: ghcr.io/goauthentik/server:latest
-    user: $PUID:$PGID
     volumes:
       - $DATA/auth/media:/media
       - $DATA/auth/custom-templates:/templates
