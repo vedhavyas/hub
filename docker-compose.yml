@@ -791,8 +791,6 @@ services:
       - redis
     networks:
       auth:
-        aliases:
-          - auth.$DOMAIN
       web:
       smtp:
       db:
