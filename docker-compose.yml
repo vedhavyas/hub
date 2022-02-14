@@ -827,7 +827,6 @@ services:
   geoip:
     container_name: geoip
     image: maxmindinc/geoipupdate:latest
-    user: $PUID:$PGID
     volumes:
       - $DATA/geoip/:/geoip
     environment:
