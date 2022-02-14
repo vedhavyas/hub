@@ -316,7 +316,7 @@ services:
     labels:
       caddy: sonarr.$DOMAIN
       caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8989}}"
+      caddy.reverse_proxy: "{{auth 9000}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   radarr:
