@@ -771,6 +771,7 @@ services:
       - AUTHENTIK_POSTGRESQL__HOST=postgres
       - AUTHENTIK_POSTGRESQL__NAME=authentik
       - AUTHENTIK_POSTGRESQL__USER=authentik
+      - POSTGRES_PASSWORD
       - AUTHENTIK_REDIS__HOST=redis
       - AUTHENTIK_COOKIE_DOMAIN=$DOMAIN
       - AUTHENTIK_AVATARS=gravatar
@@ -812,6 +813,7 @@ services:
       - AUTHENTIK_POSTGRESQL__HOST=postgres
       - AUTHENTIK_POSTGRESQL__NAME=authentik
       - AUTHENTIK_POSTGRESQL__USER=authentik
+      - POSTGRES_PASSWORD
       - AUTHENTIK_REDIS__HOST=redis
     depends_on:
       - postgres
