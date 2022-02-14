@@ -793,10 +793,9 @@ services:
     restart: unless-stopped
     command: server
     labels:
-      caddy: auth.$DOMAIN
+      caddy: auth.$DOMAIN, sonarr.$DOMAIN
       caddy.tls: $TLS_EMAIL
-      caddy.@match.host_0: sonarr.$DOMAIN
-      caddy.reverse_proxy.@match: "{{upstreams 9000}}"
+      caddy.reverse_proxy: "{{upstreams 9000}}"
 
   auth-worker:
     container_name: auth-worker
