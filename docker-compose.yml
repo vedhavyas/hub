@@ -745,3 +745,35 @@ services:
       caddy: kimai.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8001}}"
+
+  auth:
+    container_name: auth
+    image: quay.io/keycloak/keycloak:latest
+    user: $PUID:$PGID
+    environment:
+      - KEYCLOAK_ADMIN
+      - KEYCLOAK_ADMIN_PASSWORD
+      - KC_HOSTNAME=auth.$DOMAIN
+      - KC_HTTP_ENABLED=true
+      - KC_METRICS_ENABLED=true
+      - KC_LOG_LEVEL=info
+    depends_on:
+      - caddy
+      - mysql
+    networks:
+      - web
+      - smtp
+      - db
+      - monitoring
+    restart: unless-stopped
+    command: start --db-url-host mysql:33060 --db-username $KC_DB_USERNAME --db-password $KC_DB_PASSWORD
+    healthcheck:
+      test: curl --fail http://localhost:8080/health || exit 1
+      interval: 300s
+      retries: 3
+      start_period: 30s
+      timeout: 15s
+    labels:
+      caddy: auth.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8080}}"
