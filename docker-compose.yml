@@ -413,6 +413,7 @@ services:
       - $DATA/redis/:/data
     networks:
       - web
+      - db
     command: redis-server --appendonly yes
 
   wallabag:
