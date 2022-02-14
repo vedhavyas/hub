@@ -767,6 +767,7 @@ services:
       - $DATA/auth/custom-templates:/templates
       - $DATA/geoip/:/geoip
     environment:
+      - AUTHENTIK_SECRET_KEY
       - AUTHENTIK_POSTGRESQL__HOST=postgres
       - AUTHENTIK_POSTGRESQL__NAME=authentik
       - AUTHENTIK_POSTGRESQL__USER=authentik
