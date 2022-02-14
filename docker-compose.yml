@@ -313,11 +313,6 @@ services:
     healthcheck:
       test: curl -f http://sonarr:8989 &> /dev/null && echo "OK" || exit 1
       interval: 15s
-    labels:
-      caddy: sonarr.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{auth 9000}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   radarr:
     container_name: radarr
@@ -800,7 +795,8 @@ services:
     labels:
       caddy: auth.$DOMAIN
       caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 9000}}"
+      caddy.@match.host_0: sonarr.$DOMAIN
+      caddy.reverse_proxy.@match: "{{upstreams 9000}}"
 
   auth-worker:
     container_name: auth-worker
