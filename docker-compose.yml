@@ -746,36 +746,87 @@ services:
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 8001}}"
 
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    user: $PUID:$PGID
+    environment:
+      - POSTGRES_PASSWORD
+    restart: unless-stopped
+    volumes:
+      - $DATA/postgres:/var/lib/postgresql/data
+    networks:
+      - db
+
   auth:
-    container_name: auth
-    image: quay.io/keycloak/keycloak:latest
+    container_name: auth-server
+    image: ghcr.io/goauthentik/server:latest
     user: $PUID:$PGID
     volumes:
-      - $DATA/auth:/opt/keycloak/data
+      - $DATA/auth/media:/media
+      - $DATA/auth/custom-templates:/templates
+      - $DATA/geoip/:/geoip
     environment:
-      - KEYCLOAK_ADMIN
-      - KEYCLOAK_ADMIN_PASSWORD
-      - KC_HOSTNAME=auth.$DOMAIN
-      - KC_HTTP_ENABLED=true
-      - KC_METRICS_ENABLED=true
-      - KC_LOG_LEVEL=info
+      - AUTHENTIK_POSTGRESQL__HOST=postgres
+      - AUTHENTIK_POSTGRESQL__NAME=authentik
+      - AUTHENTIK_POSTGRESQL__USER=authentik
+      - AUTHENTIK_REDIS__HOST=redis
+      - AUTHENTIK_COOKIE_DOMAIN=$DOMAIN
+      - AUTHENTIK_AVATARS=gravatar
+      - AUTHENTIK_EMAIL__HOST
+      - AUTHENTIK_EMAIL__PORT
+      - AUTHENTIK_EMAIL__USERNAME
+      - AUTHENTIK_EMAIL__PASSWORD
+      - AUTHENTIK_EMAIL__USE_TLS
+      - AUTHENTIK_EMAIL__TIMEOUT
+      - AUTHENTIK_EMAIL__FROM
     depends_on:
       - caddy
-      - mysql
+      - postgres
+      - redis
     networks:
       - web
       - smtp
       - db
       - monitoring
     restart: unless-stopped
-    command: start --db-url-host mysql:33060 --db-username $KC_DB_USERNAME --db-password $KC_DB_PASSWORD
-    healthcheck:
-      test: curl --fail http://localhost:8080/health || exit 1
-      interval: 300s
-      retries: 3
-      start_period: 30s
-      timeout: 15s
+    command: server
     labels:
       caddy: auth.$DOMAIN
       caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy.reverse_proxy: "{{upstreams 9000}}"
+
+  auth-worker:
+    container_name: auth-worker
+    image: ghcr.io/goauthentik/server:latest
+    user: root
+    volumes:
+      - $DATA/auth/backups:/backups
+      - $DATA/auth/media:/media
+      - $DATA/auth/certs:/certs
+      - $DATA/auth/custom-templates:/templates
+      - $DATA/geoip/:/geoip
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - AUTHENTIK_POSTGRESQL__HOST=postgres
+      - AUTHENTIK_POSTGRESQL__NAME=authentik
+      - AUTHENTIK_POSTGRESQL__USER=authentik
+      - AUTHENTIK_REDIS__HOST=redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - db
+    restart: unless-stopped
+    command: worker
+
+  geoip:
+    container_name: geoip
+    image: maxmindinc/geoipupdate:latest
+    user: $PUID:$PGID
+    volumes:
+      - $DATA/geoip/:/geoip
+    environment:
+      - GEOIPUPDATE_EDITION_IDS="GeoLite2-City"
+      - GEOIPUPDATE_FREQUENCY="8"
+    restart: unless-stopped
