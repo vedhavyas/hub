@@ -200,6 +200,11 @@ services:
       - $DATA/media/:/data
     depends_on:
       - flaresolverr
+    labels:
+      caddy: mylar.$DOMAIN
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 8090}}"
+      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   kavita:
     image: kizaing/kavita:nightly
@@ -570,11 +575,6 @@ services:
       - '--storage.tsdb.retention.time=180d'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
-    labels:
-      caddy: prometheus.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 9090}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   grafana:
     image: grafana/grafana-enterprise:latest
@@ -764,7 +764,7 @@ services:
     restart: unless-stopped
     command: server
     labels:
-      caddy: auth.$DOMAIN, sonarr.$DOMAIN, mylar.$DOMAIN, jackett.$DOMAIN, prowlarr.$DOMAIN, transmission.$DOMAIN, radarr.$DOMAIN
+      caddy: auth.$DOMAIN, sonarr.$DOMAIN, jackett.$DOMAIN, prowlarr.$DOMAIN, transmission.$DOMAIN, radarr.$DOMAIN, prometheus.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
