@@ -186,11 +186,6 @@ services:
       - $DATA/prowlarr:/config
     depends_on:
       - flaresolverr
-    labels:
-      caddy: prowlarr.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 9696}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   mylar3:
     container_name: mylar3
@@ -208,11 +203,6 @@ services:
       - $DATA/media/:/data
     depends_on:
       - flaresolverr
-    labels:
-      caddy: mylar3.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8090}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   kavita:
     image: kizaing/kavita:nightly
@@ -254,11 +244,6 @@ services:
     healthcheck:
       test: curl -f http://jackett:9117 &> /dev/null && echo "OK" || exit 1
       interval: 15s
-    labels:
-      caddy: jackett.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 9117}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   transmission:
     container_name: transmission
@@ -793,7 +778,7 @@ services:
     restart: unless-stopped
     command: server
     labels:
-      caddy: auth.$DOMAIN, sonarr.$DOMAIN
+      caddy: auth.$DOMAIN, sonarr.$DOMAIN, mylar3.$DOMAIN, jackett.$DOMAIN, prowlarr.$DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
