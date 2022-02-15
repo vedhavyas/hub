@@ -373,11 +373,6 @@ services:
     healthcheck:
       test: curl -f http://heimdall:80 &> /dev/null && echo "OK" || exit 1
       interval: 5s
-    labels:
-      caddy: $DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 80}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   redis:
     image: redis:latest
@@ -451,10 +446,6 @@ services:
       - $DATA/media:/data
     labels:
       com.centurylinklabs.watchtower.enable: "false"
-      caddy: webdav.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8080}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
   filebrowser:
     container_name: filebrowser
@@ -764,7 +755,7 @@ services:
     restart: unless-stopped
     command: server
     labels:
-      caddy: auth.$DOMAIN, sonarr.$DOMAIN, jackett.$DOMAIN, prowlarr.$DOMAIN, transmission.$DOMAIN, radarr.$DOMAIN, prometheus.$DOMAIN
+      caddy: auth.$DOMAIN, sonarr.$DOMAIN, jackett.$DOMAIN, prowlarr.$DOMAIN, transmission.$DOMAIN, radarr.$DOMAIN, prometheus.$DOMAIN, webdav.$DOMAIN, $DOMAIN
       caddy.tls: $TLS_EMAIL
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
