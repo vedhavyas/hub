@@ -786,6 +786,14 @@ services:
       - AUTHENTIK_POSTGRESQL__USER=authentik
       - POSTGRES_PASSWORD
       - AUTHENTIK_REDIS__HOST=redis
+      - AUTHENTIK_AVATARS=gravatar
+      - AUTHENTIK_EMAIL__HOST
+      - AUTHENTIK_EMAIL__PORT
+      - AUTHENTIK_EMAIL__USERNAME
+      - AUTHENTIK_EMAIL__PASSWORD
+      - AUTHENTIK_EMAIL__USE_TLS
+      - AUTHENTIK_EMAIL__TIMEOUT
+      - AUTHENTIK_EMAIL__FROM
     depends_on:
       - postgres
       - redis
