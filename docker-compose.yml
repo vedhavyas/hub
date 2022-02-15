@@ -791,6 +791,7 @@ services:
       - redis
     networks:
       - db
+      - smtp
     restart: unless-stopped
     command: worker
 
