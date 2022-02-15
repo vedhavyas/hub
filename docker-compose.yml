@@ -1,8 +1,6 @@
 version: '3.8'
 
 networks:
-  auth:
-    external: false
   web:
     external: false
   monitoring:
@@ -103,7 +101,6 @@ services:
       - $DATA/portainer/:/data
     networks:
       - web
-      - auth
     labels:
       caddy: portainer.$DOMAIN
       caddy.tls: $TLS_EMAIL
@@ -770,7 +767,6 @@ services:
       - postgres
       - redis
     networks:
-      auth:
       web:
       smtp:
       db:
