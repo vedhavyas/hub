@@ -814,3 +814,35 @@ services:
       - GEOIPUPDATE_ACCOUNT_ID
       - GEOIPUPDATE_LICENSE_KEY
     restart: unless-stopped
+
+  vpn:
+    image: ghcr.io/bubuntux/nordvpn:latest
+    restart: unless-stopped
+    container_name: vpn
+    cap_add:
+      - NET_ADMIN               # Required
+      - NET_RAW                 # Required
+    environment: # Review https://github.com/bubuntux/nordvpn#environment-variables
+      - USER=$NORDVPN_USER     # Required
+      - PASS=$NORDVPN_PASSWORD         # Required
+      - TECHNOLOGY=NordLynx
+      - WHITELIST=showrss.info,rarbg.to,yts.mx
+    networks:
+      - web
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
+
+  qbittorrent:
+    image: ghcr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: service:vpn
+    volumes:
+      - $DATA/media/:/data
+    environment:
+      - PUID
+      - PGID
+      - TZ
+      - WEBUI_PORT=8080
+    depends_on:
+      - vpn
+    restart: unless-stopped
