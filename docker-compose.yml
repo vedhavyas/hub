@@ -537,6 +537,7 @@ services:
     container_name: monies
     restart: unless-stopped
     user: $PUID:$PGID
+    network_mode: service:vpn #use vpn:8080 to connect
     environment:
       - ZERODHA_USERNAME
       - ZERODHA_PWD

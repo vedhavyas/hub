@@ -9,7 +9,7 @@ scrape_configs:
   - job_name: 'monies'
     scrape_interval: 5s
     static_configs:
-      - targets: ['monies:8080']
+      - targets: ['vpn:8080']
 
   - job_name: 'cloud'
     scrape_interval: 5s
