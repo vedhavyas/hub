@@ -826,7 +826,7 @@ services:
       - USER=$NORDVPN_USER     # Required
       - PASS=$NORDVPN_PASSWORD         # Required
       - TECHNOLOGY=NordLynx
-      - WHITELIST=showrss.info,rarbg.to,yts.mx
+      - ALLOW_LIST=showrss.info,rarbg.to,yts.mx
     networks:
       - web
     sysctls:
