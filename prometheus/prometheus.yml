@@ -10,6 +10,8 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['vpn:8080']
+      - labels:
+          instance: 'monies:8080'
 
   - job_name: 'cloud'
     scrape_interval: 5s
