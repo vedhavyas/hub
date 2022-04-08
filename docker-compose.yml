@@ -248,29 +248,21 @@ services:
       interval: 15s
 
   transmission:
+    image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
-    restart: unless-stopped
-    image: haugene/transmission-openvpn:latest
-    cap_add:
-      - NET_ADMIN
-    volumes:
-      - $DATA/media/:/data
+    network_mode: service:vpn
     environment:
-      - OPENVPN_PROVIDER
-      - OPENVPN_USERNAME
-      - OPENVPN_PASSWORD
-      - HEALTH_CHECK_HOST
       - PUID
       - PGID
       - TZ
+      - TRANSMISSION_WEB_HOME=/flood-for-transmission/ #optional
       - TRANSMISSION_DOWNLOAD_DIR
       - TRANSMISSION_WEB_UI
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-    networks:
-      - web
+    volumes:
+      - $DATA/media/:/data
+    depends_on:
+      - vpn
+    restart: unless-stopped
     healthcheck:
       test: curl -f https://google.com &> /dev/null && echo "OK" || exit 1
       interval: 15s
@@ -831,18 +823,3 @@ services:
       - web
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
-
-  qbittorrent:
-    image: ghcr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    network_mode: service:vpn
-    volumes:
-      - $DATA/media/:/data
-    environment:
-      - PUID
-      - PGID
-      - TZ
-      - WEBUI_PORT=8080
-    depends_on:
-      - vpn
-    restart: unless-stopped
