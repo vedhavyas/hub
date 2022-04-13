@@ -777,6 +777,7 @@ services:
       - PASS=$NORDVPN_PASSWORD         # Required
       - TECHNOLOGY=NordLynx
       - ALLOW_LIST=showrss.info,rarbg.to,yts.mx
+      - CONNECT=p2p
     networks:
       - web
     sysctls:
