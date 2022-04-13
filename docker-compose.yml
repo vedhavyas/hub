@@ -184,49 +184,6 @@ services:
     depends_on:
       - flaresolverr
 
-  mylar:
-    container_name: mylar
-    image: cr.hotio.dev/hotio/mylar3:latest
-    networks:
-      - web
-    restart: unless-stopped
-    environment:
-      - UMASK=002
-      - PUID
-      - PGID
-      - TZ
-    volumes:
-      - $DATA/mylar3:/config
-      - $DATA/media/:/data
-    depends_on:
-      - flaresolverr
-    labels:
-      caddy: mylar.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8090}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-
-  kavita:
-    image: kizaing/kavita:nightly
-    container_name: kavita
-    networks:
-      - web
-      - smtp
-    volumes:
-      - $DATA/media/:/data
-      - $DATA/kavita:/kavita/config
-    restart: unless-stopped
-    healthcheck:
-       test: curl --fail http://localhost:5000 || exit 1
-       interval: 300s
-       retries: 3
-       start_period: 30s
-       timeout: 15s
-    labels:
-      caddy: kavita.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 5000}}"
-
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
