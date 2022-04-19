@@ -221,7 +221,7 @@ services:
       - vpn
     restart: unless-stopped
     healthcheck:
-      test: curl -f https://google.com &> /dev/null && echo "OK" || exit 1
+      test: curl https://google.com &> /dev/null && echo "OK" || exit 1
       interval: 15s
 
   sonarr:
@@ -781,7 +781,7 @@ services:
     networks:
       - web
     sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1  # Recomended if using ipv4 only
+      - net.ipv6.conf.all.disable_ipv6=1  # Recommended if using ipv4 only
     healthcheck:
-      test: curl -f https://google.com &> /dev/null && echo "OK" || exit 1
+      test: curl https://google.com &> /dev/null && echo "OK" || exit 1
       interval: 15s
