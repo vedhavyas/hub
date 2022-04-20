@@ -766,16 +766,18 @@ services:
     restart: unless-stopped
 
   vpn:
-    image: ghcr.io/bubuntux/nordlynx:latest
+    image: ghcr.io/bubuntux/nordvpn:latest
     restart: unless-stopped
     container_name: vpn
     cap_add:
       - NET_ADMIN               # Required
-    environment:
-      - PRIVATE_KEY=$NORDVPN_PRIVATE_KEY
+      - NET_RAW                 # Required
+    environment: # Review https://github.com/bubuntux/nordvpn#environment-variables
+      - USER=$NORDVPN_USER     # Required
+      - PASS=$NORDVPN_PASSWORD         # Required
+      - TECHNOLOGY=OpenVPN
       - ALLOW_LIST=showrss.info,rarbg.to,yts.mx
-      - RECONNECT=43200
-      - TZ
+      - CONNECT=p2p
     networks:
       - web
     sysctls:
