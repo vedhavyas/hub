@@ -779,7 +779,10 @@ services:
       - RECONNECT=43200
       - TZ
     networks:
-      - web
+      web:
+        aliases:
+          - transmission
+          - monies
     healthcheck:
       test: curl https://google.com &> /dev/null && echo "OK" || exit 1
       interval: 15s
