@@ -768,16 +768,19 @@ services:
     restart: unless-stopped
 
   vpn:
-    image: ghcr.io/bubuntux/nordlynx:latest
+    image: qmcgaw/gluetun:latest
     restart: unless-stopped
     container_name: vpn
     cap_add:
-      - NET_ADMIN               # Required
+      - NET_ADMIN
     environment:
-      - PRIVATE_KEY=$NORDVPN_PRIVATE_KEY
-      - ALLOW_LIST=showrss.info,rarbg.to,yts.mx
-      - RECONNECT=43200
-      - TZ
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=$VPN_WIREGUARD_PRIVATE_KEY
+      - WIREGUARD_ADDRESSES=$VPN_WIREGUARD_ADDRESSES
+      - SERVER_CITIES=$VPN_WIREGUARD_CITIES
+      - OWNED_ONLY=yes
+      - FIREWALL_VPN_INPUT_PORTS=$VPN_WIREGUARD_FIRWARDED_PORT
     networks:
       web:
         aliases:
