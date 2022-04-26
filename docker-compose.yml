@@ -183,6 +183,7 @@ services:
       - $DATA/prowlarr:/config
     depends_on:
       - flaresolverr
+      - transmission
 
   jackett:
     container_name: jackett
@@ -200,6 +201,7 @@ services:
       - $DATA/media/downloads:/downloads
     depends_on:
       - flaresolverr
+      - transmission
     healthcheck:
       test: curl -f http://jackett:9117 &> /dev/null && echo "OK" || exit 1
       interval: 15s
