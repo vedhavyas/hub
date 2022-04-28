@@ -8,5 +8,7 @@ done
 echo "Done."
 
 # setup script self to run on every boot
-echo "sh $(realpath "$0")" > /etc/rc.local
-chmod +x /etc/rc.local
+crontab -l > current_jobs
+echo "@reboot $(realpath "$0")" >> current_jobs
+crontab current_jobs
+rm -rf current_jobs
