@@ -43,7 +43,7 @@ sed -i 's/.*net.ipv4.ip_forward.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf
 
 # rsyslog to create /var/log/iptables.log
-cp ./scripts/conf/15-iptables.conf /etc/rsyslog.d/
+cp "${SCRIPTS_DIR}"/conf/15-iptables.conf /etc/rsyslog.d/
 chown root:root /etc/rsyslog.d/15-iptables.conf
 systemctl restart rsyslog
 

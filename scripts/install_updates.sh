@@ -9,8 +9,8 @@ apt install -y traceroute
 
 # setup unattended upgrades
 apt install -y unattended-upgrades
-sudo cp ./scripts/conf/20auto-upgrades /etc/apt/apt.conf.d/
-sudo cp ./scripts/conf/50unattended-upgrades /etc/apt/apt.conf.d/
+sudo cp "${SCRIPTS_DIR}"/conf/20auto-upgrades /etc/apt/apt.conf.d/
+sudo cp "${SCRIPTS_DIR}"/conf/50unattended-upgrades /etc/apt/apt.conf.d/
 
 sudo systemctl stop unattended-upgrades
 sudo systemctl daemon-reload
