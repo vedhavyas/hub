@@ -29,7 +29,7 @@ echo '{
     "iptables": false
 }' > /etc/docker/daemon.json
 
-systemctl start docker
+systemctl restart docker
 
 # remove policy file to reset
 rm -f /usr/sbin/policy-rc.d
