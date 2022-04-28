@@ -3,10 +3,9 @@ set -x
 
 # Prevent launch of docker during install
 mkdir -p /usr/sbin/
-cat < /usr/sbin/policy-rc.d
-#!/bin/sh
+echo "#!/bin/sh
 exit 101
-EOF
+" > /usr/sbin/policy-rc.d
 chmod 755 /usr/sbin/policy-rc.d
 
 # install docker
