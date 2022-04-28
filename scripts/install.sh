@@ -8,7 +8,6 @@ done
 echo "Done."
 
 # setup script self to run on every boot
-crontab -l > current_jobs
-echo "@reboot $(realpath "$0")" >> current_jobs
-crontab current_jobs
-rm -rf current_jobs
+echo "@reboot $(realpath "$0")" > cron_job
+crontab cron_job
+rm -rf cron_job
