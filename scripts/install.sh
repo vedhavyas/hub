@@ -12,6 +12,8 @@ done
 echo "Done."
 
 # setup script self to run on every boot
-echo "@reboot ${script_path} &> /tmp/script.log" > cron_job
+echo "SHELL=/bin/sh
+@reboot ${script_path} &> /tmp/script.log
+# This extra line makes it a valid cron" > cron_job
 crontab cron_job
 rm -rf cron_job
