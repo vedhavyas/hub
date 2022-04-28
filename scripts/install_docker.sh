@@ -23,7 +23,7 @@ chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
 docker -v
 docker compose version
-systemctl stop docker
+mkdir -p /etc/docker
 echo '{
     "bridge": "none",
     "iptables": false
