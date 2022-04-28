@@ -13,7 +13,7 @@ ip address add 10.10.1.1/24 dev wg0 || true
 ip link set wg0 up || true
 
 # generate wireguard config if not exists
-if [[ ! -e /etc/wireguard/wg0.conf ]]; then
+if [ ! -e /etc/wireguard/wg0.conf ]; then
   SERVER_PRIV_KEY=$(wg genkey)
   SERVER_PUB_KEY=$(echo "${SERVER_PRIV_KEY}" | wg pubkey)
   SERVER_PUB_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
