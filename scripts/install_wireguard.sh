@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 
 apt install -y wireguard
 mkdir /etc/wireguard >/dev/null 2>&1

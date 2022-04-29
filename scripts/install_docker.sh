@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 set -x
 
 # Prevent launch of docker during install
