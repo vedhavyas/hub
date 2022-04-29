@@ -1,5 +1,4 @@
 #!/bin/zsh
-set -x
 
 echo "Installing updates..."
 apt update -y
@@ -15,4 +14,4 @@ sudo cp "${SCRIPTS_DIR}"/conf/50unattended-upgrades /etc/apt/apt.conf.d/
 sudo systemctl stop unattended-upgrades
 sudo systemctl daemon-reload
 sudo systemctl restart unattended-upgrades
-echo "Done"
+echo "Done."

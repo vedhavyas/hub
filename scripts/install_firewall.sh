@@ -1,5 +1,4 @@
 #!/bin/zsh
-set -x
 
 echo "Setting up firewall..."
 DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y
@@ -37,7 +36,9 @@ sed -i 's/.*net.ipv4.ip_forward.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 
 # VM Overcommit Memory
 # from https://gitlab.com/cyber5k/mistborn/-/blob/master/scripts/subinstallers/iptables.sh
-(grep -i "vm.overcommit_memory" /etc/sysctl.conf && sed -i 's/.*vm.overcommit_memory.*/vm.overcommit_memory=1/' /etc/sysctl.conf) || echo "vm.overcommit_memory=1" | tee -a /etc/sysctl.conf
+if ! (grep -iq "vm.overcommit_memory" /etc/sysctl.conf && sed -i 's/.*vm.overcommit_memory.*/vm.overcommit_memory=1/' /etc/sysctl.conf); then
+  echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
+fi
 
 # Force re-read of sysctl.conf
 sysctl -p /etc/sysctl.conf
