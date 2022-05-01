@@ -20,8 +20,8 @@ fi
 echo "Setting up docker vpn network..."
 docker network create --subnet 10.10.3.0/24 docker-vpn &> /dev/null
 dvif="br-${$(docker network inspect -f {{.Id}} docker-vpn):0:12}"
-# forward packets from this network to any network except eth0
-iptables -A FORWARD -i "${dvif}" ! -o "${eth0}" -j ACCEPT
+# forward packets from this network
+iptables -A FORWARD -i "${dvif}" -j ACCEPT
 iptables -A FORWARD -o "${dvif}" -j ACCEPT
 echo "Done."
 
@@ -47,9 +47,10 @@ wg setconf wgext /etc/wireguard/external_vpn.conf
 # masquerade all out going requests from wgext
 iptables -t nat -A POSTROUTING -o wgext -j MASQUERADE
 iptables -A FORWARD -o wgext -j ACCEPT
-# TODO how to portforward PREROUTING Dport to 10.10.3.0/24 subnet ?
-iptables -A INPUT -i wgext -m state --state=ESTABLISHED,RELATED -j ACCEPT
-iptables -A FORWARD -i wgext -m state --state=ESTABLISHED,RELATED -j ACCEPT
+# Accept any port forwards from the external vpn
+# TODO how to portforward to interface ? DNAT ?
+iptables -A INPUT -i wgext -p tcp --dport "${EXTERNAL_VPN_FORWARED_PORT}" -j ACCEPT
+iptables -A INPUT -i wgext -p udp --dport "${EXTERNAL_VPN_FORWARED_PORT}" -j ACCEPT
 
 # create a new route table that will be used to find the default route for outgoing requests
 # originated from the network. This route will be picked up instead of default whenever a packet marked with 100(0x64)
@@ -67,6 +68,7 @@ iptables -A PREROUTING -t nat -m mark --mark 100 -j CONNMARK --save-mark
 # this will restore mark from conn to packet to incoming packets. For outgoing packets mark the after first one since first one is already marked.
 iptables -A PREROUTING -t mangle -j CONNMARK --restore-mark
 # add a rule to pick the above routing table whenever a packet with 100(0x64) mark is received for prerouting
+# TODO: avoid duplicating
 ip rule add fwmark 0x64 table external
 # add default route with lower metric to new route table
 ip route add default dev wgext metric 100 table external

@@ -3,3 +3,4 @@
 /venv/
 /cron/media_cleaner_config.py
 /cron/__pycache__/
+.hub/
