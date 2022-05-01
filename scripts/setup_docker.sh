@@ -7,6 +7,7 @@ docker network create --subnet 10.10.2.0/24 docker-direct &> /dev/null
 # forward packets from this network to any network
 ddif="br-${$(sudo docker network inspect -f {{.Id}} docker-direct):0:12}"
 iptables -A FORWARD -i "${ddif}" -j ACCEPT
+iptables -A FORWARD -o "${ddif}" -j ACCEPT
 echo "Done."
 
 source "${SCRIPTS_DIR}"/../.env
@@ -21,6 +22,7 @@ docker network create --subnet 10.10.3.0/24 docker-vpn &> /dev/null
 dvif="br-${$(sudo docker network inspect -f {{.Id}} docker-vpn):0:12}"
 # forward packets from this network to any network except eth0
 iptables -A FORWARD -i "${dvif}" ! -d "${eth0}" -j ACCEPT
+iptables -A FORWARD -o "${ddif}" -j ACCEPT
 echo "Done."
 
 echo "Setting up external wireguard vpn..."
@@ -44,12 +46,10 @@ wg setconf wgext /etc/wireguard/external_vpn.conf
 
 # masquerade all out going requests from wgext
 iptables -t nat -A POSTROUTING -o wgext -j MASQUERADE
-
-# drop all the forwarding traffic originating from wgext
-# this ensure only host can initiate new connections
+iptables -A FORWARD -o wgext -j ACCEPT
 # TODO how to portforward PREROUTING Dport to 10.10.3.0/24 subnet ?
-iptables -A FORWARD -i wgext -m state --state=NEW -j DROP
-iptables -A INPUT -i wgext -m state --state=NEW -j DROP
+iptables -A INPUT -i wgext -m state --state=ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i wgext -m state --state=ESTABLISHED,RELATED -j ACCEPT
 
 # create a new route table that will be used to find the default route for outgoing requests
 # originated from the network. This route will be picked up instead of default whenever a packet marked with 100(0x64)

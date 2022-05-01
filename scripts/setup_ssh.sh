@@ -20,8 +20,9 @@ eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{prin
 iptables -A INPUT -i "${eth0}" -m state --state=ESTABLISHED,RELATED -j ACCEPT
 # accept ssh
 iptables -A INPUT -i "${eth0}" -p tcp --dport 22 -j ACCEPT
-# enable MASQUERADE on default interface
+# enable MASQUERADE on default interface for forwarding
 iptables -t nat -A POSTROUTING -o "$eth0" -j MASQUERADE
+iptables -A FORWARD -o "${eth0}" -j ACCEPT
 
 # save iptables
 iptables-save
