@@ -15,7 +15,7 @@ iptables -A INPUT -i "${eth0}" -p udp --dport 51820 -j ACCEPT
 iptables -A INPUT -i wghub -p tcp --dport 22 -j ACCEPT
 # enable forwarding from wireguard
 iptables -A FORWARD -i wghub -j ACCEPT
-iptables -A FORWARD -0 wghub -j ACCEPT
+iptables -A FORWARD -o wghub -j ACCEPT
 # save iptables
 iptables-save
 
