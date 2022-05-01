@@ -5,7 +5,7 @@ eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{prin
 systemctl stop docker
 docker network create --subnet 10.10.2.0/24 docker-direct &> /dev/null
 # forward packets from this network to any network
-ddif="br-${$(sudo docker network inspect -f {{.Id}} docker-direct):0:12}"
+ddif="br-${$(docker network inspect -f {{.Id}} docker-direct):0:12}"
 iptables -A FORWARD -i "${ddif}" -j ACCEPT
 iptables -A FORWARD -o "${ddif}" -j ACCEPT
 echo "Done."
@@ -19,10 +19,10 @@ fi
 
 echo "Setting up docker vpn network..."
 docker network create --subnet 10.10.3.0/24 docker-vpn &> /dev/null
-dvif="br-${$(sudo docker network inspect -f {{.Id}} docker-vpn):0:12}"
+dvif="br-${$(docker network inspect -f {{.Id}} docker-vpn):0:12}"
 # forward packets from this network to any network except eth0
-iptables -A FORWARD -i "${dvif}" ! -d "${eth0}" -j ACCEPT
-iptables -A FORWARD -o "${ddif}" -j ACCEPT
+iptables -A FORWARD -i "${dvif}" ! -o "${eth0}" -j ACCEPT
+iptables -A FORWARD -o "${dvif}" -j ACCEPT
 echo "Done."
 
 echo "Setting up external wireguard vpn..."
