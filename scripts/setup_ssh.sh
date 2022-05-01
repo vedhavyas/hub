@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-echo "Setting up firewall..."
+echo "Setting up Firewall and SSH..."
 DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y
 
 # flush iptables
@@ -15,11 +15,12 @@ iptables -P OUTPUT ACCEPT
 iptables -P FORWARD ACCEPT
 
 # always accept already established and related packets
-iptables -A INPUT -m state --state=ESTABLISHED,RELATED -j ACCEPT
-# accept ssh
-iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-# enable MASQUERADE on default interface
 eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
+# TODO test how wireguard is getting through. since coz wireguard connection is considered ESTABLISHED?
+iptables -A INPUT -i "${eth0}" -m state --state=ESTABLISHED,RELATED -j ACCEPT
+# accept ssh
+iptables -A INPUT -i "${eth0}" -p tcp --dport 22 -j ACCEPT
+# enable MASQUERADE on default interface
 iptables -t nat -A POSTROUTING -o "$eth0" -j MASQUERADE
 # drop everything else
 iptables -P INPUT DROP
@@ -52,5 +53,6 @@ systemctl restart rsyslog
 systemctl disable systemd-resolved.service
 systemctl stop systemd-resolved.service
 rm /etc/resolv.conf
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
+# TODO
+echo "nameserver 1.1.1.1" > /etc/resolv.conf
 echo "Done."

@@ -1,10 +1,11 @@
 #!/bin/zsh
 
-echo "Installing updates..."
+echo "Installing packages..."
 apt update -y
 apt upgrade -y
 apt install -y jq apt-transport-https ca-certificates curl software-properties-common
 apt install -y traceroute
+apt install -y wireguard qrencode
 
 # setup unattended upgrades
 apt install -y unattended-upgrades

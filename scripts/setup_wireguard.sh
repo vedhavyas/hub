@@ -1,10 +1,12 @@
 #!/bin/zsh
 
-echo "Installing wireguard..."
-apt install -y wireguard qrencode
+echo "Setting up wireguard..."
 
 # update firewall to accept wireguard on udp
-iptables -A INPUT -p udp --dport 51820 -j ACCEPT
+eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
+iptables -A INPUT -i "${eth0}" -p udp --dport 51820 -j ACCEPT
+# save iptables
+iptables-save
 
 # generate wiregaurd interface
 ip link del wghub || true
