@@ -57,7 +57,6 @@ ListenPort = $WG_HUB_PORT
 PrivateKey = $(cat wghub.key)
 EOF
     ln -sf  "$(pwd)"/wghub.conf /etc/wireguard/wghub.conf
-    sync_wg_hub_conf
 }
 
 create_new_client_conf() {
@@ -134,7 +133,7 @@ main() {
     umask 077
     test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
-    test -f /etc/wireguard/wghub.conf || create_hub_conf
+    test -f wghub.conf || create_hub_conf
     sync_wg_hub_conf
 
     CLIENT_NAME="$1"

@@ -29,6 +29,7 @@ cat > /etc/docker/daemon.json << EOF
 EOF
 
 groupadd docker
+useradd -M docker -g docker -s /bin/zsh
 usermod -aG docker docker
 systemctl restart docker
 docker system prune -a -f
