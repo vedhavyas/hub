@@ -31,7 +31,6 @@ setup )
   done
 
   # setup script self to run on every boot
-  # TODO: better name
   # sym link to init.d
   chmod +x "${script_path}"
   ln -sf  "${script_path}" /etc/init.d/hub
@@ -44,6 +43,15 @@ setup )
 wireguard )
   shift
   "${SRV_DIR}"/wireguard/wireguard.sh "$@"
+  ;;
+
+service )
+  script="${SRV_DIR}"/"${2}"/start.sh
+  if [ -e "${script}" ]; then
+    echo "Unknown service $2"
+    exit 1
+  fi
+  "${script}"
   ;;
 
 * )
