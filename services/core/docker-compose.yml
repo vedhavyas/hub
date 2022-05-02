@@ -40,7 +40,7 @@ services:
     depends_on:
       - unbound
     environment:
-      - TLS_EMAIL=$ADMIN_EMAIL
+      - ADMIN_EMAIL=$ADMIN_EMAIL
     env_file:
       - ../.env
     volumes:
@@ -48,6 +48,6 @@ services:
       - '$DATA_DIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
     labels:
       caddy: pihole.hub
-      caddy.tls: $TLS_EMAIL
+      caddy.tls: $ADMIN_EMAIL
       caddy.reverse_proxy: "{{upstreams 80}}"
 
