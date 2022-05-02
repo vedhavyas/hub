@@ -8,13 +8,13 @@ docker compose up -d
 echo "nameserver 10.10.2.2" > /etc/resolv.conf
 
 # add dns record
-dns_records="${DATA_DIR}/pihole/etc-pihole/custom.list"
-until test -f "${dns_records}"; do
+custom_records="${DATA_DIR}/pihole/etc-pihole/custom.list"
+until test -f "${custom_records}"; do
     sleep 1
 done
 
-if ! grep -iq "10.10.2.2 pihole.hub" "${dns_records}"; then
-  echo "adding pihole.hub DNS record"
-  echo "10.10.2.2 pihole.hub" >> "${dns_records}"
-fi
+cat > "${custom_records}" << EOF
+10.10.2.2 pihole.hub
+10.10.1.1 hub
+EOF
 echo "Done."
