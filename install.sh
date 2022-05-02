@@ -4,12 +4,9 @@
 echo "Setting up Hub..."
 script_path=$(realpath "$0")
 root_dir=$(dirname "${script_path}")
-# shellcheck disable=SC2034
-CONF_DIR="${root_dir}"/conf
-# shellcheck disable=SC2034
-DATA_DIR="${root_dir}"/data
-# shellcheck disable=SC2034
-SRV_DIR="${root_dir}"/services
+export CONF_DIR="${root_dir}"/conf
+export DATA_DIR="${root_dir}"/data
+export SRV_DIR="${root_dir}"/services
 
 # set up dns to cloudflare
 systemctl disable systemd-resolved.service
@@ -19,16 +16,14 @@ echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
 # install
 for arg in upgrades docker; do
-  if ! output=$("${SRV_DIR}"/"${arg}"/install.sh); then
-    echo "${output}"
+  if ! "${SRV_DIR}"/"${arg}"/install.sh; then
     exit 1
   fi
 done
 
 # start services
 for arg in ssh wireguard docker vpn dns; do
-  if ! output=$("${SRV_DIR}"/"${arg}"/start.sh); then
-    echo "${output}"
+  if ! "${SRV_DIR}"/"${arg}"/start.sh; then
     exit 1
   fi
 done
@@ -36,7 +31,6 @@ done
 # setup script self to run on every boot
 # TODO: better name
 # sym link to init.d
-
 chmod +x "${script_path}"
 ln -sf  "${script_path}" /etc/init.d/hub
 # sym link to rc level 3, start last

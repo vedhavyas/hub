@@ -1,14 +1,13 @@
 #!/bin/zsh
 
 echo "Installing packages..."
-apt update -y
-apt upgrade -y
-apt autoremove -y
-apt install -y jq apt-transport-https ca-certificates curl software-properties-common
-apt install -y traceroute
-apt install -y wireguard qrencode
-DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y
-
+apt update -y &> /dev/null
+apt upgrade -y &> /dev/null
+apt autoremove -y &> /dev/null
+apt install jq apt-transport-https ca-certificates curl software-properties-common -y &> /dev/null
+apt install traceroute -y &> /dev/null
+apt install wireguard qrencode -y &> /dev/null
+DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y &> /dev/null
 # setup unattended upgrades
 apt install -y unattended-upgrades
 sudo cp "${CONF_DIR}"/20auto-upgrades /etc/apt/apt.conf.d/
