@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 echo "Starting core services..."
+source "${SRV_DIR}"/.env
 cd "${SRV_DIR}/core"  || { echo "Core services doesn't exist"; exit 1; }
 docker compose up -d
 
