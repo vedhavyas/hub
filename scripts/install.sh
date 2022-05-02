@@ -6,6 +6,7 @@ script_path=$(realpath "$0")
 SCRIPTS_DIR=$(dirname "${script_path}")
 export SCRIPTS_DIR
 
+# install
 for arg in apt docker; do
   if ! output=$("${SCRIPTS_DIR}"/install_"${arg}".sh); then
     echo "${output}"
@@ -13,11 +14,20 @@ for arg in apt docker; do
   fi
 done
 
+# setup
 for arg in ssh wireguard docker; do
   if ! output=$("${SCRIPTS_DIR}"/setup_"${arg}".sh); then
     echo "${output}"
     exit 1
   fi
+done
+
+# start services
+for arg in base; do
+  if ! output=$("${SCRIPTS_DIR}"/start_"${arg}".sh); then
+      echo "${output}"
+      exit 1
+    fi
 done
 
 # setup script self to run on every boot

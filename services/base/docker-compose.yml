@@ -1,0 +1,33 @@
+version: "3.8"
+
+networks:
+  direct:
+    external: true
+    name: docker-direct
+  vpn:
+    external: true
+    name: docker-vpn
+
+services:
+  unbound:
+    image: mvance/unbound:latest
+    container_name: unbound
+    restart: unless-stopped
+    networks:
+      - direct
+
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    networks:
+      - direct
+    environment:
+      ADMIN_EMAIL: "postmaster@vedhavays.dev"
+      PIHOLE_DNS_: unbound
+      WEBTHEME: default-dark
+      # WEBPASSWORD: 'set a secure password here or it will be random'
+    # TODO: update volumes
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
