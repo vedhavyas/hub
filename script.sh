@@ -5,6 +5,7 @@ root_dir=$(dirname "${script_path}")
 export CONF_DIR="${root_dir}"/conf
 export DATA_DIR="${root_dir}"/data
 export SRV_DIR="${root_dir}"/services
+source "${SRV_DIR}"/.env
 
 cmd=${1:-setup}
 case $cmd in
