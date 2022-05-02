@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
     networks:
       direct:
-        - ipv4_address: 10.10.2.2
+        ipv4_address: 10.10.2.2
     depends_on:
       - unbound
     env_file:
