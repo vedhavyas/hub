@@ -6,7 +6,8 @@ export CONF_DIR="${root_dir}"/conf
 export DATA_DIR="${root_dir}"/data
 export SRV_DIR="${root_dir}"/services
 
-case $1 in
+cmd=${1:-setup}
+case $cmd in
 setup )
   # setup
   echo "Setting up Hub..."
