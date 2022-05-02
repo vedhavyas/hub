@@ -11,7 +11,8 @@ services:
     container_name: unbound
     restart: unless-stopped
     networks:
-      - direct
+      direct:
+        ipv4_address: 10.10.2.3
 
   pihole:
     image: pihole/pihole:latest
