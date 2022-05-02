@@ -6,8 +6,7 @@ set -e
 export WG_HUB_PORT=51820
 export WG_NET_ADDRESS="10.10.1."
 export WG_CLIENT_ALLOWED_IPS="0.0.0.0/0"
-# TODO
-export CLIENT_DNS="1.1.1.1"
+export CLIENT_DNS="10.10.2.2"
 
 get_ext_net_if() {
     ip route sh | awk '$1 == "default" && $2 == "via" { print $5; exit }'
@@ -127,9 +126,9 @@ create_new_client() {
 }
 
 main() {
-    WG_CONF_DIR=$(dirname "$(realpath "$0")")/.hub/wireguard/
+    WG_CONF_DIR="${DATA_DIR}"/wireguard
     mkdir -p "${WG_CONF_DIR}"
-    cd "${WG_CONF_DIR}" || { echo "Wireguard config directory doesn't exist"; exit 1; }
+    cd "${WG_CONF_DIR}" || { echo "Wireguard data directory doesn't exist"; exit 1; }
 
     # create hub if required
     umask 077

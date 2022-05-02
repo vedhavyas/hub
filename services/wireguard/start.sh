@@ -20,5 +20,5 @@ iptables -A FORWARD -o wghub -j ACCEPT
 iptables-save
 
 # generate wireguard server hub
-"${SCRIPTS_DIR}"/wireguard.sh
+"${SRV_DIR}"/wireguard/wireguard.sh
 echo "Done."

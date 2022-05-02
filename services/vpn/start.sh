@@ -1,16 +1,6 @@
 #!/bin/zsh
 
-echo "Setting up docker direct network..."
-eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
-systemctl stop docker
-docker network create --subnet 10.10.2.0/24 docker-direct &> /dev/null
-# forward packets from this network to any network
-ddif="br-${$(docker network inspect -f {{.Id}} docker-direct):0:12}"
-iptables -A FORWARD -i "${ddif}" -j ACCEPT
-iptables -A FORWARD -o "${ddif}" -j ACCEPT
-echo "Done."
-
-source "${SCRIPTS_DIR}"/../.env
+source "${SRV_DIR}"/.env
 # if external is set, then set it up as well
 EXTERNAL_VPN_ENABLED=${EXTERNAL_VPN_ENABLED:-false}
 if [[ "${EXTERNAL_VPN_ENABLED}" = "false" ]]; then
@@ -23,6 +13,8 @@ dvif="br-${$(docker network inspect -f {{.Id}} docker-vpn):0:12}"
 # forward packets from this network
 iptables -A FORWARD -i "${dvif}" -j ACCEPT
 iptables -A FORWARD -o "${dvif}" -j ACCEPT
+# accept input requests from this docker network to host
+iptables -A INPUT -i "${dvif}" -j ACCEPT
 echo "Done."
 
 echo "Setting up external wireguard vpn..."

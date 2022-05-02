@@ -1,0 +1,29 @@
+version: "3.8"
+
+networks:
+  direct:
+    external: true
+    name: docker-direct
+
+services:
+  unbound:
+    image: mvance/unbound:latest
+    container_name: unbound
+    restart: unless-stopped
+    networks:
+      - direct
+
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    networks:
+      direct:
+        - ipv4_address: 10.10.2.2
+    depends_on:
+      - unbound
+    env_file:
+      - ../.env
+    volumes:
+      - '$DATA_DIR/pihole/etc-pihole:/etc/pihole'
+      - '$DATA_DIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'

@@ -28,6 +28,8 @@ cat > /etc/docker/daemon.json << EOF
 }
 EOF
 
+groupadd docker
+usermod -aG docker docker
 systemctl restart docker
 docker system prune -a -f
 
