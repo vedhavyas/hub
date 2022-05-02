@@ -1,0 +1,51 @@
+version: "3.8"
+
+networks:
+  docker-direct:
+    external: true
+  docker-vpn:
+    external: true
+
+services:
+  caddy:
+    container_name: caddy
+    image: lucaslorentz/caddy-docker-proxy:latest
+    restart: unless-stopped
+    environment:
+      - CADDY_INGRESS_NETWORKS=docker-direct,docker-vpn
+    networks:
+      docker-direct:
+        - ipv4_address: 10.10.2.4
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $DATA_DIR/caddy_data/:/data
+    labels:
+      caddy.email: internal
+
+  unbound:
+    container_name: unbound
+    image: mvance/unbound:latest
+    restart: unless-stopped
+    networks:
+      docker-direct:
+        ipv4_address: 10.10.2.3
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    networks:
+      docker-direct:
+        ipv4_address: 10.10.2.2
+    depends_on:
+      - unbound
+    env_file:
+      - ../.env
+    volumes:
+      - '$DATA_DIR/pihole/etc-pihole:/etc/pihole'
+      - '$DATA_DIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+    labels:
+      caddy: pihole.hub
+      caddy.tls: $TLS_EMAIL
+      caddy.reverse_proxy: "{{upstreams 80}}"
+

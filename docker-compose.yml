@@ -11,22 +11,6 @@ networks:
     external: false
 
 services:
-  caddy:
-    container_name: caddy
-    image: lucaslorentz/caddy-docker-proxy:latest
-    restart: unless-stopped
-    environment:
-      - CADDY_INGRESS_NETWORKS=my-cloud_web
-    networks:
-      - web
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - $DATA/caddy_data/:/data
-    labels:
-      caddy.email: $ADMIN_EMAIL
-    ports:
-      - "80:80"
-      - "443:443"
 
   watchtower:
     container_name: watchtower

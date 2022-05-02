@@ -25,7 +25,7 @@ setup )
   done
 
   # start services
-  for arg in ssh wireguard docker vpn dns; do
+  for arg in ssh wireguard docker vpn core; do
     if ! "${SRV_DIR}"/"${arg}"/start.sh; then
       exit 1
     fi
