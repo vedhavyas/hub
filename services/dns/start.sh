@@ -9,7 +9,7 @@ echo "nameserver 10.10.2.2" > /etc/resolv.conf
 
 # add dns record
 dns_records="${DATA_DIR}/pihole/etc-pihole/custom.list"
-until [ -e "${dns_records}" ]; do
+until test -f "${dns_records}"; do
     sleep 1
 done
 

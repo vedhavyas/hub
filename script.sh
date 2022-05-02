@@ -47,10 +47,7 @@ wireguard )
 
 service )
   script="${SRV_DIR}"/"${2}"/start.sh
-  if [ -e "${script}" ]; then
-    echo "Unknown service $2"
-    exit 1
-  fi
+  test -f "${script}" || { echo "Unknown service $2"; exit 1; }
   "${script}"
   ;;
 
