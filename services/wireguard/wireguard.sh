@@ -59,6 +59,12 @@ EOF
     ln -sf  "$(pwd)"/wghub.conf /etc/wireguard/wghub.conf
 }
 
+create_post_up_script() {
+    echo "No postup scripts. creating one!"
+    touch post_up.sh
+    chmod +x post_up.sh
+}
+
 create_new_client_conf() {
     SEQNO="$1"
     CLIENT_NAME="$2"
@@ -134,6 +140,7 @@ main() {
     test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
     test -f wghub.conf || create_hub_conf
+    test -f post_up.sh || create_post_up_script
     sync_wg_hub_conf
 
     CLIENT_NAME="$1"
@@ -154,16 +161,21 @@ main() {
     # sync wireguard hub
     sync_wg_hub_conf
 
-#    case $2 in
-#    dev)
-#      case $3 in
-#      external)
-#        iptables -t nat -I PREROUTING 1 -s $WG_NET_ADDRESS$SEQNO ! -d 10.10.0.0/16 -j MARK --set-mark 100
-#        ;;
-#      esac
-#
-#      ;;
-#    esac
+    case $2 in
+    gateway)
+      # we only have one external vpn,
+      # so forward requests to it.
+      # marking any requests bound to this vpn needs to be marked with 100
+      # rest of the requests wont be marked
+      # if already present, ignore it
+      if ! grep -Fq "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 100" post_up.sh; then
+        echo "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 100" >> post_up.sh
+        iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}"${SEQNO}" ! -d 10.10.0.0/16 -j MARK --set-mark 100
+      fi
+
+      # TODO for ip, need to create a new route table with different mark
+      ;;
+    esac
 }
 
 main "$1"
