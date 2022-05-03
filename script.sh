@@ -9,7 +9,9 @@ source "${SRV_DIR}"/.env
 
 cmd=${1:-setup}
 case $cmd in
-setup )
+# start is called by the systemd service
+# Todo
+setup|start )
   # setup
   echo "Setting up Hub..."
   # set up dns to cloudflare
