@@ -10,11 +10,11 @@ chmod 755 /usr/sbin/policy-rc.d
 
 echo "Installing docker and compose..."
 # install docker
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-apt update -y
-apt-cache policy docker-ce # this ensures that docker is installed from the docker repo instead of ubuntu repo
-apt install docker-ce -y
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - &> /dev/null
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" &> /dev/null
+apt update -y &> /dev/null
+apt-cache policy docker-ce &> /dev/null # this ensures that docker is installed from the docker repo instead of ubuntu repo
+apt install docker-ce -y &> /dev/null
 
 # install docker-compose
 curl -s -L "https://github.com/docker/compose/releases/download/$(curl -s -L https://api.github.com/repos/docker/compose/releases/latest | jq -r '.name')/docker-compose-$(uname -s)-$(uname -m)" -o /usr/libexec/docker/cli-plugins/docker-compose
