@@ -154,16 +154,16 @@ main() {
     # sync wireguard hub
     sync_wg_hub_conf
 
-    case $2 in
-    dev)
-      case $3 in
-      external)
-        iptables -t nat -I PREROUTING 1 -s $WG_NET_ADDRESS$SEQNO ! -d 10.10.0.0/16 -j MARK --set-mark 100
-        ;;
-      esac
-
-      ;;
-    esac
+#    case $2 in
+#    dev)
+#      case $3 in
+#      external)
+#        iptables -t nat -I PREROUTING 1 -s $WG_NET_ADDRESS$SEQNO ! -d 10.10.0.0/16 -j MARK --set-mark 100
+#        ;;
+#      esac
+#
+#      ;;
+#    esac
 }
 
 main "$1"
