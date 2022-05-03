@@ -33,6 +33,9 @@ useradd -M docker -g docker -s /bin/zsh
 usermod -aG docker docker
 systemctl restart docker
 systemctl restart docker.socket
+#prune system
+docker stop "$(docker ps -aq)"
+docker system prune -a -f
 
 # remove policy file to reset
 rm -f /usr/sbin/policy-rc.d
