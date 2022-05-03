@@ -18,8 +18,8 @@ services:
       - TRANSMISSION_WEB_UI=flood-for-transmission
       - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
     expose:
-      - "51413"
-      - "51413/udp"
+      - "58419:51413"
+      - "58419:51413/udp"
     volumes:
       - ${DATA_DIR}/transmission:/config
       - $DATA_DIR/media/:/data
