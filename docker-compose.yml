@@ -12,29 +12,6 @@ networks:
 
 services:
 
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower:latest
-    restart: unless-stopped
-    user: $PUID:$PGID
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/localtime:/etc/localtime:ro
-    command: --cleanup --interval=3600
-    networks:
-      - smtp
-    environment:
-      - WATCHTOWER_NO_STARTUP_MESSAGE=true
-      - WATCHTOWER_ROLLING_RESTART=true
-      - WATCHTOWER_NOTIFICATIONS_LEVEL
-      - WATCHTOWER_NOTIFICATIONS=email
-      - WATCHTOWER_NOTIFICATION_EMAIL_FROM
-      - WATCHTOWER_NOTIFICATION_EMAIL_TO
-      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER
-      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT
-      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER
-      - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD
-      - WATCHTOWER_NOTIFICATION_EMAIL_DELAY
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -73,36 +50,7 @@ services:
       options:
         max-size: 1g
 
-  portainer:
-    container_name: portainer
-    image: portainer/portainer-ce:latest
-    restart: unless-stopped
-    user: $PUID:$PGID
-    command: -H unix:///var/run/docker.sock --admin-password=$PORTAINER_ADMIN_PASSWORD
-    volumes:
-      # ensure docker.sock is available for PGID group
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - $DATA/portainer/:/data
-    networks:
-      - web
-    labels:
-      caddy: portainer.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 9000}}"
 
-  autoheal:
-    container_name: autoheal
-    image: willfarrell/autoheal:latest
-    restart: unless-stopped
-    user: $PUID:$PGID
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - AUTOHEAL_CONTAINER_LABEL=all
-    networks:
-      - web
-      - monitoring
-      - smtp
 
   bitwarden:
     image: vaultwarden/server:alpine

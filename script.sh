@@ -6,6 +6,10 @@ export CONF_DIR="${root_dir}"/conf
 export DATA_DIR="${root_dir}"/data
 export SRV_DIR="${root_dir}"/services
 source "${SRV_DIR}"/.env
+PUID=$(id -u docker)
+PGID=$(id -g docker)
+export PUID
+export PGID
 
 cmd=${1:-setup}
 case $cmd in
@@ -28,7 +32,7 @@ setup|start )
   done
 
   # start services
-  for arg in ssh wireguard docker vpn core; do
+  for arg in ssh wireguard docker vpn core maintenance; do
     if ! "${SRV_DIR}"/"${arg}"/start.sh; then
       exit 1
     fi

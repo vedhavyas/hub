@@ -1,0 +1,49 @@
+version: '3.8'
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower:latest
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    command: --cleanup --interval=3600
+    networks:
+      - docker-direct
+    env_file:
+      - .env
+      - ../.env
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    user: $PUID:$PGID
+    command: -H unix:///var/run/docker.sock --admin-password=$PORTAINER_ADMIN_PASSWORD
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - docker-direct
+    labels:
+      caddy: portainer.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9000}}"
+
+
+  autoheal:
+    container_name: autoheal
+    image: willfarrell/autoheal:latest
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL
+    networks:
+      - docker-direct
