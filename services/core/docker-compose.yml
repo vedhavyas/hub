@@ -48,5 +48,6 @@ services:
     labels:
       caddy: pihole.hub
       caddy.tls: internal
+      caddy.redir: / /admin
       caddy.reverse_proxy: "{{upstreams 80}}"
 
