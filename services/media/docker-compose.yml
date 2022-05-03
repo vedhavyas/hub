@@ -21,6 +21,7 @@ services:
       - "58419"
       - "58419/udp"
     volumes:
+      - ${DATA_DIR}/transmission:/config
       - $DATA_DIR/media/:/data
     networks:
       docker-vpn:
