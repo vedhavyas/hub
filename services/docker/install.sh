@@ -32,6 +32,7 @@ groupadd docker
 useradd -M docker -g docker -s /bin/zsh
 usermod -aG docker docker
 systemctl restart docker
+docker stop "$(docker container ls -q)"
 docker system prune -a -f
 
 # remove policy file to reset
