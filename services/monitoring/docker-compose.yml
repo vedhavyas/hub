@@ -64,7 +64,7 @@ services:
     networks:
       - docker-direct
     volumes:
-      - $CONF_DIR/grafana_datasource.yml:/etc/grafana/provisioning/
+      - $CONF_DIR/grafana_datasource.yml:/etc/grafana/provisioning/datasource.yml
       - $DATA_DIR/grafana/data/:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD
