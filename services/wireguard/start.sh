@@ -16,9 +16,11 @@ iptables -A INPUT -i wghub -p tcp --dport 22 -j ACCEPT
 # enable forwarding from wireguard
 iptables -A FORWARD -i wghub -j ACCEPT
 iptables -A FORWARD -o wghub -j ACCEPT
-# save iptables
-iptables-save
 
 # generate wireguard server hub
 "${SRV_DIR}"/wireguard/wireguard.sh
+# add postup iptable rules if any
+"${DATA_DIR}"/wireguard/post_up.sh
+# save iptables
+iptables-save
 echo "Done."
