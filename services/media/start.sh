@@ -18,13 +18,13 @@ if [[ "${EXTERNAL_VPN}" = "" ]]; then
 fi
 
 # wait for transmission to come up
-wait-for-it -t 60 10.10.3.2:9091
+wait-for-it -t 60 10.10.3.100:9091
 VPN_FORWARDED_PORT="${EXTERNAL_VPN:u}_VPN_FORWARDED_PORT"
 
 # Accept any port forwards from the external vpn
 inf=wg_${EXTERNAL_VPN}
-iptables -t nat -A PREROUTING -i "${inf}" -p tcp --dport "${(P)VPN_FORWARDED_PORT}" -j DNAT --to 10.10.3.2:"${(P)VPN_FORWARDED_PORT}"
-#iptables -t nat -A PREROUTING -i "${inf}" -p udp --dport "${(P)VPN_FORWARDED_PORT}" -j DNAT --to 10.10.3.2:"${(P)VPN_FORWARDED_PORT}"
+iptables -t nat -A PREROUTING -i "${inf}" -p tcp --dport "${(P)VPN_FORWARDED_PORT}" -j DNAT --to 10.10.3.100:"${(P)VPN_FORWARDED_PORT}"
+iptables -t nat -A PREROUTING -i "${inf}" -p udp --dport "${(P)VPN_FORWARDED_PORT}" -j DNAT --to 10.10.3.100:"${(P)VPN_FORWARDED_PORT}"
 
 echo "Done."
 

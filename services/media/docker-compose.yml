@@ -5,6 +5,31 @@ networks:
     external: true
 
 services:
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+      - TRANSMISSION_WEB_HOME=/flood-for-transmission/ #optional
+      # pick what you like from here - https://haugene.github.io/docker-transmission-openvpn/config-options/
+      - TRANSMISSION_WEB_UI=flood-for-transmission
+      - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
+    volumes:
+      - $DATA_DIR/media/:/data
+    networks:
+      docker-vpn:
+        ipv4_address: 10.10.3.100
+    healthcheck:
+      test: curl https://google.com &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: transmission.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9091}}"
+
   flaresolverr:
     image: flaresolverr/flaresolverr:latest
     container_name: flaresolverr
@@ -54,31 +79,6 @@ services:
       caddy: jackett.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9117}}"
-
-  transmission:
-    image: lscr.io/linuxserver/transmission:latest
-    container_name: transmission
-    restart: unless-stopped
-    environment:
-      - PUID
-      - PGID
-      - TZ
-      - TRANSMISSION_WEB_HOME=/flood-for-transmission/ #optional
-      # pick what you like from here - https://haugene.github.io/docker-transmission-openvpn/config-options/
-      - TRANSMISSION_WEB_UI=flood-for-transmission
-      - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
-    volumes:
-      - $DATA_DIR/media/:/data
-    networks:
-      docker-vpn:
-        ipv4_address: 10.10.3.2
-    healthcheck:
-      test: curl https://google.com &> /dev/null && echo "OK" || exit 1
-      interval: 15s
-    labels:
-      caddy: transmission.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 9091}}"
 
   sonarr:
     container_name: sonarr
