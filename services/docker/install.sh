@@ -34,7 +34,7 @@ usermod -aG docker docker
 systemctl restart docker
 systemctl restart docker.socket
 #prune system
-docker stop "$(docker ps -aq)"
+docker ps -aq | xargs docker stop
 docker system prune -a -f
 
 # remove policy file to reset
