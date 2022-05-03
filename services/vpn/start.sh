@@ -8,7 +8,7 @@ if [[ "${EXTERNAL_VPN}" = "" ]]; then
 fi
 
 echo "Setting up ${EXTERNAL_VPN} vpn network..."
-docker network create --subnet 10.10.3.0/24 docker-vpn &> /dev/null
+docker network create --subnet 10.10.3.0/24 --ip-range 10.10.3.128/25 docker-vpn &> /dev/null
 dvif="br-${$(docker network inspect -f {{.Id}} docker-vpn):0:12}"
 # forward packets from this network
 iptables -A FORWARD -i "${dvif}" -j ACCEPT
