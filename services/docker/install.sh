@@ -32,6 +32,7 @@ groupadd docker
 useradd -M docker -g docker -s /bin/zsh
 usermod -aG docker docker
 systemctl restart docker
+systemctl restart docker.socket
 docker stop "$(docker container ls -q)"
 docker system prune -a -f
 
