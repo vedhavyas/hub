@@ -8,6 +8,7 @@ export SRV_DIR="${root_dir}"/services
 source "${SRV_DIR}"/.env
 PUID=$(id -u docker)
 PGID=$(id -g docker)
+export TZ=UTC
 export PUID
 export PGID
 

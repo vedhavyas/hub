@@ -1,0 +1,163 @@
+version: '3.8'
+
+networks:
+  docker-vpn:
+    external: true
+
+services:
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    networks:
+      - docker-vpn
+    environment:
+      - LOG_LEVEL=info
+      - CAPTCHA_SOLVER=hcaptcha-solver
+
+  prowlarr:
+    container_name: prowlarr
+    image: cr.hotio.dev/hotio/prowlarr:nightly
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    environment:
+      - UMASK=002
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA_DIR/prowlarr:/config
+    labels:
+      caddy: prowlarr.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9696}}"
+
+  jackett:
+    container_name: jackett
+    image: linuxserver/jackett:latest
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA_DIR/jackett:/config
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA_DIR/media/downloads:/downloads
+    healthcheck:
+      test: curl -f http://jackett:9117 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: jackett.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9117}}"
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+      - TRANSMISSION_WEB_HOME=/flood-for-transmission/ #optional
+      # pick what you like from here - https://haugene.github.io/docker-transmission-openvpn/config-options/
+      - TRANSMISSION_WEB_UI=flood-for-transmission
+      - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
+    volumes:
+      - $DATA_DIR/media/:/data
+    networks:
+      docker-vpn:
+        ipv4_address: 10.10.3.2
+    healthcheck:
+      test: curl https://google.com &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: transmission.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 9091}}"
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA_DIR/sonarr/:/config
+      - $DATA_DIR/media/:/data
+    healthcheck:
+      test: curl -f http://sonarr:8989 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: sonarr.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8989}}"
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA_DIR/radarr/:/config
+      - $DATA_DIR/media/:/data
+    healthcheck:
+      test: curl -f http://radarr:7878 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: radarr.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 7878}}"
+
+  emby:
+    image: emby/embyserver:latest
+    container_name: emby
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - GIDLIST=$PGID
+    volumes:
+      - $DATA_DIR/emby/:/config
+      - $DATA_DIR/media/:/mnt
+    networks:
+      - docker-vpn
+    labels:
+      caddy: emby.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8096}}"
+    restart: unless-stopped
+
+  ombi:
+    image: linuxserver/ombi:latest
+    container_name: ombi
+    networks:
+      - docker-vpn
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA_DIR/ombi/:/config
+    healthcheck:
+      test: curl -f http://ombi:3579 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    restart: unless-stopped
+    labels:
+      caddy: ombi.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3579}}"

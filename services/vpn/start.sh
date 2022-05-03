@@ -21,7 +21,6 @@ VPN_PRIVATE_KEY="${EXTERNAL_VPN:u}_VPN_PRIVATE_KEY"
 VPN_PEER_PUBLIC_KEY="${EXTERNAL_VPN:u}_VPN_PEER_PUBLIC_KEY"
 VPN_PEER_ENDPOINT="${EXTERNAL_VPN:u}_VPN_PEER_ENDPOINT"
 VPN_ADDRESS="${EXTERNAL_VPN:u}_VPN_ADDRESS"
-VPN_FORWARDED_PORT="${EXTERNAL_VPN:u}_VPN_FORWARDED_PORT"
 
 cat > /etc/wireguard/"${EXTERNAL_VPN}".conf << EOF
 [Interface]
@@ -45,10 +44,6 @@ wg setconf "${inf}" /etc/wireguard/"${EXTERNAL_VPN}".conf
 # masquerade all out going requests from vpn interface
 iptables -t nat -A POSTROUTING -o "${inf}" -j MASQUERADE
 iptables -A FORWARD -o "${inf}" -j ACCEPT
-# Accept any port forwards from the external vpn
-# TODO how to portforward to interface ? DNAT ?
-iptables -A INPUT -i "${inf}" -p tcp --dport "${(P)VPN_FORWARDED_PORT}" -j ACCEPT
-iptables -A INPUT -i "${inf}" -p udp --dport "${(P)VPN_FORWARDED_PORT}" -j ACCEPT
 
 # create a new route table that will be used to find the default route for outgoing requests
 # originated from the network. This route will be picked up instead of default whenever a packet marked with 100(0x64)
