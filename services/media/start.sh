@@ -20,7 +20,7 @@ fi
 # wait for transmission to come up
 wait-for-it -t 60 10.10.3.100:9091
 VPN_FORWARDED_PORT="${EXTERNAL_VPN:u}_VPN_FORWARDED_PORT"
-wait-for-it -t 60 10.10.3.100:"${(P)VPN_FORWARDED_PORT}"
+wait-for-it -t 60 10.10.3.100:51413
 
 # Accept any port forwards from the external vpn
 inf=wg_${EXTERNAL_VPN}
