@@ -7,6 +7,7 @@ apt autoremove -y &> /dev/null
 apt install jq apt-transport-https ca-certificates curl software-properties-common -y &> /dev/null
 apt install traceroute -y &> /dev/null
 apt install wireguard qrencode -y &> /dev/null
+apt install wait-for-it -y &> /dev/null
 DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y &> /dev/null
 # setup unattended upgrades
 apt install -y unattended-upgrades

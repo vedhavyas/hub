@@ -8,9 +8,7 @@ docker compose up -d
 echo "nameserver 10.10.2.2" > /etc/resolv.conf
 
 # wait until dns starts
-until test -f "${DATA_DIR}"/pihole/etc-dnsmasq.d/01-pihole.conf; do
-    sleep 1
-done
+wait-for-it -t 60 10.10.2.2:53
 
 # add dns record for caddy reverse proxy
 custom_records="${DATA_DIR}/pihole/etc-dnsmasq.d/03-hub-dns.conf"
