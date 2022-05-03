@@ -24,6 +24,7 @@ services:
     container_name: portainer
     image: portainer/portainer-ce:latest
     restart: unless-stopped
+    # https://github.com/portainer/portainer/issues/3092
     command: -H unix:///var/run/docker.sock
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
