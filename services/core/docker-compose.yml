@@ -20,7 +20,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DATA_DIR/caddy_data/:/data
     labels:
-      caddy.email: internal
+      caddy.local_certs:
 
   unbound:
     container_name: unbound
@@ -39,8 +39,6 @@ services:
         ipv4_address: 10.10.2.2
     depends_on:
       - unbound
-    environment:
-      - ADMIN_EMAIL=$ADMIN_EMAIL
     env_file:
       - ../.env
     volumes:
@@ -48,6 +46,6 @@ services:
       - '$DATA_DIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
     labels:
       caddy: pihole.hub
-      caddy.tls: $ADMIN_EMAIL
-      caddy.reverse_proxy: "{{upstreams 80}}"
+      caddy.tls: internal
+      caddy.reverse_proxy: {{upstreams 80}}
 
