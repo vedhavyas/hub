@@ -24,6 +24,7 @@ services:
     container_name: portainer
     image: portainer/portainer-ce:latest
     restart: unless-stopped
+    user: $PUID:$PGID
     # https://github.com/portainer/portainer/issues/3092
     command: -H unix:///var/run/docker.sock
     volumes:
