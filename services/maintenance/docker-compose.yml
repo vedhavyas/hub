@@ -25,7 +25,6 @@ services:
     image: portainer/portainer-ce:latest
     restart: unless-stopped
     user: $PUID:$PGID
-    privileged: true
     command: -H unix:///var/run/docker.sock --admin-password=$PORTAINER_ADMIN_PASSWORD
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -43,6 +42,7 @@ services:
     user: $PUID:$PGID
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer:/data:z
     environment:
       - AUTOHEAL_CONTAINER_LABEL
     networks:
