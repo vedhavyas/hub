@@ -60,6 +60,15 @@ service )
   "${script}"
   ;;
 
+log )
+  case ${2} in
+  tail)
+    tail -f /var/log/syslog | grep hub
+    ;;
+  * )
+    < /var/log/syslog grep hub
+  esac
+  ;;
 * )
   echo "Unknown command $1"
   ;;
