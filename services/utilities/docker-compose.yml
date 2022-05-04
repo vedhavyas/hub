@@ -50,7 +50,7 @@ services:
     restart: unless-stopped
     volumes:
       - '$DATA_DIR/media:/srv'
-      - '$DATA_DIR/filebrowser/:/'
+      - '$DATA_DIR/filebrowser/filebrowser.db:/database.db'
     networks:
       - docker-direct
     user: $PUID:$PGID
