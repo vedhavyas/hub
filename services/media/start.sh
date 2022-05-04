@@ -17,7 +17,7 @@ if [[ "${EXTERNAL_VPN}" != "" ]]; then
 fi
 
 cd "${SRV_DIR}/media"  || { echo "Media services doesn't exist"; exit 1; }
-docker compose up -d
+docker compose up -d --quiet-pull
 
 if [ -z "${PEER_PORT}" ]; then
   echo "Done."

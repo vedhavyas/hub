@@ -2,7 +2,7 @@
 
 echo "Starting core services..."
 cd "${SRV_DIR}/core"  || { echo "Core services doesn't exist"; exit 1; }
-docker compose up -d
+docker compose up -d --quiet-pull
 
 # update resolve.conf with pihole container address
 echo "nameserver 10.10.2.2" > /etc/resolv.conf
