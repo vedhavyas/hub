@@ -37,14 +37,3 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
-  autoheal:
-    container_name: autoheal
-    image: willfarrell/autoheal:latest
-    restart: unless-stopped
-    user: $PUID:$PGID
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - AUTOHEAL_CONTAINER_LABEL
-    networks:
-      - docker-direct
