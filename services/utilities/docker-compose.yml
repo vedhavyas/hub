@@ -14,6 +14,8 @@ services:
       - docker-direct
     volumes:
       - $DATA_DIR/bitwarden/:/data
+    env_file:
+      - ../.env
     environment:
       - WEBSOCKET_ENABLED
       - DOMAIN=https://bitwarden.hub
@@ -76,6 +78,8 @@ services:
     #user: $PUID:$PGID
     depends_on:
       - redis
+    env_file:
+      - ../.env
     environment:
       - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.hub
       - SYMFONY__ENV__SERVER_NAME
@@ -109,6 +113,8 @@ services:
     volumes:
       - '$DATA_DIR/hackmd/config/:/config'
       - '$DATA_DIR/hackmd/db/:/data'
+    env_file:
+      - ../.env
     environment:
       - CMD_DB_DIALECT="sqlite:/data/hackmd.db"
       - PGID
@@ -153,11 +159,12 @@ services:
     container_name: mysql
     image: mysql:latest
     user: $PUID:$PGID
+    env_file:
+      - ../.env
     environment:
       - MYSQL_DATABASE
       - MYSQL_USER
       - MYSQL_PASSWORD
-      - MYSQL_ROOT_PASSWORD
     command: --default-storage-engine innodb
     restart: unless-stopped
     volumes:
@@ -174,9 +181,9 @@ services:
   kimai:
     container_name: kimai
     image: kimai/kimai2:apache
+    env_file:
+      - ../.env
     environment:
-      - ADMINMAIL
-      - ADMINPASS
       - DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE
       - TRUSTED_HOSTS=kimai.hub,localhost,127.0.0.1
     depends_on:
