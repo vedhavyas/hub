@@ -3,7 +3,7 @@
 echo "Starting media services..."
 for i in prowlarr jackett media sonarr radarr emby ombi; do
   mkdir -p "${DATA_DIR}"/${i}
-  chown -R docker:docker "${DATA_DIR}"/${i}/*
+  chown docker:docker "${DATA_DIR}"/${i}
 done
 
 source "${SRV_DIR}"/.env

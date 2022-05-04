@@ -17,43 +17,7 @@ services:
 
 
 
-  bitwarden:
-    image: vaultwarden/server:alpine
-    container_name: bitwarden
-    restart: unless-stopped
-    user: $PUID:$PGID
-    networks:
-      - web
-      - smtp
-    volumes:
-      - $DATA/bitwarden/:/data
-    environment:
-      - WEBSOCKET_ENABLED
-      - DOMAIN=https://bitwarden.$DOMAIN
-      - SIGNUPS_ALLOWED
-      - ADMIN_TOKEN
-      - SIGNUPS_VERIFY
-      - INVITATIONS_ALLOWED
-      - SMTP_HOST
-      - SMTP_FROM
-      - SMTP_FROM_NAME
-      - SMTP_PORT
-      - SMTP_SSL
-      - SMTP_USERNAME
-      - SMTP_PASSWORD
-    healthcheck:
-      test: curl -f http://bitwarden:80 &> /dev/null && echo "OK" || exit 1
-      interval: 5s
-    labels:
-      caddy: bitwarden.$DOMAIN
-      caddy.reverse_proxy_0: "{{upstreams 80}}"
-      caddy.tls: $TLS_EMAIL
-      caddy.encode: gzip
-      caddy.header.X-XSS-Protection: '"1; mode=block;"'
-      caddy.header.X-Frame-Options: "DENY"
-      caddy.header.X-Content-Type-Options: "none"
-      caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
-      caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
+
 
 
 
@@ -78,52 +42,7 @@ services:
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
-  redis:
-    image: redis:latest
-    container_name: redis
-    restart: unless-stopped
-    user: $PUID:$PGID
-    volumes:
-      - $DATA/redis/:/data
-    networks:
-      - web
-      - db
-    command: redis-server --appendonly yes
 
-  wallabag:
-    image: wallabag/wallabag:latest
-    container_name: wallabag
-    restart: unless-stopped
-    # https://github.com/wallabag/docker/issues/233
-    #user: $PUID:$PGID
-    depends_on:
-      - redis
-    environment:
-      - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.$DOMAIN
-      - SYMFONY__ENV__SERVER_NAME
-      - SYMFONY__ENV__FOSUSER_REGISTRATION
-      - SYMFONY__ENV__FOSUSER_CONFIRMATION
-      - SYMFONY__ENV__MAILER_HOST
-      - SYMFONY__ENV__MAILER_PORT
-      - SYMFONY__ENV__MAILER_AUTH_MODE
-      - SYMFONY__ENV__MAILER_ENCRYPTION
-      - SYMFONY__ENV__MAILER_USER
-      - SYMFONY__ENV__MAILER_PASSWORD
-      - SYMFONY__ENV__FROM_EMAIL
-      - SYMFONY__ENV__TWOFACTOR_SENDER
-    volumes:
-      - '$DATA/wallabag/data:/var/www/wallabag/data'
-      - '$DATA/wallabag/images:/var/www/wallabag/web/assets/images'
-    networks:
-      - web
-      - smtp
-    healthcheck:
-      test: curl -f http://wallabag:80 &> /dev/null && echo "OK" || exit 1
-      interval: 5s
-    labels:
-      caddy: wallabag.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 80}}"
 
   cron:
     build: ./cron
@@ -155,68 +74,10 @@ services:
       caddy.reverse_proxy: "{{upstreams 8080}}"
       caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
 
-  filebrowser:
-    container_name: filebrowser
-    image: filebrowser/filebrowser:v2
-    restart: unless-stopped
-    volumes:
-      - '$DATA/media:/srv'
-      - '$DATA/filebrowser/filebrowser.db:/database.db'
-    networks:
-      - web
-    user: $PUID:$PGID
-    labels:
-      caddy: drive.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 80}}"
 
-  hackmd:
-    image: ghcr.io/linuxserver/hedgedoc:latest
-    container_name: hackmd
-    restart: unless-stopped
-    volumes:
-      - '$DATA/hackmd/config/:/config'
-      - '$DATA/hackmd/db/:/data'
-    environment:
-      - CMD_DB_DIALECT="sqlite:/data/hackmd.db"
-      - PGID
-      - PUID
-      - TZ
-      - CMD_ALLOW_ANONYMOUS=false
-      - CMD_ALLOW_EMAIL_REGISTER=false
-      - CMD_DOMAIN=hackmd.$DOMAIN
-      - CMD_CSP_ALLOW_FRAMING=false
-      - CMD_CSP_ALLOW_PDF_EMBED=false
-      - CMD_USESSL=false
-      - CMD_PROTOCOL_USESSL=true
-      - CMD_SESSION_SECRET
-    networks:
-      - web
-    labels:
-      caddy: hackmd.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 3000}}"
 
-  polkadot_apps:
-    image: jacogr/polkadot-js-apps:latest
-    container_name: polkadot_apps
-    restart: unless-stopped
-    # looks like specific user is not set for apps
-    #user: $PUID:$PGID
-    networks:
-      - web
-    healthcheck:
-      test: curl -f http://polkadot_apps:80 &> /dev/null && echo "OK" || exit 1
-      interval: 5s
-    depends_on:
-      - caddy
-    labels:
-      caddy_0: cfg.$DOMAIN
-      caddy_0.tls: $TLS_EMAIL
-      caddy_0.reverse_proxy: "{{upstreams 80}}"
-      caddy_1: air.$DOMAIN
-      caddy_1.tls: $TLS_EMAIL
-      caddy_1.reverse_proxy: "{{upstreams 80}}"
+
+
 
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
@@ -336,48 +197,9 @@ services:
       caddy.reverse_proxy: "{{upstreams 5232}}"
       com.centurylinklabs.watchtower.enable: "false"
 
-  mysql:
-    container_name: mysql
-    image: mysql:latest
-    user: $PUID:$PGID
-    environment:
-      - MYSQL_DATABASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_ROOT_PASSWORD
-    command: --default-storage-engine innodb
-    restart: unless-stopped
-    volumes:
-      - $DATA/mysql:/var/lib/mysql
-    networks:
-      - db
-    healthcheck:
-      test: mysqladmin -p$$MYSQL_ROOT_PASSWORD ping -h localhost
-      interval: 20s
-      start_period: 10s
-      timeout: 10s
-      retries: 3
 
-  kimai:
-    container_name: kimai
-    image: kimai/kimai2:apache
-    environment:
-      - ADMINMAIL
-      - ADMINPASS
-      - DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE
-      - TRUSTED_HOSTS=kimai.$DOMAIN,localhost,127.0.0.1
-    depends_on:
-      - caddy
-      - mysql
-    networks:
-      - web
-      - smtp
-      - db
-    restart: unless-stopped
-    labels:
-      caddy: kimai.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8001}}"
+
+
 
   postgres:
     container_name: postgres

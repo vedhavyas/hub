@@ -33,7 +33,7 @@ setup|start )
   done
 
   # start services
-  for arg in ssh wireguard docker vpn core maintenance monitoring media; do
+  for arg in ssh wireguard docker vpn core maintenance monitoring media utilities; do
     if ! "${SRV_DIR}"/"${arg}"/start.sh; then
       exit 1
     fi
