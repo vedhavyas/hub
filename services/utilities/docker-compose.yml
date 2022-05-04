@@ -169,6 +169,8 @@ services:
     restart: unless-stopped
     volumes:
       - $DATA_DIR/mysql:/var/lib/mysql
+    cap_add:
+      - SYS_NICE
     networks:
       - docker-direct
     healthcheck:
