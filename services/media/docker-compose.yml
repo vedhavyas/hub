@@ -18,6 +18,7 @@ services:
       - TRANSMISSION_WEB_UI=flood-for-transmission
       - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
       - CURL_CA_BUNDLE=/certs/ca-certificates.crt
+      - PEERPORT
     volumes:
       - /etc/ssl/certs:/certs
       - ${DATA_DIR}/transmission:/config
