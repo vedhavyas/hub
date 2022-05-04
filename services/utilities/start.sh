@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 echo "Starting utility services..."
+source "${SRV_DIR}"/.env
 for i in bitwarden filebrowser redis wallabag hackmd mysql; do
   mkdir -p "${DATA_DIR}"/${i}
   chown docker:docker "${DATA_DIR}"/${i}
