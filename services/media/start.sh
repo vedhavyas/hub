@@ -8,6 +8,8 @@ done
 
 source "${SRV_DIR}"/.env
 EXTERNAL_VPN=${EXTERNAL_VPN:-}
+HOST_IP=$(curl https://icanhazip.com)
+export HOST_IP
 export PEER_PORT=
 if [[ "${EXTERNAL_VPN}" != "" ]]; then
   VPN_FORWARDED_PORT="${EXTERNAL_VPN:u}_VPN_FORWARDED_PORT"

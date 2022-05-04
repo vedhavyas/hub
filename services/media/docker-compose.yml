@@ -27,7 +27,7 @@ services:
       docker-vpn:
         ipv4_address: 10.10.3.100
     healthcheck:
-      test: curl https://google.com &> /dev/null && echo "OK" || exit 1
+      test: if [ $(curl https://icanhazip.com) != ${HOST_IP} ]; then echo "OK"; else exit 1; fi
       interval: 15s
     labels:
       caddy: transmission.hub
