@@ -17,8 +17,9 @@ services:
       # pick what you like from here - https://haugene.github.io/docker-transmission-openvpn/config-options/
       - TRANSMISSION_WEB_UI=flood-for-transmission
       - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
-      - CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+      - CURL_CA_BUNDLE=/certs/ca-certificates.crt
     volumes:
+      - /etc/ssl/certs:/certs
       - ${DATA_DIR}/transmission:/config
       - $DATA_DIR/media/:/data
     networks:
