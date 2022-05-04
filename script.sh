@@ -15,7 +15,6 @@ export PGID
 cmd=${1:-setup}
 case $cmd in
 # start is called by the systemd service
-# Todo
 setup|start )
   # setup
   echo "Setting up Hub..."
@@ -31,9 +30,12 @@ setup|start )
       exit 1
     fi
   done
-
+  all=(ssh wireguard docker vpn core maintenance monitoring media utilities)
+  base=(ssh wireguard docker vpn)
+  services=${2:-all}
   # start services
-  for arg in ssh wireguard docker vpn core maintenance monitoring media utilities; do
+  echo "Starting ${services}..."
+  for arg in ${(P)services[*]}; do
     if ! "${SRV_DIR}"/"${arg}"/start.sh; then
       exit 1
     fi
