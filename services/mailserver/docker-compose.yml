@@ -27,6 +27,8 @@ services:
       - $DATA_DIR/mailserver/mail-logs/:/var/log/mail/
       - $DATA_DIR/mailserver/config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MAIL_SERVER_DOMAIN
     env_file:
       - mailserver.env
       - ../.env
