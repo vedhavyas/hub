@@ -1,11 +1,8 @@
 version: '3.8'
 
 networks:
-  docker-direct:
-    external: true
-  default:
+  docker-vpn:
     # https://chris.heald.me/2018/docker-default-routes/
-    name: docker-vpn
     external: true
 
 services:
@@ -15,7 +12,7 @@ services:
     restart: unless-stopped
     user: $PUID:$PGID
     networks:
-      - docker-direct
+      - docker-vpn
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -37,7 +34,7 @@ services:
       - '/var/lib/docker/:/var/lib/docker:ro'
     restart: unless-stopped
     networks:
-      - docker-direct
+      - docker-vpn
     logging:
       options:
         max-size: 1g
@@ -48,7 +45,7 @@ services:
     restart: unless-stopped
     user: $PUID:$PGID
     networks:
-      - docker-direct
+      - docker-vpn
     volumes:
       - $CONF_DIR/prometheus.yml:/etc/prometheus/prometheus.yml
       - $DATA_DIR/prometheus/data:/prometheus
@@ -66,7 +63,7 @@ services:
     restart: unless-stopped
     user: $PUID:$PGID
     networks:
-      - docker-direct
+      - docker-vpn
     volumes:
       - $CONF_DIR/grafana_datasource.yml:/etc/grafana/provisioning/datasource.yml
       - $DATA_DIR/grafana/data/:/var/lib/grafana
@@ -86,8 +83,5 @@ services:
     env_file:
       - ../.env
     networks:
-      default:
-        priority: 101 # attach to this network before the direct network
-      docker-direct:
-        priority: 100
+      - docker-vpn
 
