@@ -3,7 +3,7 @@ global:
   evaluation_interval: 10s # By default, scrape targets every 15 seconds.
 
   external_labels:
-    monitor: 'Cloud dashboard'
+    monitor: 'Hub dashboard'
 
 scrape_configs:
   - job_name: 'monies'
@@ -11,7 +11,7 @@ scrape_configs:
     static_configs:
       - targets: ['monies:8080']
 
-  - job_name: 'cloud'
+  - job_name: 'hub'
     scrape_interval: 5s
     static_configs:
       - targets: ['node-exporter:9100', 'cadvisor:8080']
