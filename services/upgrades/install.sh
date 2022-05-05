@@ -17,4 +17,7 @@ sudo cp "${CONF_DIR}"/50unattended-upgrades /etc/apt/apt.conf.d/
 sudo systemctl stop unattended-upgrades
 sudo systemctl daemon-reload
 sudo systemctl restart unattended-upgrades
+
+# install ohmyzsh
+runuser -l admin -c 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
 echo "Done."

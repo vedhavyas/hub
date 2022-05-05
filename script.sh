@@ -56,6 +56,11 @@ wireguard )
   "${SRV_DIR}"/wireguard/wireguard.sh "$@"
   ;;
 
+migrate )
+  shift
+  "${SRV_DIR}"/migrate/migrate.sh "$@"
+  ;;
+
 service )
   script="${SRV_DIR}"/"${2}"/start.sh
   test -f "${script}" || { echo "Unknown service $2"; exit 1; }
