@@ -7,6 +7,7 @@ for i in mailserver radicale; do
 done
 
 source "${SRV_DIR}"/.env
+export MAILSERVER_DOMAIN
 cd "${SRV_DIR}/mailserver"  || { echo "Mail server services doesn't exist"; exit 1; }
 docker compose up -d --quiet-pull --remove-orphans
 
