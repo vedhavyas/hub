@@ -81,6 +81,11 @@ log )
     < /var/log/syslog grep hub
   esac
   ;;
+
+certbot )
+  "${SRV_DIR}"/mailserver/certbot.sh
+  ;;
+
 * )
   echo "Unknown command $1"
   ;;
