@@ -197,3 +197,17 @@ services:
       caddy: kimai.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8001}}"
+
+  webdav:
+    container_name: webdav
+    image: vedhavyas/webdav:latest
+    restart: unless-stopped
+    user: $PUID:$PGID
+    networks:
+      - docker-direct
+    volumes:
+      - $DATA_DIR/media:/data
+    labels:
+      caddy: webdav.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"

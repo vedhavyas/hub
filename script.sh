@@ -51,14 +51,9 @@ setup|start )
   echo "Hub installation completed."
   ;;
 
-wireguard )
+wireguard|migrate )
   shift
-  "${SRV_DIR}"/wireguard/wireguard.sh "$@"
-  ;;
-
-migrate )
-  shift
-  "${SRV_DIR}"/migrate/migrate.sh "$@"
+  "${SRV_DIR}/${1}/${1}.sh" "$@"
   ;;
 
 service )

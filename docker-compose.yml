@@ -58,21 +58,7 @@ services:
     labels:
       com.centurylinklabs.watchtower.enable: "false"
 
-  webdav:
-    build: ./webdav
-    container_name: webdav
-    restart: unless-stopped
-    user: $PUID:$PGID
-    networks:
-      - web
-    volumes:
-      - $DATA/media:/data
-    labels:
-      com.centurylinklabs.watchtower.enable: "false"
-      caddy: webdav.$DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 8080}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
+
 
 
 
