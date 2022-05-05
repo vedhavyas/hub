@@ -3,6 +3,8 @@ version: '3.8'
 networks:
   docker-direct:
     external: true
+  docker-vpn:
+    external: true
 
 services:
   node-exporter:
@@ -73,3 +75,17 @@ services:
       caddy: grafana.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+
+  monies:
+    image: vedhavyas/monies:latest
+    container_name: monies
+    restart: unless-stopped
+    user: $PUID:$PGID
+    env_file:
+      - ../.env
+    networks:
+      docker-vpn:
+        priority: 101 # attach to this network before the direct network
+      docker-direct:
+        priority: 100
+
