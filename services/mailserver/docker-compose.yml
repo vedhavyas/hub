@@ -1,0 +1,70 @@
+version: '3.8'
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  mailserver:
+    image: mailserver/docker-mailserver:latest
+    container_name: mailserver
+    # If the FQDN for your mail-server is only two labels (eg: example.com),
+    # you can assign this entirely to `hostname` and remove `domainname`.
+    hostname: mail
+    domainname: $MAIL_SERVER_DOMAIN
+    # More information about the mail-server ports:
+    # https://docker-mailserver.github.io/docker-mailserver/edge/config/security/understanding-the-ports/
+    # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
+    # ports:
+    #  - "25:25"    # SMTP  (explicit TLS => STARTTLS)
+    #  - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
+    #  - "465:465"  # ESMTP (implicit TLS)
+    #  - "587:587"  # ESMTP (explicit TLS => STARTTLS)
+    #  - "993:993"  # IMAP4 (implicit TLS)
+    volumes:
+      - $DATA_DIR/mailserver/mail-data/:/var/mail/
+      - $DATA_DIR/mailserver/mail-state/:/var/mail-state/
+      - $DATA_DIR/mailserver/mail-logs/:/var/log/mail/
+      - $DATA_DIR/mailserver/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+    env_file: mailserver.env
+    restart: unless-stopped
+    stop_grace_period: 1m
+    networks:
+      docker-direct:
+        ipv4_address: 10.10.2.254
+        aliases:
+          - mail.$MAIL_SERVER_DOMAIN
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+
+  radicale:
+    image: vedhavyas/radicale:latest
+    container_name: radicale
+    init: true
+    read_only: true
+    user: $PUID:$PGID
+    networks:
+      - docker-direct
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - KILL
+    healthcheck:
+      test: curl -f http://127.0.0.1:5232 || exit 1
+      interval: 30s
+      retries: 3
+    restart: unless-stopped
+    volumes:
+      - $DATA_DIR/radicale/data:/data
+      - $CONF_DIR/radicale_config:/config/config
+    labels:
+      caddy: radicale.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5232}}"

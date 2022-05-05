@@ -30,8 +30,9 @@ setup|start )
       exit 1
     fi
   done
-  all=(ssh wireguard docker vpn core maintenance monitoring media utilities)
+  all=(ssh wireguard docker vpn core maintenance monitoring media utilities mailserver)
   base=(ssh wireguard docker vpn)
+  rest=(core maintenance monitoring media utilities mailserver)
   services=${2:-all}
   # start services
   echo "Starting ${services}..."
@@ -54,6 +55,11 @@ setup|start )
 wireguard|migrate )
   shift
   "${SRV_DIR}/${1}/${1}.sh" "$@"
+  ;;
+
+mailserver )
+  shift
+  docker exec -it mailserver setup "${@}"
   ;;
 
 service )

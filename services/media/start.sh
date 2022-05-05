@@ -30,6 +30,7 @@ wait-for-it -t 60 10.10.3.100:"${PEER_PORT}"
 
 # port forward host to transmission
 inf=wg_${EXTERNAL_VPN}
+# set the mark so that right route table is picked
 iptables -t nat -I PREROUTING -i "${inf}" -j MARK --set-mark 100
 iptables -t nat -A PREROUTING -i "${inf}" -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.100:"${PEER_PORT}"
 
