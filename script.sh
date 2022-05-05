@@ -75,10 +75,10 @@ service )
 log )
   case ${2} in
   tail)
-    tail -f /var/log/syslog | grep hub
+    tail -f /var/log/syslog | grep "hub hub"
     ;;
   * )
-    < /var/log/syslog grep hub
+    < /var/log/syslog grep "hub hub"
   esac
   ;;
 
