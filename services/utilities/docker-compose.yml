@@ -1,0 +1,213 @@
+version: '3.8'
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  bitwarden:
+    image: vaultwarden/server:alpine
+    container_name: bitwarden
+    restart: unless-stopped
+    user: $PUID:$PGID
+    networks:
+      - docker-direct
+    volumes:
+      - $DATA_DIR/bitwarden/:/data
+    env_file:
+      - ../.env
+    environment:
+      - WEBSOCKET_ENABLED
+      - DOMAIN=https://bitwarden.hub
+      - SIGNUPS_ALLOWED
+      - ADMIN_TOKEN
+      - SIGNUPS_VERIFY
+      - INVITATIONS_ALLOWED
+      - SMTP_HOST
+      - SMTP_FROM
+      - SMTP_FROM_NAME
+      - SMTP_PORT
+      - SMTP_SSL
+      - SMTP_USERNAME
+      - SMTP_PASSWORD
+    healthcheck:
+      test: curl -f http://bitwarden:80 &> /dev/null && echo "OK" || exit 1
+      interval: 5s
+    labels:
+      caddy: bitwarden.hub
+      caddy.reverse_proxy_0: "{{upstreams 80}}"
+      caddy.tls: internal
+      caddy.encode: gzip
+      caddy.header.X-XSS-Protection: '"1; mode=block;"'
+      caddy.header.X-Frame-Options: "DENY"
+      caddy.header.X-Content-Type-Options: "none"
+      caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
+      caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
+
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser:v2
+    restart: unless-stopped
+    volumes:
+      - '$DATA_DIR/media:/srv'
+      - '$DATA_DIR/filebrowser/filebrowser.db:/database.db'
+    networks:
+      - docker-direct
+    user: $PUID:$PGID
+    labels:
+      caddy: drive.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - $DATA_DIR/redis/:/data
+    networks:
+      - docker-direct
+    command: redis-server --appendonly yes
+
+  wallabag:
+    image: wallabag/wallabag:latest
+    container_name: wallabag
+    restart: unless-stopped
+    # https://github.com/wallabag/docker/issues/233
+    #user: $PUID:$PGID
+    depends_on:
+      - redis
+    env_file:
+      - ../.env
+    environment:
+      - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.hub
+      - SYMFONY__ENV__SERVER_NAME
+      - SYMFONY__ENV__FOSUSER_REGISTRATION
+      - SYMFONY__ENV__FOSUSER_CONFIRMATION
+      - SYMFONY__ENV__MAILER_HOST
+      - SYMFONY__ENV__MAILER_PORT
+      - SYMFONY__ENV__MAILER_AUTH_MODE
+      - SYMFONY__ENV__MAILER_ENCRYPTION
+      - SYMFONY__ENV__MAILER_USER
+      - SYMFONY__ENV__MAILER_PASSWORD
+      - SYMFONY__ENV__FROM_EMAIL
+      - SYMFONY__ENV__TWOFACTOR_SENDER
+    volumes:
+      - '$DATA_DIR/wallabag/data:/var/www/wallabag/data'
+      - '$DATA_DIR/wallabag/images:/var/www/wallabag/web/assets/images'
+    networks:
+      - docker-direct
+    healthcheck:
+      test: curl -f http://wallabag:80 &> /dev/null && echo "OK" || exit 1
+      interval: 5s
+    labels:
+      caddy: wallabag.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"
+
+  hackmd:
+    image: ghcr.io/linuxserver/hedgedoc:latest
+    container_name: hackmd
+    restart: unless-stopped
+    volumes:
+      - '$DATA_DIR/hackmd/config/:/config'
+      - '$DATA_DIR/hackmd/db/:/data'
+    env_file:
+      - ../.env
+    environment:
+      - CMD_DB_DIALECT="sqlite:/data/hackmd.db"
+      - PGID
+      - PUID
+      - TZ
+      - CMD_ALLOW_ANONYMOUS=false
+      - CMD_ALLOW_EMAIL_REGISTER=false
+      - CMD_DOMAIN=hackmd.hub
+      - CMD_CSP_ALLOW_FRAMING=false
+      - CMD_CSP_ALLOW_PDF_EMBED=false
+      - CMD_USESSL=false
+      - CMD_PROTOCOL_USESSL=true
+      - CMD_SESSION_SECRET
+    networks:
+      - docker-direct
+    labels:
+      caddy: hackmd.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+  polkadot_apps:
+    # TODO migrate browser state
+    image: jacogr/polkadot-js-apps:latest
+    container_name: polkadot_apps
+    restart: unless-stopped
+    # looks like specific user is not set for apps
+    #user: $PUID:$PGID
+    networks:
+      - docker-direct
+    healthcheck:
+      test: curl -f http://polkadot_apps:80 &> /dev/null && echo "OK" || exit 1
+      interval: 5s
+    labels:
+      caddy_0: cfg.hub
+      caddy_0.tls: internal
+      caddy_0.reverse_proxy: "{{upstreams 80}}"
+      caddy_1: air.hub
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 80}}"
+
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    user: $PUID:$PGID
+    env_file:
+      - ../.env
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    command: --default-storage-engine innodb
+    restart: unless-stopped
+    volumes:
+      - $DATA_DIR/mysql:/var/lib/mysql
+    cap_add:
+      - SYS_NICE
+    networks:
+      - docker-direct
+    healthcheck:
+      test: mysqladmin -p$$MYSQL_ROOT_PASSWORD ping -h localhost
+      interval: 20s
+      start_period: 10s
+      timeout: 10s
+      retries: 3
+
+  kimai:
+    container_name: kimai
+    image: kimai/kimai2:apache
+    env_file:
+      - ../.env
+    environment:
+      - DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE
+      - TRUSTED_HOSTS=kimai.hub,localhost,127.0.0.1
+    depends_on:
+      - mysql
+    networks:
+      - docker-direct
+    restart: unless-stopped
+    labels:
+      caddy: kimai.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8001}}"
+
+  webdav:
+    container_name: webdav
+    image: vedhavyas/webdav:latest
+    restart: unless-stopped
+    user: $PUID:$PGID
+    networks:
+      - docker-direct
+    volumes:
+      - $DATA_DIR/media:/data
+    labels:
+      caddy: webdav.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"

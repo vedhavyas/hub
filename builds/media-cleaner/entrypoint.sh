@@ -9,7 +9,6 @@ echo "SHELL=/bin/bash
 BASH_ENV=/container.env
 0 */1 * * * /media_cleaner.py > /proc/1/fd/1 2>/proc/1/fd/2
 0 */1 * * * /download_cleaner.sh > /proc/1/fd/1 2>/proc/1/fd/2
-# 0 0 * * * /create_vultr_snapshot > /proc/1/fd/1 2>/proc/1/fd/2
 # This extra line makes it a valid cron" > scheduler.txt
 
 crontab scheduler.txt
