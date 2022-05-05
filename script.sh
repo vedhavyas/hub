@@ -56,8 +56,9 @@ setup|start )
   ;;
 
 wireguard|migrate )
+  cmd=$1
   shift
-  "${SRV_DIR}/${1}/${1}.sh" "$@"
+  "${SRV_DIR}/${cmd}/${cmd}.sh" "$@"
   ;;
 
 mailserver )
