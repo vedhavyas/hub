@@ -27,7 +27,9 @@ services:
       - $DATA_DIR/mailserver/mail-logs/:/var/log/mail/
       - $DATA_DIR/mailserver/config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
-    env_file: mailserver.env
+    env_file:
+      - mailserver.env
+      - ../.env
     restart: unless-stopped
     stop_grace_period: 1m
     networks:
