@@ -31,7 +31,7 @@ EOF
 groupadd docker
 useradd -M docker -g docker -s /bin/zsh
 usermod -aG docker docker
-chown +x docker:docker "${DATA_DIR}"
+chown docker:docker "${DATA_DIR}"
 systemctl restart docker
 systemctl restart docker.socket
 #prune system
