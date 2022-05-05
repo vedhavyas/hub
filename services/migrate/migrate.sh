@@ -10,12 +10,12 @@ HUB_NEW_SSH=${HUB_NEW_SSH:-hub}
 case ${1} in
 "")
   echo "Full data sync between machines..."
-  ssh -t admin@"$HUB_OLD_SSH" 'rsync -varlpogEtP /home/admin/my-cloud/'${HUB_OLD_DATA_DIR}/'  root@"'${HUB_NEW_SSH}'":/home/admin/my-cloud/'${HUB_NEW_DATA_DIR}'' || exit 1
+  ssh -t admin@"$HUB_OLD_SSH" 'rsync -varlpogEtP /home/admin/my-cloud/'${HUB_OLD_DATA_DIR}/'  root@"'${HUB_NEW_SSH}'":/home/admin/hub/'${HUB_NEW_DATA_DIR}'' || exit 1
   echo "Done..."
   ;;
 *)
   echo "Syncing ${1} between machines... "
-  ssh -t admin@"$HUB_OLD_SSH" 'rsync -varlpogEtP /home/admin/my-cloud/'${HUB_OLD_DATA_DIR}/${1}/'  root@"'${HUB_NEW_SSH}'":/home/admin/my-cloud/'${HUB_NEW_DATA_DIR}/${1}'' || exit 1
+  ssh -t admin@"$HUB_OLD_SSH" 'rsync -varlpogEtP /home/admin/my-cloud/'${HUB_OLD_DATA_DIR}/${1}/'  root@"'${HUB_NEW_SSH}'":/home/admin/hub/'${HUB_NEW_DATA_DIR}/${1}'' || exit 1
   ;;
 esac
 

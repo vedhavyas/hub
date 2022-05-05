@@ -4,8 +4,11 @@ script_path=$(realpath "$0")
 root_dir=$(dirname "${script_path}")
 export CONF_DIR="${root_dir}"/conf
 export DATA_DIR="${root_dir}"/data
+mkdir -p "${DATA_DIR}"
 export SRV_DIR="${root_dir}"/services
 source "${SRV_DIR}"/.env
+# TODO: setup wont work for all services at a time sice docker user may be created by the docker service
+# so start base and then rest
 PUID=$(id -u docker)
 PGID=$(id -g docker)
 export TZ=UTC
