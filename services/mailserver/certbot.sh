@@ -14,7 +14,7 @@ docker run -it --rm --name certbot \
             --ip 10.10.2.253 \
             -v "${DATA_DIR}/certbot/certs:/etc/letsencrypt" \
             -v "${DATA_DIR}/certbot/logs:/var/log/letsencrypt" \
-            certbot/certbot certonly --standalone -d "${MAIL_SERVER_DOMAIN}" -m "${MAIL_SERVER_DOMAIN_EMAIL}"
+            certbot/certbot certonly --standalone -d mail."${MAIL_SERVER_DOMAIN}" -m "${MAIL_SERVER_DOMAIN_EMAIL}" --agree-tos
 
 for port in ${ports[*]} ; do
   iptables -t nat -D PREROUTING -i "${eth0}" -p tcp --dport "${port}" -j DNAT --to 10.10.2.253:"${port}"
