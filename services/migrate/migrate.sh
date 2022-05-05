@@ -5,7 +5,7 @@ HUB_NEW_DATA_DIR=${HUB_NEW_DATA_DIR:-data}
 HUB_OLD_SSH=${HUB_OLD_SSH:-cloud}
 # this should resolve to public ip of the host
 # all need root password
-HUB_NEW_SSH=${HUB_NEW_SSH:-"65.20.99.221"}
+HUB_NEW_SSH=${HUB_NEW_SSH:-hub}
 
 case ${1} in
 "")
