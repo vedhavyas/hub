@@ -27,6 +27,7 @@ services:
       - $DATA_DIR/mailserver/mail-logs/:/var/log/mail/
       - $DATA_DIR/mailserver/config/:/tmp/docker-mailserver/
       - /etc/localtime:/etc/localtime:ro
+      - ${DATA_DIR}/certbot/certs:/etc/letsencrypt
     env_file:
       - ../.env
       - mailserver.env
