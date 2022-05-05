@@ -25,3 +25,10 @@ done
 
 chown docker:docker "${DATA_DIR}"/certbot
 chown -R docker:docker "${DATA_DIR}"/certbot/*
+
+# Setup a cron schedule
+echo "SHELL=/bin/zsh
+0 0 * * * $(realpath "$SRV_DIR"/../script.sh) certbot
+# This extra line makes it a valid cron" > /tmp/scheduler.txt
+
+crontab /tmp/scheduler.txt
