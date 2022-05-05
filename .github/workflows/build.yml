@@ -1,0 +1,26 @@
+# build workflow builds docker images, pushes images to docker hub and updates swagger API
+on:
+  schedule:
+    - cron: '0 0 * * *'  # every day at midnight
+  workflow_dispatch:
+name: Build
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      DOCKER_USERNAME: ${{ secrets.docker_username }}
+      DOCKER_PASSWORD: ${{ secrets.docker_password }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build docker images
+        run: ./builds/script.sh build
+      - name: Push images to Docker Hub
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+          ./builds/script.sh push

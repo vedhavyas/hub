@@ -9,12 +9,6 @@ import os
 from dateutil.parser import parse
 from datetime import datetime,date,timedelta,timezone
 
-# Hash password if not hashed
-#if cfg.admin_password_sha1 == '':
-#     cfg.admin_password_sha1=hashlib.sha1(cfg.admin_password.encode()).hexdigest()
-#auth_key=''
-#print('Hash:'+ cfg.admin_password_sha1)
-
 
 def retjprint(rawjson):
     #return a formatted string of the python JSON object
