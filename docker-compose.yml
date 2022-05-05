@@ -21,48 +21,6 @@ services:
 
 
 
-  heimdall:
-    image: linuxserver/heimdall:latest
-    container_name: heimdall
-    environment:
-      - PUID
-      - PGID
-      - TZ
-    volumes:
-      - $DATA/heimdall:/config
-    restart: unless-stopped
-    networks:
-      - web
-    healthcheck:
-      test: curl -f http://heimdall:80 &> /dev/null && echo "OK" || exit 1
-      interval: 5s
-    labels:
-      caddy: $DOMAIN
-      caddy.tls: $TLS_EMAIL
-      caddy.reverse_proxy: "{{upstreams 80}}"
-      caddy.basicauth.admin: $BASIC_AUTH_PASSWORD
-
-
-
-  cron:
-    build: ./cron
-    container_name: cron
-    restart: unless-stopped
-    networks:
-      - web
-    volumes:
-      - $DATA/media/downloads:/downloads
-    environment:
-      - VULTR_API_KEY
-      - VULTR_MAX_SNAPSHOTS
-    labels:
-      com.centurylinklabs.watchtower.enable: "false"
-
-
-
-
-
-
 
 
   calibre-web:
