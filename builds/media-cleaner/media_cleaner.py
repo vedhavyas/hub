@@ -640,6 +640,9 @@ try:
     test=cfg.DEBUG
     #removing DEBUG from media_cleaner_config.py file is sort of configuration reset
 
+    if not cfg.admin_username:
+        raise AttributeError
+
     #depending on what is missing from media_cleaner_config.py file; try to only ask for certain input
     if (
             not hasattr(cfg, 'server_brand') or
@@ -773,7 +776,7 @@ try:
         print ('\n')
 
 #the except
-except (AttributeError, ModuleNotFoundError):
+except (AttributeError, ModuleNotFoundError, TypeError):
     #we are here because the media_cleaner_config.py file does not exist
     #this is either the first time the script is running or media_cleaner_config.py file was deleted
     #when this happens create a new media_cleaner_config.py file
