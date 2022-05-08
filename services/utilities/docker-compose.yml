@@ -130,7 +130,6 @@ services:
       caddy.reverse_proxy: "{{upstreams 3000}}"
 
   polkadot_apps:
-    # TODO migrate browser state
     image: jacogr/polkadot-js-apps:latest
     container_name: polkadot_apps
     restart: unless-stopped

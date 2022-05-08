@@ -181,3 +181,21 @@ services:
       - EMBY_USER_KEY
     depends_on:
       - emby
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    restart: unless-stopped
+    environment:
+      - AUDIOBOOKSHELF_UID=$PUID
+      - AUDIOBOOKSHELF_GID=$PGID
+    networks:
+      - docker-vpn
+    volumes:
+      - $DATA_DIR/media/audio-books:/audiobooks
+      - $DATA_DIR/media/podcasts:/podcasts
+      - $DATA_DIR/audiobookshelf/config:/config
+      - $DATA_DIR/audiobookshelf/metadata:/metadata
+    labels:
+      caddy: audio.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"
