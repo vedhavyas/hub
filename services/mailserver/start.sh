@@ -6,11 +6,8 @@ for i in mailserver radicale; do
   chown docker:docker "${DATA_DIR}"/${i}
 done
 
-source "${SRV_DIR}"/.env
-export MAIL_SERVER_DOMAIN
-export MAIL_SERVER_DOMAIN_EMAIL
-
 cd "${SRV_DIR}/mailserver"  || { echo "Mail server services doesn't exist"; exit 1; }
+
 # run certbot
 ./certbot.sh
 

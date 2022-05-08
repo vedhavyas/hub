@@ -2,18 +2,25 @@
 
 script_path=$(realpath "$0")
 root_dir=$(dirname "${script_path}")
-export CONF_DIR="${root_dir}"/conf
-export DATA_DIR="${root_dir}"/data
+
+# export all variables from here
+set -a
+CONF_DIR="${root_dir}"/conf
+DATA_DIR="${root_dir}"/data
 mkdir -p "${DATA_DIR}"
-export SRV_DIR="${root_dir}"/services
+SRV_DIR="${root_dir}"/services
 source "${SRV_DIR}"/.env
-# TODO: setup wont work for all services at a time sice docker user may be created by the docker service
-# so start base and then rest
 PUID=$(id -u docker)
 PGID=$(id -g docker)
-export TZ=UTC
-export PUID
-export PGID
+TZ=UTC
+set +a
+
+# create a user
+groupadd docker
+useradd -M docker -g docker -s /bin/zsh
+usermod -aG docker docker
+usermod -aG docker admin
+chown docker:docker "${DATA_DIR}"
 
 cmd=${1:-setup}
 case $cmd in

@@ -14,15 +14,13 @@ services:
       - docker-direct
     volumes:
       - $DATA_DIR/bitwarden/:/data
-    env_file:
-      - ../.env
     environment:
-      - WEBSOCKET_ENABLED
+      - WEBSOCKET_ENABLED=true
       - DOMAIN=https://bitwarden.hub
-      - SIGNUPS_ALLOWED
-      - ADMIN_TOKEN
-      - SIGNUPS_VERIFY
-      - INVITATIONS_ALLOWED
+      - SIGNUPS_ALLOWED=false
+      - ADMIN_TOKEN=admin
+      - SIGNUPS_VERIFY=true
+      - INVITATIONS_ALLOWED=true
       - SMTP_HOST
       - SMTP_FROM
       - SMTP_FROM_NAME
@@ -78,13 +76,11 @@ services:
     #user: $PUID:$PGID
     depends_on:
       - redis
-    env_file:
-      - ../.env
     environment:
       - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.hub
-      - SYMFONY__ENV__SERVER_NAME
-      - SYMFONY__ENV__FOSUSER_REGISTRATION
-      - SYMFONY__ENV__FOSUSER_CONFIRMATION
+      - SYMFONY__ENV__SERVER_NAME="My bookmarks"
+      - SYMFONY__ENV__FOSUSER_REGISTRATION=false
+      - SYMFONY__ENV__FOSUSER_CONFIRMATION=false
       - SYMFONY__ENV__MAILER_HOST
       - SYMFONY__ENV__MAILER_PORT
       - SYMFONY__ENV__MAILER_AUTH_MODE
@@ -113,8 +109,6 @@ services:
     volumes:
       - '$DATA_DIR/hackmd/config/:/config'
       - '$DATA_DIR/hackmd/db/:/data'
-    env_file:
-      - ../.env
     environment:
       - CMD_DB_DIALECT="sqlite:/data/hackmd.db"
       - PGID
@@ -159,12 +153,11 @@ services:
     container_name: mysql
     image: mysql:latest
     user: $PUID:$PGID
-    env_file:
-      - ../.env
     environment:
-      - MYSQL_DATABASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
+      - MYSQL_DATABASE=kimai
+      - MYSQL_USER=kimai
+      - MYSQL_PASSWORD=kimai
+      - MYSQL_ROOT_PASSWORD
     command: --default-storage-engine innodb
     restart: unless-stopped
     volumes:
@@ -183,9 +176,9 @@ services:
   kimai:
     container_name: kimai
     image: kimai/kimai2:apache
-    env_file:
-      - ../.env
     environment:
+      - ADMINMAIL
+      - ADMINPASS
       - DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE
       - TRUSTED_HOSTS=kimai.hub,localhost,127.0.0.1
     depends_on:

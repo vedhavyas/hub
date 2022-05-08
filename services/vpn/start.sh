@@ -1,6 +1,5 @@
 #!/bin/zsh
 
-source "${SRV_DIR}"/.env
 # if external is set, then set it up as well
 EXTERNAL_VPN=${EXTERNAL_VPN:-}
 if [[ "${EXTERNAL_VPN}" = "" ]]; then

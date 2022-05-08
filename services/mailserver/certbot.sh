@@ -1,7 +1,6 @@
 #!/bin/zsh
 
 source "${SRV_DIR}"/.env
-export MAIL_SERVER_DOMAIN
 
 echo "Issuing certificate for ${MAIL_SERVER_DOMAIN} using email ${MAIL_SERVER_DOMAIN_EMAIL}..."
 mkdir -p "${DATA_DIR}"/certbot
@@ -26,9 +25,10 @@ done
 chown docker:docker "${DATA_DIR}"/certbot
 chown -R docker:docker "${DATA_DIR}"/certbot/*
 
-# Setup a cron schedule
+# Setup a cron schedule to run every day at 12 am
 echo "SHELL=/bin/zsh
 0 0 * * * $(realpath "$SRV_DIR"/../script.sh) certbot
 # This extra line makes it a valid cron" > /tmp/scheduler.txt
 
 crontab /tmp/scheduler.txt
+rm -rf /tmp/scheduler.txt

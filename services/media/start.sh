@@ -6,7 +6,6 @@ for i in prowlarr jackett media sonarr radarr emby ombi; do
   chown docker:docker "${DATA_DIR}"/${i}
 done
 
-source "${SRV_DIR}"/.env
 EXTERNAL_VPN=${EXTERNAL_VPN:-}
 HOST_IP=$(curl https://icanhazip.com)
 export HOST_IP
