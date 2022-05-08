@@ -109,5 +109,5 @@ services:
     labels:
       caddy: dashboard.hub
       caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 3000}}"
+      caddy.reverse_proxy: "{{upstreams 5005}}"
 
