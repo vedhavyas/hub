@@ -40,9 +40,11 @@ services:
     depends_on:
       - unbound
       - caddy
-    env_file:
-      - ../.env
-      - .env
+    environment:
+      - PIHOLE_DNS_=unbound
+      - WEBTHEME="default-dark"
+      - WEBPASSWORD=pihole
+      - ADMIN_EMAIL=${PIHOLE_ADMIN_EMAIL}
     volumes:
       - '$DATA_DIR/pihole/etc-pihole:/etc/pihole'
       - '$DATA_DIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'

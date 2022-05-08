@@ -3,10 +3,10 @@ set -e
 
 # this script was forked from https://github.com/burghardt/easy-wg-quick/blob/master/easy-wg-quick
 # and was modified to fit my needs.
-export WG_HUB_PORT=51820
-export WG_NET_ADDRESS="10.10.1."
-export WG_CLIENT_ALLOWED_IPS="0.0.0.0/0"
-export CLIENT_DNS="10.10.2.2"
+WG_HUB_PORT=51820
+WG_NET_ADDRESS="10.10.1."
+WG_CLIENT_ALLOWED_IPS="0.0.0.0/0"
+CLIENT_DNS="10.10.2.2"
 
 get_ext_net_if() {
     ip route sh | awk '$1 == "default" && $2 == "via" { print $5; exit }'

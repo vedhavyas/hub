@@ -21,7 +21,7 @@ services:
       - PEERPORT
     volumes:
       - /etc/ssl/certs:/certs
-      - ${DATA_DIR}/transmission:/config
+      - $DATA_DIR/transmission:/config
       - $DATA_DIR/media/:/data
     networks:
       docker-vpn:
@@ -174,7 +174,10 @@ services:
       - docker-vpn
     volumes:
       - $DATA_DIR/media/downloads:/downloads
-    env_file:
-      - ../.env
+    environment:
+      - EMBY_USER
+      - EMBY_PASSWD_HASH
+      - EMBY_ACCESS_TOKEN
+      - EMBY_USER_KEY
     depends_on:
       - emby

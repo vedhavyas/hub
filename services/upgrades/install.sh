@@ -18,7 +18,4 @@ sudo systemctl stop unattended-upgrades
 sudo systemctl daemon-reload
 sudo systemctl restart unattended-upgrades
 
-# install ohmyzsh
-# this caused used to login in to admin and not logout
-su admin sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 echo "Done."
