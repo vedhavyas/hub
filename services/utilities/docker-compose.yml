@@ -179,7 +179,7 @@ services:
     environment:
       - ADMINMAIL
       - ADMINPASS
-      - DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql/$MYSQL_DATABASE
+      - DATABASE_URL=mysql://kimai:kimai@mysql/kimai
       - TRUSTED_HOSTS=kimai.hub,localhost,127.0.0.1
     depends_on:
       - mysql

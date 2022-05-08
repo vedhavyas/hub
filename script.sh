@@ -16,8 +16,8 @@ TZ=UTC
 set +a
 
 # create a user
-groupadd docker
-useradd -M docker -g docker -s /bin/zsh
+groupadd docker &> /dev/null
+useradd -M docker -g docker -s /bin/zsh &> /dev/null
 usermod -aG docker docker
 usermod -aG docker admin
 chown docker:docker "${DATA_DIR}"
