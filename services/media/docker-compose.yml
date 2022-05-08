@@ -184,6 +184,7 @@ services:
 
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
     restart: unless-stopped
     environment:
       - AUDIOBOOKSHELF_UID=$PUID
@@ -201,7 +202,7 @@ services:
       caddy.reverse_proxy: "{{upstreams 80}}"
 
   podcasts:
-    image: akhilrex/podgrab
+    image: akhilrex/podgrab:latest
     container_name: podcasts
     restart: unless-stopped
     environment:
