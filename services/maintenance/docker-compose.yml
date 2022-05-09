@@ -31,7 +31,7 @@ services:
 
   portainer:
     container_name: portainer
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.11.1
     restart: unless-stopped
     user: $PUID:$PGID
     # https://github.com/portainer/portainer/issues/3092
