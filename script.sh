@@ -22,6 +22,10 @@ usermod -aG docker docker
 usermod -aG docker admin
 chown docker:docker "${DATA_DIR}"
 
+all=(ssh wireguard docker vpn core maintenance monitoring media utilities mailserver)
+base=(ssh wireguard docker vpn)
+rest=(core maintenance monitoring media utilities mailserver)
+
 cmd=${1:-setup}
 case $cmd in
 # start is called by the systemd service
@@ -40,9 +44,7 @@ setup|start )
       exit 1
     fi
   done
-  all=(ssh wireguard docker vpn core maintenance monitoring media utilities mailserver)
-  base=(ssh wireguard docker vpn)
-  rest=(core maintenance monitoring media utilities mailserver)
+
   services=${2:-all}
   # start services
   echo "Starting ${services}..."
@@ -74,9 +76,20 @@ mailserver )
   ;;
 
 service )
-  script="${SRV_DIR}"/"${2}"/start.sh
-  test -f "${script}" || { echo "Unknown service $2"; exit 1; }
-  "${script}"
+  case $2 in
+  all)
+    for arg in ${rest[*]}; do
+        if ! "${SRV_DIR}"/"${arg}"/start.sh; then
+          exit 1
+        fi
+      done
+    ;;
+  *)
+    script="${SRV_DIR}"/"${2}"/start.sh
+    test -f "${script}" || { echo "Unknown service $2"; exit 1; }
+    "${script}"
+    ;;
+  esac
   ;;
 
 log )
