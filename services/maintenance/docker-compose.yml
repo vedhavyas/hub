@@ -45,4 +45,7 @@ services:
       caddy: portainer.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9000}}"
+      flame.type: application
+      flame.name: Portainer
+      flame.url: https://portainer.hub
 

@@ -41,6 +41,9 @@ services:
       caddy.header.X-Content-Type-Options: "none"
       caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
       caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
+      flame.type: application
+      flame.name: Bitwarden
+      flame.url: https://bitwarden.hub
 
   filebrowser:
     container_name: filebrowser
@@ -56,6 +59,9 @@ services:
       caddy: drive.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
+      flame.type: application
+      flame.name: Drive
+      flame.url: https://drive.hub
 
   redis:
     image: redis:latest
@@ -101,6 +107,9 @@ services:
       caddy: wallabag.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
+      flame.type: application
+      flame.name: Wallabag
+      flame.url: https://wallabag.hub
 
   hackmd:
     image: ghcr.io/linuxserver/hedgedoc:latest
@@ -128,6 +137,9 @@ services:
       caddy: hackmd.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+      flame.type: application
+      flame.name: Hackmd
+      flame.url: https://hackmd.hub
 
   polkadot_apps:
     image: jacogr/polkadot-js-apps:latest
@@ -147,6 +159,9 @@ services:
       caddy_1: air.hub
       caddy_1.tls: internal
       caddy_1.reverse_proxy: "{{upstreams 80}}"
+      flame.type: application
+      flame.name: AIR;CFG
+      flame.url: https://air.hub;https://cfg.hub
 
   mysql:
     container_name: mysql
@@ -189,6 +204,9 @@ services:
       caddy: kimai.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8001}}"
+      flame.type: application
+      flame.name: Kimai
+      flame.url: https://kimai.hub
 
   webdav:
     container_name: webdav

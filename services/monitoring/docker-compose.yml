@@ -63,6 +63,9 @@ services:
       caddy: prometheus.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9090}}"
+      flame.type: application
+      flame.name: Prometheus
+      flame.url: https://prometheus.hub
 
   grafana:
     image: grafana/grafana-enterprise:latest
@@ -81,6 +84,9 @@ services:
       caddy: grafana.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+      flame.type: application
+      flame.name: Grafana
+      flame.url: https://grafana.hub
 
   monies:
     image: vedhavyas/monies:latest
@@ -94,3 +100,20 @@ services:
       - LIVE_COIN_WATCH_API_KEY
     networks:
       - docker-vpn
+
+  flame:
+    image: pawelmalak/flame:latest
+    container_name: flame
+    volumes:
+      - $DATA_DIR/flame/data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock # optional but required for Docker integration
+    environment:
+      - PASSWORD=flame
+    restart: unless-stopped
+    networks:
+      - docker-vpn
+    labels:
+      caddy: dashboard.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5005}}"
+

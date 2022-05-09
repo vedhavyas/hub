@@ -53,4 +53,7 @@ services:
       caddy.tls: internal
       caddy.redir: / /admin
       caddy.reverse_proxy: "{{upstreams 80}}"
+      flame.type: application
+      flame.name: PiHole
+      flame.url: https://pihole.hub
 
