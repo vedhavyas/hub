@@ -106,6 +106,10 @@ certbot )
   "${SRV_DIR}"/mailserver/certbot.sh
   ;;
 
+mullvad )
+  "${SRV_DIR}"/vpn/mullvad.sh
+  ;;
+
 * )
   echo "Unknown command $1"
   ;;

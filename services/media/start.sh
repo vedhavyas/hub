@@ -1,18 +1,23 @@
 #!/bin/zsh
 
 echo "Starting media services..."
-for i in prowlarr jackett media sonarr radarr emby ombi audiobookshelf; do
+for i in transmission prowlarr jackett media sonarr radarr emby ombi audiobookshelf; do
   mkdir -p "${DATA_DIR}"/${i}
   chown docker:docker "${DATA_DIR}"/${i}
 done
 
-EXTERNAL_VPN=${EXTERNAL_VPN:-}
 HOST_IP=$(curl https://icanhazip.com)
 export HOST_IP
 export PEER_PORT=
-if [[ "${EXTERNAL_VPN}" != "" ]]; then
-  VPN_FORWARDED_PORT="${EXTERNAL_VPN:u}_VPN_FORWARDED_PORT"
-  export PEER_PORT=${(P)VPN_FORWARDED_PORT}
+if [ -f "${DATA_DIR}"/mullvad/mullvad.env ]; then
+  source "${DATA_DIR}"/mullvad/mullvad.env
+  export PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
+fi
+
+if [ -f "${DATA_DIR}"/transmission/settings.json ]; then
+  if [ -n "${PEER_PORT}" ]; then
+    sed -i -r "s/\"peer-port\": [0-9]+/\"peer-port\": ${PEER_PORT}/" "${DATA_DIR}"/transmission/settings.json
+  fi
 fi
 
 cd "${SRV_DIR}/media"  || { echo "Media services doesn't exist"; exit 1; }
@@ -28,10 +33,9 @@ wait-for-it -t 60 10.10.3.100:9091
 wait-for-it -t 60 10.10.3.100:"${PEER_PORT}"
 
 # port forward host to transmission
-inf=wg_${EXTERNAL_VPN}
 # set the mark so that right route table is picked
-iptables -t nat -I PREROUTING -i "${inf}" -j MARK --set-mark 100
-iptables -t nat -A PREROUTING -i "${inf}" -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.100:"${PEER_PORT}"
+iptables -t nat -I PREROUTING -i wg_mullvad -j MARK --set-mark 100
+iptables -t nat -A PREROUTING -i wg_mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.100:"${PEER_PORT}"
 
 echo "Done."
 

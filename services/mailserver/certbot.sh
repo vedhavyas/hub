@@ -1,7 +1,5 @@
 #!/bin/zsh
 
-source "${SRV_DIR}"/.env
-
 echo "Issuing certificate for ${MAIL_SERVER_DOMAIN} using email ${MAIL_SERVER_DOMAIN_EMAIL}..."
 mkdir -p "${DATA_DIR}"/certbot
 # port forward host to certbot
