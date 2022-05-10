@@ -6,7 +6,7 @@ docker run --rm --name mullvad-cli \
             --net docker-direct \
             -v "${DATA_DIR}/mullvad/:/data" \
             -e MULLVAD_ACCOUNT \
-            -e MULLVAD_CITY_CODE} \
+            -e MULLVAD_CITY_CODE \
             vedhavyas/mullvad:latest
 
 chown docker:docker "${DATA_DIR}"/mullvad
