@@ -1,10 +1,13 @@
 #!/bin/zsh
 set -e
 mkdir -p "${DATA_DIR}"/mullvad
+chown docker:docker "${DATA_DIR}"/mullvad
+chown -R docker:docker "${DATA_DIR}"/mullvad/*
 
 docker rmi vedhavyas/mullvad:latest || true
 docker run --rm --name mullvad-cli \
             --net docker-direct \
+            -u docker:docker \
             -v "${DATA_DIR}/mullvad/:/data" \
             -e MULLVAD_ACCOUNT \
             -e MULLVAD_CITY_CODE \
