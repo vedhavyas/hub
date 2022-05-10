@@ -88,7 +88,8 @@ PrivateKey = %s
 PublicKey = %s
 AllowedIPs = 0.0.0.0/0
 Endpoint = %s
-PersistentKeepalive = 25`, priv, peerPub, peerEndpoint)
+PersistentKeepalive = 25
+`, priv, peerPub, peerEndpoint)
 	return ioutil.WriteFile("/data/mullvad.conf", []byte(data), 0777)
 }
 

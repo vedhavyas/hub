@@ -18,6 +18,9 @@ iptables -A INPUT -i "${dvif}" -j ACCEPT
 ip link del wg_mullvad || true
 ip link add wg_mullvad type wireguard || true
 
+# create mullvad conf and start wireguard
+"${SRV_DIR}"/vpn/mullvad.sh
+
 # masquerade all out going requests from vpn interface
 iptables -t nat -A POSTROUTING -o wg_mullvad -j MASQUERADE
 iptables -A FORWARD -o wg_mullvad -j ACCEPT
@@ -52,9 +55,6 @@ ip route add $(ip route | grep 10.10.1.0/24 | sed 's/linkdown//') table mullvad
 ip route add blackhole default metric 101 table mullvad
 # save iptables
 iptables-save
-
-# create mullvad conf and start wireguard
-"${SRV_DIR}"/vpn/mullvad.sh
 
 echo "Done."
 
