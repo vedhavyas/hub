@@ -2,6 +2,7 @@
 set -e
 mkdir -p "${DATA_DIR}"/mullvad
 
+docker rmi vedhavyas/mullvad:latest
 docker run --rm --name mullvad-cli \
             --net docker-direct \
             -v "${DATA_DIR}/mullvad/:/data" \
