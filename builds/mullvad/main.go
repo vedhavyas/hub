@@ -27,6 +27,7 @@ func main() {
 
 	// remove all ports
 	for _, port := range data.Account.CityPorts {
+		fmt.Printf("Removing port[%v] in City[%s]\n", port.Port, port.CityCode)
 		err := removePort(data.AuthToken, port.Port, port.CityCode)
 		if err != nil {
 			panic(err)
@@ -35,6 +36,7 @@ func main() {
 
 	// remove all peers
 	for _, peer := range data.Account.WgPeers {
+		fmt.Printf("Removing peer: %v\n", peer.Key.Public)
 		err := removePeer(data.AuthToken, peer.Key.Public)
 		if err != nil {
 			panic(err)
@@ -199,7 +201,15 @@ func removePort(token string, port int, cityCode string) error {
 	}
 
 	body := bytes.NewReader(payloadBytes)
-	return call("POST", "https://api.mullvad.net/www/ports/remove/", token, body, &struct{}{})
+	err = call("POST", "https://api.mullvad.net/www/ports/remove/", token, body, &struct{}{})
+	if err == nil {
+		return nil
+	}
+
+	if err == io.EOF {
+		return nil
+	}
+	return err
 }
 
 func addPeer(token string, publicKey string) (peerAddress string, err error) {
@@ -232,7 +242,16 @@ func removePeer(token string, publicKey string) (err error) {
 	}
 	body := bytes.NewReader(payloadBytes)
 
-	return call("POST", "https://api.mullvad.net/www/wg-pubkeys/revoke/", token, body, &struct{}{})
+	err = call("POST", "https://api.mullvad.net/www/wg-pubkeys/revoke/", token, body, &struct{}{})
+	if err == nil {
+		return nil
+	}
+
+	if err == io.EOF {
+		return nil
+	}
+
+	return err
 }
 
 func call[T any](method, url, token string, body io.Reader, response *T) error {
