@@ -108,6 +108,9 @@ certbot )
 
 mullvad )
   "${SRV_DIR}"/vpn/mullvad.sh
+  # also update transmission
+  docker stop transmission
+  "${SRV_DIR}"/media/start.sh
   ;;
 
 * )
