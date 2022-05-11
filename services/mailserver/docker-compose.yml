@@ -70,6 +70,3 @@ services:
       caddy: radicale.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 5232}}"
-      flame.type: application
-      flame.name: Radicale
-      flame.url: https://radicale.hub

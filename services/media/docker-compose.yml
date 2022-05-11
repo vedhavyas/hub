@@ -33,9 +33,6 @@ services:
       caddy: transmission.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9091}}"
-      flame.type: application
-      flame.name: Transmission
-      flame.url: https://transmission.hub
 
   flaresolverr:
     image: flaresolverr/flaresolverr:latest
@@ -64,9 +61,6 @@ services:
       caddy: prowlarr.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9696}}"
-      flame.type: application
-      flame.name: Prowlarr
-      flame.url: https://prowlarr.hub
 
   jackett:
     container_name: jackett
@@ -89,9 +83,6 @@ services:
       caddy: jackett.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9117}}"
-      flame.type: application
-      flame.name: Jackett
-      flame.url: https://jackett.hub
 
   sonarr:
     container_name: sonarr
@@ -114,9 +105,6 @@ services:
       caddy: sonarr.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8989}}"
-      flame.type: application
-      flame.name: Sonarr
-      flame.url: https://sonarr.hub
 
   radarr:
     container_name: radarr
@@ -139,13 +127,11 @@ services:
       caddy: radarr.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 7878}}"
-      flame.type: application
-      flame.name: Radarr
-      flame.url: https://radarr.hub
 
   emby:
     image: emby/embyserver:latest
     container_name: emby
+    restart: unless-stopped
     environment:
       - UID=$PUID
       - GID=$PGID
@@ -159,10 +145,6 @@ services:
       caddy: emby.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8096}}"
-      flame.type: application
-      flame.name: Emby
-      flame.url: https://emby.hub
-    restart: unless-stopped
 
   ombi:
     image: linuxserver/ombi:latest
@@ -183,9 +165,6 @@ services:
       caddy: ombi.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3579}}"
-      flame.type: application
-      flame.name: Ombi
-      flame.url: https://ombi.hub
 
   media-cleaner:
     container_name: media-cleaner
@@ -221,9 +200,6 @@ services:
       caddy: audio.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
-      flame.type: application
-      flame.name: AudioBookShelf
-      flame.url: https://audio.hub
 
   podcasts:
     image: akhilrex/podgrab:latest
@@ -240,6 +216,3 @@ services:
       caddy: podcasts.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
-      flame.type: application
-      flame.name: Podcasts
-      flame.url: https://podcasts.hub
