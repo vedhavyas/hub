@@ -45,7 +45,7 @@ create_hub_key() {
 
 sync_wg_hub_conf() {
     echo "Syncing wireguard hub config..."
-    wg setconf wghub /etc/wireguard/wghub.conf
+    wg setconf wg-hub /etc/wireguard/wghub.conf
 }
 
 create_hub_conf() {

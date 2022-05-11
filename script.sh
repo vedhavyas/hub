@@ -9,111 +9,93 @@ CONF_DIR="${root_dir}"/conf
 DATA_DIR="${root_dir}"/data
 mkdir -p "${DATA_DIR}"
 SRV_DIR="${root_dir}"/services
-source "${SRV_DIR}"/.env
-PUID=$(id -u docker)
-PGID=$(id -g docker)
-TZ=UTC
-set +a
+APPS_DIR="${root_dir}"/apps
+SCRIPTS_DIR="${root_dir}"/scripts
+source "${root_dir}"/.env
 
-# create a user
+# create a docker user
 groupadd docker &> /dev/null
 useradd -M docker -g docker -s /bin/zsh &> /dev/null
 usermod -aG docker docker
 usermod -aG docker admin
 chown docker:docker "${DATA_DIR}"
 
-all=(ssh wireguard docker vpn core maintenance monitoring media utilities mailserver)
-base=(ssh wireguard docker vpn)
-rest=(core maintenance monitoring media utilities mailserver)
+PUID=$(id -u docker)
+PGID=$(id -g docker)
+TZ=UTC
+set +a
 
-cmd=${1:-setup}
+function install_deps() {
+  "${SCRIPTS_DIR}"/deps.sh
+}
+
+function setup_network() {
+  "${SCRIPTS_DIR}"/network.sh
+}
+
+function setup_firewall() {
+  "${SCRIPTS_DIR}"/firewall.sh
+}
+
+function start_services() {
+  "${SCRIPTS_DIR}"/services.sh
+}
+
+function setup_initd() {
+    # setup script self to run on every boot
+    # sym link to init.d
+    chmod +x "${script_path}"
+    ln -sf  "${script_path}" /etc/init.d/hub
+    # sym link to rc level 3, start last
+    # https://unix.stackexchange.com/a/83753/310751
+    ln -sf /etc/init.d/hub /etc/rc3.d/S99hub
+}
+
+cmd=${1:-start}
 case $cmd in
 # start is called by the systemd service
-setup|start )
-  # setup
-  echo "Setting up Hub..."
+start )
+  echo "Starting Hub..."
   # set up dns to cloudflare
   systemctl disable systemd-resolved.service
   systemctl stop systemd-resolved.service
   rm /etc/resolv.conf
   echo "nameserver 1.1.1.1" > /etc/resolv.conf
-
-  # install
-  for arg in upgrades docker; do
-    if ! "${SRV_DIR}"/"${arg}"/install.sh; then
-      exit 1
-    fi
-  done
-
-  services=${2:-all}
-  # start services
-  echo "Starting ${services}..."
-  for arg in ${(P)services[*]}; do
-    if ! "${SRV_DIR}"/"${arg}"/start.sh; then
-      exit 1
-    fi
-  done
-
-  # setup script self to run on every boot
-  # sym link to init.d
-  chmod +x "${script_path}"
-  ln -sf  "${script_path}" /etc/init.d/hub
-  # sym link to rc level 3, start last
-  # https://unix.stackexchange.com/a/83753/310751
-  ln -sf /etc/init.d/hub /etc/rc3.d/S99hub
-  echo "Hub installation completed."
+  install_deps
+  setup_network
+  setup_firewall
+  start_services
+  setup_initd
+  echo "Hub started."
   ;;
 
-wireguard|migrate )
-  cmd=$1
+restart|reload )
+  echo "Restarting Hub..."
+  setup_network
+  setup_firewall
+  start_services
+  echo "Hub started."
+  ;;
+
+status )
+  docker compose ls
+  ;;
+
+apps )
   shift
-  "${SRV_DIR}/${cmd}/${cmd}.sh" "$@"
-  ;;
-
-mailserver )
+  app="${1}"
   shift
-  docker exec -it mailserver setup "${@}"
+  "${APPS_DIR}/${app}.sh" "$@"
   ;;
 
-service|restart )
-  services=${2:-all}
-  case $2 in
-  all)
-    # start services
-    echo "Starting ${services}..."
-    for arg in ${(P)services[*]}; do
-      if ! "${SRV_DIR}"/"${arg}"/start.sh; then
-        exit 1
-      fi
-    done
-    ;;
-  *)
-    script="${SRV_DIR}"/"${2}"/start.sh
-    test -f "${script}" || { echo "Unknown service $2"; exit 1; }
-    "${script}"
-    ;;
-  esac
-  ;;
-
-log )
+logs )
   case ${2} in
-  tail)
+  -f)
     tail -f /var/log/syslog | grep "hub hub"
     ;;
   * )
     < /var/log/syslog grep "hub hub"
   esac
-  ;;
-
-certbot )
-  "${SRV_DIR}"/mailserver/certbot.sh
-  ;;
-
-mullvad )
-  "${SRV_DIR}"/vpn/mullvad.sh
-  # also update transmission
-  docker stop transmission
-  "${SRV_DIR}"/media/start.sh
   ;;
 
 * )
