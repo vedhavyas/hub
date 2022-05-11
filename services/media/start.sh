@@ -34,8 +34,8 @@ wait-for-it -t 60 10.10.3.100:"${PEER_PORT}"
 
 # port forward host to transmission
 # set the mark so that right route table is picked
-iptables -t nat -I PREROUTING -i wg_mullvad -j MARK --set-mark 100
-iptables -t nat -A PREROUTING -i wg_mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.100:"${PEER_PORT}"
+iptables -t nat -I PREROUTING -i wg-mullvad -j MARK --set-mark 100
+iptables -t nat -A PREROUTING -i wg-mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.100:"${PEER_PORT}"
 
 echo "Done."
 

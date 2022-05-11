@@ -15,15 +15,15 @@ iptables -A FORWARD -o "${dvif}" -j ACCEPT
 iptables -A INPUT -i "${dvif}" -j ACCEPT
 
 # generate wiregaurd interface
-ip link del wg_mullvad || true
-ip link add wg_mullvad type wireguard || true
+ip link del wg-mullvad || true
+ip link add wg-mullvad type wireguard || true
 
 # create mullvad conf and start wireguard
 "${SRV_DIR}"/vpn/mullvad.sh
 
 # masquerade all out going requests from vpn interface
-iptables -t nat -A POSTROUTING -o wg_mullvad -j MASQUERADE
-iptables -A FORWARD -o wg_mullvad -j ACCEPT
+iptables -t nat -A POSTROUTING -o wg-mullvad -j MASQUERADE
+iptables -A FORWARD -o wg-mullvad -j ACCEPT
 
 # create a new route table that will be used to find the default route for outgoing requests
 # originated from the network. This route will be picked up instead of default whenever a packet marked with 100(0x64)
@@ -44,7 +44,7 @@ iptables -A PREROUTING -t mangle -j CONNMARK --restore-mark
 # TODO: avoid duplicating
 ip rule add fwmark 0x64 table mullvad
 # add default route with lower metric to new route table
-ip route add default dev wg_mullvad metric 100 table mullvad
+ip route add default dev wg-mullvad metric 100 table mullvad
 # get default route from main table for destination to 10.10.3.0/24. ignore linkdown since docker network is not connected to any containers yet
 # shellcheck disable=SC2046
 ip route add $(ip route | grep 10.10.3.0/24 | sed 's/linkdown//') table mullvad

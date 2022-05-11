@@ -18,8 +18,8 @@ chown -R docker:docker "${DATA_DIR}"/mullvad/*
 # copy wg conf and sync wg conf
 source "${DATA_DIR}"/mullvad/mullvad.env
 cp "${DATA_DIR}"/mullvad/mullvad.conf /etc/wireguard/
-ip address add "${MULLVAD_VPN_ID_ADDR}" dev wg_mullvad || true
-ip link set wg_mullvad up || true
-wg setconf wg_mullvad /etc/wireguard/mullvad.conf
+ip address add "${MULLVAD_VPN_ID_ADDR}" dev wg-mullvad || true
+ip link set wg-mullvad up || true
+wg setconf wg-mullvad /etc/wireguard/mullvad.conf
 
 
