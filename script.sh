@@ -75,14 +75,17 @@ mailserver )
   docker exec -it mailserver setup "${@}"
   ;;
 
-service )
+service|restart )
+  services=${2:-all}
   case $2 in
   all)
-    for arg in ${rest[*]}; do
-        if ! "${SRV_DIR}"/"${arg}"/start.sh; then
-          exit 1
-        fi
-      done
+    # start services
+    echo "Starting ${services}..."
+    for arg in ${(P)services[*]}; do
+      if ! "${SRV_DIR}"/"${arg}"/start.sh; then
+        exit 1
+      fi
+    done
     ;;
   *)
     script="${SRV_DIR}"/"${2}"/start.sh
@@ -115,5 +118,6 @@ mullvad )
 
 * )
   echo "Unknown command $1"
+  exit 1
   ;;
 esac
