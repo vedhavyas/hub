@@ -11,6 +11,7 @@ export HOST_IP
 source "${DATA_DIR}"/mullvad/mullvad.env
 PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
 
+docker stop transmission
 if [ -f "${DATA_DIR}"/transmission/settings.json ]; then
   if [ -n "${PEER_PORT}" ]; then
     sed -i -r "s/\"peer-port\": [0-9]+/\"peer-port\": ${PEER_PORT}/" "${DATA_DIR}"/transmission/settings.json
