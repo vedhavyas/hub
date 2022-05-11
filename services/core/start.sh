@@ -1,6 +1,10 @@
 #!/bin/zsh
 
 echo "Starting core services..."
+mkdir -p "${DATA_DIR}"/pihole
+chown docker:docker "${DATA_DIR}"/pihole
+mkdir -p "${DATA_DIR}"/caddy_data
+chown docker:docker "${DATA_DIR}"/caddy_data
 cd "${SRV_DIR}/core"  || { echo "Core services doesn't exist"; exit 1; }
 docker compose up -d --quiet-pull --remove-orphans
 
