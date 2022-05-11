@@ -25,6 +25,14 @@ PGID=$(id -g docker)
 TZ=UTC
 set +a
 
+function setup_cloudflare_dns() {
+  # set up dns to cloudflare
+  systemctl disable systemd-resolved.service
+  systemctl stop systemd-resolved.service
+  rm /etc/resolv.conf
+  echo "nameserver 1.1.1.1" > /etc/resolv.conf
+}
+
 function install_deps() {
   "${SCRIPTS_DIR}"/deps.sh
 }
@@ -56,11 +64,7 @@ case $cmd in
 # start is called by the systemd service
 start )
   echo "Starting Hub..."
-  # set up dns to cloudflare
-  systemctl disable systemd-resolved.service
-  systemctl stop systemd-resolved.service
-  rm /etc/resolv.conf
-  echo "nameserver 1.1.1.1" > /etc/resolv.conf
+  setup_cloudflare_dns
   install_deps
   setup_network
   setup_firewall
