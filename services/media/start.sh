@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 echo "Starting media services..."
-for i in transmission prowlarr jackett media sonarr radarr emby ombi audiobookshelf; do
+for i in transmission prowlarr jackett media sonarr radarr emby ombi audiobookshelf podcasts; do
   mkdir -p "${DATA_DIR}"/${i}
   chown docker:docker "${DATA_DIR}"/${i}
 done
