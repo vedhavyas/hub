@@ -74,7 +74,7 @@ restart|reload )
   setup_network
   setup_firewall
   start_services
-  echo "Hub started."
+  echo "Hub restarted."
   ;;
 
 status )
