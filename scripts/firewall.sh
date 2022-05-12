@@ -32,6 +32,9 @@ iptables -P INPUT DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 
+# flush ip rules
+ip rule flush
+
 # always accept already established and related packets
 eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
 iptables -A INPUT -i "${eth0}" -m state --state=ESTABLISHED,RELATED -j ACCEPT
@@ -80,7 +83,6 @@ iptables -A PREROUTING -t nat -m mark --mark 100 -j CONNMARK --save-mark
 # this will restore mark from conn to packet to incoming packets. For outgoing packets mark the after first one since first one is already marked.
 iptables -A PREROUTING -t mangle -j CONNMARK --restore-mark
 # add a rule to pick the above routing table whenever a packet with 100(0x64) mark is received for prerouting
-# TODO: avoid duplicating
 ip rule add fwmark 0x64 table mullvad
 # add default route with lower metric to new route table
 ip route add default dev wg-mullvad metric 100 table mullvad
