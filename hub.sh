@@ -27,7 +27,8 @@ set +a
 
 function run_script() {
   echo "Running script ${1}..."
-  if ! output=$("${SCRIPTS_DIR}"/"$1".sh); then
+  shift
+  if ! output=$("${SCRIPTS_DIR}"/"$1".sh "$@"); then
     echo "${output}"
     exit 1
   fi
@@ -55,7 +56,7 @@ function setup_firewall() {
 }
 
 function start_services() {
-  run_script services
+  run_script services "$@"
 }
 
 function setup_initd() {
