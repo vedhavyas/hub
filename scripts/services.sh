@@ -56,7 +56,17 @@ for service in "${services[@]}"; do
   pre=${service}_pre_up
   command -v "$pre" >/dev/null && $pre
 
-  docker compose -p "${service}" -f "${SRV_DIR}"/docker-compose-"${service}".yml "$docker_command" -d --quiet-pull --remove-orphans
+  case $docker_command in
+  up)
+    docker compose -p "${service}" -f "${SRV_DIR}"/docker-compose-"${service}".yml "$docker_command" -d --quiet-pull --remove-orphans
+    ;;
+  restart)
+    docker compose -p "${service}" -f "${SRV_DIR}"/docker-compose-"${service}".yml "$docker_command"
+    ;;
+  *)
+    echo "unknown docker command ${docker_command}"
+    exit 1
+  esac
 
   post=${service}_post_up
   command -v "$post" >/dev/null && $post
