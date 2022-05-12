@@ -4,9 +4,11 @@
 systemctl disable ufw.service
 apt purge ufw -y
 
-
 # enable ip forwarding
 sed -i 's/.*net.ipv4.ip_forward.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+
+# disable ipv6
+sed -i 's/.*net.ipv6.conf.all.disable_ipv6.*/net.ipv6.conf.all.disable_ipv6=1/' /etc/sysctl.conf
 
 # VM Overcommit Memory
 # from https://gitlab.com/cyber5k/mistborn/-/blob/master/scripts/subinstallers/iptables.sh
