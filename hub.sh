@@ -86,7 +86,7 @@ restart|reload )
   echo "Restarting Hub..."
   setup_network
   setup_firewall
-  start_services
+  start_services restart
   echo "Hub restarted."
   ;;
 
