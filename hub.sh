@@ -29,7 +29,7 @@ function run_script() {
   echo "Running script ${1}..."
   script=${1}
   shift
-  "${SCRIPTS_DIR}"/"$script".sh "$@" || exit 1
+  "${SCRIPTS_DIR}"/"$script".sh || exit 1
   echo "Done."
 }
 
@@ -54,7 +54,7 @@ function setup_firewall() {
 }
 
 function start_services() {
-  run_script services "$@"
+  run_script services
 }
 
 function setup_initd() {
@@ -85,7 +85,7 @@ restart|reload )
   echo "Restarting Hub..."
   setup_network
   setup_firewall
-  start_services restart
+  start_services
   echo "Hub restarted."
   ;;
 
