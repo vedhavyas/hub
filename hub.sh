@@ -42,6 +42,10 @@ function setup_cloudflare_dns() {
   echo "nameserver 1.1.1.1" > /etc/resolv.conf
 }
 
+function link_binary() {
+    ln -sf  "${script_path}" /usr/bin/hub
+}
+
 function install_deps() {
   run_script deps
 }
@@ -79,6 +83,7 @@ start )
   setup_firewall
   start_services
   setup_initd
+  link_binary
   echo "Hub started."
   ;;
 
