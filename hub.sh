@@ -27,11 +27,9 @@ set +a
 
 function run_script() {
   echo "Running script ${1}..."
+  script=${1}
   shift
-  if ! output=$("${SCRIPTS_DIR}"/"$1".sh "$@"); then
-    echo "${output}"
-    exit 1
-  fi
+  "${SCRIPTS_DIR}"/"$script".sh "$@" || exit 1
   echo "Done."
 }
 
