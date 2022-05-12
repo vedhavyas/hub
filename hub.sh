@@ -104,6 +104,5 @@ logs )
 
 * )
   echo "Unknown command $1"
-  exit 1
   ;;
 esac

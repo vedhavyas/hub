@@ -29,7 +29,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR}/certbot/certs:/etc/letsencrypt
     env_file:
-      - mailserver.env
+      - ${CONF_DIR}/mailserver.conf
     restart: unless-stopped
     stop_grace_period: 1m
     networks:
