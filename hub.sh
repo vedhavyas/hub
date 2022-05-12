@@ -27,7 +27,7 @@ set +a
 
 function run_script() {
   echo "Running script ${1}..."
-  if ! output="${SCRIPTS_DIR}"/$1.sh; then
+  if ! output=$("${SCRIPTS_DIR}"/"$1".sh); then
     echo "${output}"
     exit 1
   fi
