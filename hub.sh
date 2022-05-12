@@ -109,10 +109,10 @@ apps )
 logs )
   case ${2} in
   -f)
-    tail -f /var/log/syslog | grep "hub hub"
+    journalctl -u hub -f
     ;;
   * )
-    < /var/log/syslog grep "hub hub"
+    journalctl -u hub --no-pager
   esac
   ;;
 
