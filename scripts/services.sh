@@ -51,11 +51,12 @@ function media_post_up() {
 
 services=(core maintenance monitoring media utilities mailserver)
 # start services
+docker_command=${1-up}
 for service in "${services[@]}"; do
   pre=${service}_pre_up
   command -v "$pre" >/dev/null && $pre
 
-  docker compose -p "${service}" -f "${SRV_DIR}"/docker-compose-"${service}".yml up -d --quiet-pull --remove-orphans
+  docker compose -p "${service}" -f "${SRV_DIR}"/docker-compose-"${service}".yml "$docker_command" -d --quiet-pull --remove-orphans
 
   post=${service}_post_up
   command -v "$post" >/dev/null && $post
