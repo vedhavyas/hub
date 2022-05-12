@@ -5,10 +5,11 @@ root_dir=$(dirname "${script_path}")
 
 # export all variables from here
 set -a
+ROOT_DIR=${root_dir}
 CONF_DIR="${root_dir}"/conf
 DATA_DIR="${root_dir}"/data
 mkdir -p "${DATA_DIR}"
-SRV_DIR="${root_dir}"/services
+DOCKER_DIR="${root_dir}"/docker
 APPS_DIR="${root_dir}"/apps
 SCRIPTS_DIR="${root_dir}"/scripts
 source "${root_dir}"/.env
