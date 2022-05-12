@@ -53,13 +53,10 @@ services=(core maintenance monitoring media utilities mailserver)
 # start services
 for service in "${services[@]}"; do
   pre=${service}_pre_up
-  post=${service}_post_up
-  if command -v "$pre"; then
-    $pre
-  fi
+  command -v "$pre" >/dev/null && $pre
 
   docker compose -p "${service}" -f "${SRV_DIR}"/docker-compose-"${service}".yml up -d --quiet-pull --remove-orphans
-  if command -v "$post"; then
-    $post
-  fi
+
+  post=${service}_post_up
+  command -v "$post" >/dev/null && $post
 done
