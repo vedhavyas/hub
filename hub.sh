@@ -25,6 +25,15 @@ PGID=$(id -g docker)
 TZ=UTC
 set +a
 
+function run_script() {
+  echo "Running script ${1}..."
+  if ! output="${SCRIPTS_DIR}"/$1.sh; then
+    echo "${output}"
+    exit 1
+  fi
+  echo "Done."
+}
+
 function setup_cloudflare_dns() {
   # set up dns to cloudflare
   systemctl disable systemd-resolved.service
@@ -34,29 +43,29 @@ function setup_cloudflare_dns() {
 }
 
 function install_deps() {
-  "${SCRIPTS_DIR}"/deps.sh
+  run_script deps
 }
 
 function setup_network() {
-  "${SCRIPTS_DIR}"/network.sh
+  run_script network
 }
 
 function setup_firewall() {
-  "${SCRIPTS_DIR}"/firewall.sh
+  run_script firewall
 }
 
 function start_services() {
-  "${SCRIPTS_DIR}"/services.sh
+  run_script services
 }
 
 function setup_initd() {
-    # setup script self to run on every boot
-    # sym link to init.d
-    chmod +x "${script_path}"
-    ln -sf  "${script_path}" /etc/init.d/hub
-    # sym link to rc level 3, start last
-    # https://unix.stackexchange.com/a/83753/310751
-    ln -sf /etc/init.d/hub /etc/rc3.d/S99hub
+  # setup script self to run on every boot
+  # sym link to init.d
+  chmod +x "${script_path}"
+  ln -sf  "${script_path}" /etc/init.d/hub
+  # sym link to rc level 3, start last
+  # https://unix.stackexchange.com/a/83753/310751
+  ln -sf /etc/init.d/hub /etc/rc3.d/S99hub
 }
 
 cmd=${1:-start}
