@@ -58,7 +58,7 @@ for service in "${services[@]}"; do
     $pre
   fi
 
-  docker compose up -d -p "${service}" --quiet-pull --remove-orphans -f "${SRV_DIR}"/docker-compose-"${service}".yml
+  docker compose -p "${service}" -f "${SRV_DIR}"/docker-compose-"${service}".yml up -d --quiet-pull --remove-orphans
   if command -v "$post"; then
     $post
   fi
