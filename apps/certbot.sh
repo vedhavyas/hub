@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-echo "Issuing certificate for ${SERVER_DOMAIN} using email ${SERVER_DOMAIN_EMAIL}..."
+echo "Issuing certificate for mail.${SERVER_DOMAIN} using email ${SERVER_DOMAIN_EMAIL}..."
 mkdir -p "${DATA_DIR}"/certbot
 # port forward host to certbot
 eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
