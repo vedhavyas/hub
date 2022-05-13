@@ -12,10 +12,6 @@ get_ext_net_if() {
     ip route sh | awk '$1 == "default" && $2 == "via" { print $5; exit }'
 }
 
-get_ext_net_ip() {
-    ip addr sh "$(get_ext_net_if)" | grep 'inet ' | xargs | awk -F'[ /]' '{ print $2 }'
-}
-
 update_seq_no() {
     echo "$1" > seqno.txt
 }
@@ -81,7 +77,7 @@ PrivateKey = $(wg genkey | tee "wgclient_$CLIENT_NAME.key")
 PublicKey = $(wg pubkey < wghub.key)
 PresharedKey = $(cat wgpsk.key)
 AllowedIPs = $WG_CLIENT_ALLOWED_IPS
-Endpoint = $(get_ext_net_ip):$WG_HUB_PORT
+Endpoint = $SERVER_DOMAIN:$WG_HUB_PORT
 PersistentKeepalive = 25
 EOF
 }

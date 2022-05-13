@@ -11,7 +11,7 @@ services:
     # If the FQDN for your mail-server is only two labels (eg: example.com),
     # you can assign this entirely to `hostname` and remove `domainname`.
     hostname: mail
-    domainname: $MAIL_SERVER_DOMAIN
+    domainname: $SERVER_DOMAIN
     # More information about the mail-server ports:
     # https://docker-mailserver.github.io/docker-mailserver/edge/config/security/understanding-the-ports/
     # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
@@ -36,7 +36,7 @@ services:
       docker-direct:
         ipv4_address: 10.10.2.254
         aliases:
-          - mail.$MAIL_SERVER_DOMAIN
+          - mail.$SERVER_DOMAIN
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
