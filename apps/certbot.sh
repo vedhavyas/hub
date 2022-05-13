@@ -25,7 +25,6 @@ chown -R docker:docker "${DATA_DIR}"/certbot/*
 
 # Setup a cron schedule to run every day at 12 am
 echo "SHELL=/bin/zsh
-# TODO global lib
 0 0 * * * $(realpath "$ROOT_DIR"/hub.sh) apps certbot
 # This extra line makes it a valid cron" > /tmp/scheduler.txt
 
