@@ -212,7 +212,7 @@ services:
       - docker-vpn
     volumes:
       - $DATA_DIR/podcasts/config:/config
-      - $DATA_DIR/podcasts/assets:/assets
+      - $DATA_DIR/media/podcasts:/assets
     labels:
       caddy: podcasts.hub
       caddy.tls: internal
