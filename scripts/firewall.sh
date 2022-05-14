@@ -32,6 +32,9 @@ iptables -P INPUT DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 
+# flush duplicate rule with mullvad mark
+while ip rule del fwmark 0x64; do :; done || true
+
 # always accept already established and related packets
 eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
 iptables -A INPUT -i "${eth0}" -m state --state=ESTABLISHED,RELATED -j ACCEPT
