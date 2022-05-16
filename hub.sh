@@ -13,6 +13,7 @@ DOCKER_DIR="${root_dir}"/docker
 APPS_DIR="${root_dir}"/apps
 SCRIPTS_DIR="${root_dir}"/scripts
 SYSTEMD_DIR="${root_dir}"/systemd
+HUB_DIR=/hub
 source "${root_dir}"/.env
 
 # create a docker user

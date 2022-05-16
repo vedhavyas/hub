@@ -47,7 +47,8 @@ services:
     image: filebrowser/filebrowser:v2
     restart: unless-stopped
     volumes:
-      - '$DATA_DIR/:/srv'
+      - '$HUB_DIR/:/srv/hub'
+      - '$DATA_DIR/:/srv/data'
       - '$DATA_DIR/filebrowser/filebrowser.db:/database.db'
     networks:
       - docker-direct
