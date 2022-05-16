@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# ensure unmount
+fusermount -uz /hub
+
 # create required folders and setup ownership
 mkdir -p /hub
 mkdir -p /opt/rclone/logs /opt/rclone/cache
