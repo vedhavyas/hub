@@ -3,6 +3,9 @@
 # ensure unmount
 fusermount -uz /hub
 
+# delete
+rm -rf /hub
+
 # create required folders and setup ownership
 mkdir -p /hub
 mkdir -p /opt/rclone/logs /opt/rclone/cache
