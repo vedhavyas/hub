@@ -166,22 +166,6 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3579}}"
 
-  media-cleaner:
-    container_name: media-cleaner
-    image: vedhavyas/media-cleaner:latest
-    restart: unless-stopped
-    networks:
-      - docker-vpn
-    volumes:
-      - $HUB_DIR/media/downloads:/downloads
-    environment:
-      - EMBY_USER
-      - EMBY_PASSWD_HASH
-      - EMBY_ACCESS_TOKEN
-      - EMBY_USER_KEY
-    depends_on:
-      - emby
-
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     container_name: audiobookshelf
