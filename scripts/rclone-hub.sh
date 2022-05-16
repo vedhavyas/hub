@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# stop rclone-hub
+systemctl stop rclone-hub
+
 # ensure unmount
 fusermount -uz /hub
 
