@@ -1,0 +1,27 @@
+[Unit]
+Description=RClone mount for Hub
+
+[Service]
+Type=notify
+Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
+KillMode=none
+RestartSec=5
+ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
+--auto-confirm \
+--allow-other \
+--dir-cache-time 24h \
+--log-file /opt/rclone/logs/hub.log \
+--log-level INFO \
+--cache-dir=/opt/rclone/cache/hub \
+--vfs-cache-mode full \
+--vfs-cache-max-size 100G \
+--vfs-write-back 1h \
+--vfs-cache-max-age 24h \
+--vfs-read-ahead 1G
+ExecStop=/bin/fusermount -uz /hub
+Restart=on-failure
+User=docker
+Group=docker
+
+[Install]
+WantedBy=multi-user.target

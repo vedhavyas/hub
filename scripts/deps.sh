@@ -53,3 +53,6 @@ docker system prune -a -f
 
 # remove policy file to reset
 rm -f /usr/sbin/policy-rc.d
+
+# install rclone
+curl https://rclone.org/install.sh | sudo bash

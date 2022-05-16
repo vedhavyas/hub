@@ -12,6 +12,7 @@ mkdir -p "${DATA_DIR}"
 DOCKER_DIR="${root_dir}"/docker
 APPS_DIR="${root_dir}"/apps
 SCRIPTS_DIR="${root_dir}"/scripts
+SYSTEMD_DIR="${root_dir}"/systemd
 source "${root_dir}"/.env
 
 # create a docker user
@@ -50,6 +51,10 @@ function install_deps() {
   run_script deps
 }
 
+function setup_rclone_hub() {
+  run_script rclone-hub
+}
+
 function setup_network() {
   run_script network
 }
@@ -79,6 +84,7 @@ start )
   echo "Starting Hub..."
   setup_cloudflare_dns
   install_deps
+  setup_rclone_hub
   setup_network
   setup_firewall
   start_services
