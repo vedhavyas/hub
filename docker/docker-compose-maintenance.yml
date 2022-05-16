@@ -46,3 +46,28 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
+  avahi:
+    container_name: avahi
+    image: solidnerd/avahi:latest
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - ${CONF_DIR}/avahi_time_machine.service:/etc/avahi/services/timemachine.service:ro
+    networks:
+      - docker-direct
+
+  samba:
+    image: yaurora/samba:latest
+    container_name: samba
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - ${CONF_DIR}/smb.conf:/etc/samba/smb.conf
+      - /container_data/media:/share
+    environment:
+      - TZ
+      - SMB_USER
+      - SMB_PASS
+    networks:
+      - docker-direct
+
