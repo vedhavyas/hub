@@ -55,4 +55,4 @@ docker system prune -a -f
 rm -f /usr/sbin/policy-rc.d
 
 # install rclone
-curl https://rclone.org/install.sh | sudo bash
+curl https://rclone.org/install.sh | sudo bash || true
