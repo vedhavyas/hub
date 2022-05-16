@@ -1,0 +1,12 @@
+[Unit]
+Description=Setup Hub network
+Requires=hub-deps.service
+After=hub-deps.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hub run-script network
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

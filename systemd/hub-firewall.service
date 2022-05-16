@@ -1,0 +1,12 @@
+[Unit]
+Description=Setup Hub firewall
+Requires=hub-network.service
+After=hub-network.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hub run-script firewall
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

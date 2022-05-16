@@ -1,8 +1,5 @@
 #!/bin/zsh
 
-# stop rclone-hub
-systemctl stop rclone-hub
-
 # ensure unmount
 fusermount -uz /hub
 
@@ -32,16 +29,7 @@ EOF
 
 chown docker:docker /opt/rclone/*
 
-# setup unit
-cp "${SYSTEMD_DIR}"/rclone-hub.service /etc/systemd/system/rclone-hub.service
-
 # update fuse to allow others
 if ! (grep -iq "user_allow_other" /etc/fuse.conf && sed -i 's/.*user_allow_other.*/user_allow_other/' /etc/fuse.conf); then
   echo "user_allow_other" >> /etc/fuse.conf
 fi
-
-# reload units
-systemctl daemon-reload
-
-# start unit
-systemctl start rclone-hub

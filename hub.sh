@@ -36,74 +36,20 @@ function run_script() {
   echo "Done."
 }
 
-function setup_cloudflare_dns() {
-  # set up dns to cloudflare
-  systemctl disable systemd-resolved.service
-  systemctl stop systemd-resolved.service
-  rm /etc/resolv.conf
-  echo "nameserver 1.1.1.1" > /etc/resolv.conf
-}
-
-function link_binary() {
-    ln -sf  "${script_path}" /usr/bin/hub
-}
-
-function install_deps() {
-  run_script deps
-}
-
-function setup_rclone_hub() {
-  run_script rclone-hub
-}
-
-function setup_network() {
-  run_script network
-}
-
-function setup_firewall() {
-  run_script firewall
-}
-
-function start_services() {
-  run_script services
-}
-
-function setup_initd() {
-  # setup script self to run on every boot
-  # sym link to init.d
-  chmod +x "${script_path}"
-  ln -sf  "${script_path}" /etc/init.d/hub
-  # sym link to rc level 3, start last
-  # https://unix.stackexchange.com/a/83753/310751
-  ln -sf /etc/init.d/hub /etc/rc3.d/S99hub
-}
-
-cmd=${1:-start}
+cmd=${1}
 case $cmd in
-# start is called by the systemd service
-start )
-  echo "Starting Hub..."
-  setup_cloudflare_dns
-  install_deps
-  setup_rclone_hub
-  setup_network
-  setup_firewall
-  start_services
-  setup_initd
-  link_binary
-  echo "Hub started."
-  ;;
+init )
+  # link the binary
+  ln -sf  "${script_path}" /usr/bin/hub
 
-restart|reload )
-  echo "Restarting Hub..."
-  setup_network
-  setup_firewall
-  start_services
-  echo "Hub restarted."
-  ;;
+  # copy units to system
+  cp  "${SYSTEMD_DIR}"/* /etc/systemd/system/
 
-status )
-  docker compose ls
+  # reload systemctl
+  systemctl daemon-reload
+
+  # enable units
+  systemctl reenable hub-deps hub-mount hub-network hub-firewall hub-services
   ;;
 
 apps )
@@ -124,8 +70,10 @@ logs )
   ;;
 
 run-script )
-  run_script "$2"
+  shift
+  run_script "$@"
   ;;
+
 * )
   echo "Unknown command $1"
   ;;

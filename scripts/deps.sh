@@ -1,5 +1,11 @@
 #!/bin/zsh
 
+# set up dns to cloudflare
+systemctl disable systemd-resolved.service
+systemctl stop systemd-resolved.service
+rm /etc/resolv.conf
+echo "nameserver 1.1.1.1" > /etc/resolv.conf
+
 apt update -y &> /dev/null
 apt upgrade -y &> /dev/null
 apt autoremove -y &> /dev/null
@@ -49,7 +55,7 @@ systemctl restart docker
 systemctl restart docker.socket
 #prune system
 docker ps -aq | xargs docker stop
-docker system prune -a -f
+docker system prune -a -f --volumens
 
 # remove policy file to reset
 rm -f /usr/sbin/policy-rc.d

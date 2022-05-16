@@ -1,0 +1,11 @@
+[Unit]
+Description=Install Hub dependencies
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hub run-script deps
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

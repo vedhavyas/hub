@@ -1,12 +1,12 @@
 [Unit]
-Description=RClone mount for Hub
-Wants=network-online.target
+Description=Start Hub mount
+Requires=hub-deps.service
+After=hub-deps.service
 
 [Service]
 Type=notify
 Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
-KillMode=none
-RestartSec=5
+ExecStartPre=/usr/bin/hub run-script pre-mount
 ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --auto-confirm \
 --allow-other \
@@ -21,10 +21,9 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --vfs-write-back 5m \
 --vfs-cache-max-age 9999h \
 --vfs-read-ahead 1G
-ExecStop=/bin/fusermount -uz /hub
+ExecStop=/usr/bin/fusermount -uz /hub
+RestartSec=5
 Restart=on-failure
-User=docker
-Group=docker
 
 [Install]
 WantedBy=multi-user.target

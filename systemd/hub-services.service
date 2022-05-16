@@ -1,0 +1,12 @@
+[Unit]
+Description=Setup Hub network
+Requires=hub-deps.service hub-mount.service hub-network.service hub-firewall.service
+After=hub-deps.service hub-mount.service hub-network.service hub-firewall.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hub run-script services
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
