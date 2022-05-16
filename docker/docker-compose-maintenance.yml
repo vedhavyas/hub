@@ -50,7 +50,6 @@ services:
     container_name: avahi
     image: solidnerd/avahi:latest
     restart: unless-stopped
-    user: $PUID:$PGID
     volumes:
       - ${CONF_DIR}/avahi_time_machine.service:/etc/avahi/services/timemachine.service:ro
     networks:
@@ -60,10 +59,9 @@ services:
     image: yaurora/samba:latest
     container_name: samba
     restart: unless-stopped
-    user: $PUID:$PGID
     volumes:
       - ${CONF_DIR}/smb.conf:/etc/samba/smb.conf
-      - /container_data/media:/share
+      - ${HUB_DIR}/time-machine:/time-machine
     environment:
       - TZ
       - SMB_USER
