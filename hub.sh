@@ -52,6 +52,11 @@ init )
   systemctl reenable hub-deps hub-mount hub-network hub-firewall hub-services
   ;;
 
+status )
+  systemctl list-unit-files 'hub-*'
+  systemctl list-units 'hub-*'
+  ;;
+
 apps )
   shift
   app="${1}"
