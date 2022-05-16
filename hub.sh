@@ -122,6 +122,9 @@ logs )
   esac
   ;;
 
+run-script )
+  run_script "$2"
+  ;;
 * )
   echo "Unknown command $1"
   ;;
