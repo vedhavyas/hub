@@ -52,9 +52,16 @@ function media_post_up() {
 services=(core maintenance monitoring media utilities mailserver)
 # start services
 for service in "${services[@]}"; do
-  pre=${service}_pre_up
-  command -v "$pre" >/dev/null && $pre
-  docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml up -d --quiet-pull --remove-orphans || exit 1
-  post=${service}_post_up
-  command -v "$post" >/dev/null && $post
+  case $1 in
+  start|reload)
+    pre=${service}_pre_up
+    command -v "$pre" >/dev/null && $pre
+    docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml up -d --quiet-pull --remove-orphans || exit 1
+    post=${service}_post_up
+    command -v "$post" >/dev/null && $post
+    ;;
+  stop)
+    docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml down
+  esac
+
 done

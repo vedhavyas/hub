@@ -32,7 +32,7 @@ function run_script() {
   echo "Running script ${1}..."
   script=${1}
   shift
-  "${SCRIPTS_DIR}"/"$script".sh || exit 1
+  "${SCRIPTS_DIR}"/"$script".sh "$@" || exit 1
   echo "Done."
 }
 

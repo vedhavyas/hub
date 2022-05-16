@@ -1,7 +1,7 @@
 [Unit]
 Description=Setup Hub firewall
-Requires=hub-network.service
-After=hub-network.service
+Requires=hub-network.service hub-mount.service
+After=hub-network.service hub-mount.service
 
 [Service]
 Type=oneshot
