@@ -22,7 +22,7 @@ services:
     volumes:
       - /etc/ssl/certs:/certs
       - $DATA_DIR/transmission:/config
-      - $DATA_DIR/media/:/data
+      - $HUB_DIR/media/:/data
     networks:
       docker-vpn:
         ipv4_address: 10.10.3.100
@@ -75,7 +75,7 @@ services:
     volumes:
       - $DATA_DIR/jackett:/config
       - /etc/localtime:/etc/localtime:ro
-      - $DATA_DIR/media/downloads:/downloads
+      - $HUB_DIR/media/downloads:/downloads
     healthcheck:
       test: curl -f http://jackett:9117 &> /dev/null && echo "OK" || exit 1
       interval: 15s
@@ -97,7 +97,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $DATA_DIR/sonarr/:/config
-      - $DATA_DIR/media/:/data
+      - $HUB_DIR/media/:/data
     healthcheck:
       test: curl -f http://sonarr:8989 &> /dev/null && echo "OK" || exit 1
       interval: 15s
@@ -119,7 +119,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $DATA_DIR/radarr/:/config
-      - $DATA_DIR/media/:/data
+      - $HUB_DIR/media/:/data
     healthcheck:
       test: curl -f http://radarr:7878 &> /dev/null && echo "OK" || exit 1
       interval: 15s
@@ -138,7 +138,7 @@ services:
       - GIDLIST=$PGID
     volumes:
       - $DATA_DIR/emby/:/config
-      - $DATA_DIR/media/:/mnt
+      - $HUB_DIR/media/:/mnt
     networks:
       - docker-vpn
     labels:
@@ -173,7 +173,7 @@ services:
     networks:
       - docker-vpn
     volumes:
-      - $DATA_DIR/media/downloads:/downloads
+      - $HUB_DIR/media/downloads:/downloads
     environment:
       - EMBY_USER
       - EMBY_PASSWD_HASH
@@ -192,8 +192,8 @@ services:
     networks:
       - docker-vpn
     volumes:
-      - $DATA_DIR/media/audio-books:/audiobooks
-      - $DATA_DIR/media/podcasts:/podcasts
+      - $HUB_DIR/media/audio-books:/audiobooks
+      - $HUB_DIR/media/podcasts:/podcasts
       - $DATA_DIR/audiobookshelf/config:/config
       - $DATA_DIR/audiobookshelf/metadata:/metadata
     labels:
@@ -212,7 +212,7 @@ services:
       - docker-vpn
     volumes:
       - $DATA_DIR/podcasts/config:/config
-      - $DATA_DIR/media/podcasts:/assets
+      - $HUB_DIR/media/podcasts:/assets
     labels:
       caddy: podcasts.hub
       caddy.tls: internal
