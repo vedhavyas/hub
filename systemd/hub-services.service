@@ -1,5 +1,5 @@
 [Unit]
-Description=Setup Hub network
+Description=Setup Hub services
 Requires=hub-deps.service hub-mount.service hub-network.service hub-firewall.service
 After=hub-deps.service hub-mount.service hub-network.service hub-firewall.service
 
