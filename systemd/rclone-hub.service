@@ -15,7 +15,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --cache-dir=/opt/rclone/cache/hub \
 --vfs-cache-mode full \
 --vfs-cache-max-size 100G \
---vfs-write-back 1h \
+--vfs-write-back 10m \
 --vfs-cache-max-age 24h \
 --vfs-read-ahead 1G
 ExecStop=/bin/fusermount -uz /hub
