@@ -9,6 +9,8 @@ rm -rf /hub
 # create required folders and setup ownership
 mkdir -p /hub
 mkdir -p /opt/rclone/logs /opt/rclone/cache
+chown -R docker:docker /hub
+chown -R docker:docker /opt/rclone
 
 # create conf
 cat > /opt/rclone/rclone.conf << EOF
