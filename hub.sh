@@ -67,10 +67,10 @@ apps )
 logs )
   case ${2} in
   -f)
-    journalctl -u hub -f
+    journalctl -u "hub-*" -f
     ;;
   * )
-    journalctl -u hub --no-pager
+    journalctl -u "hub-*" --no-pager
   esac
   ;;
 
