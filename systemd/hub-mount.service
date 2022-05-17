@@ -9,7 +9,7 @@ Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
 ExecStartPre=+/usr/bin/hub run-script pre-mount
 ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --auto-confirm \
---allow-other \
+#--allow-other \
 # no updates happen on the cloud, so set it to max
 --dir-cache-time 9999h \
 --poll-interval 0 \
