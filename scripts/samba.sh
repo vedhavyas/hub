@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 useradd -M "${SMB_USER}"
 (echo "${SMB_PASS}"; echo "${SMB_PASS}") | smbpasswd -L -D 3 -a -s "${SMB_USER}"
 mkdir -p /home/"${SMB_USER}"
