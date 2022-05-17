@@ -15,6 +15,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --poll-interval 0 \
 --log-file /opt/rclone/logs/hub.log \
 --log-level INFO \
+--umask 000 \
 --cache-dir=/opt/rclone/cache/hub \
 --vfs-cache-mode full \
 --vfs-cache-max-size 100G \
