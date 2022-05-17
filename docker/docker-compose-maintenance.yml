@@ -53,6 +53,7 @@ services:
       - TM_UID=$PUID
       - TM_GID=$PGID
       - SET_PERMISSIONS=true
+      - DEBUG_LEVEL=5
     restart: unless-stopped
     networks:
       docker-direct:
