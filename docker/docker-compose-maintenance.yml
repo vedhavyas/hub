@@ -48,7 +48,7 @@ services:
 
   samba:
     container_name: samba
-    image: ghcr.io/jtagcat/samba:latest
+    image: dperson/samba:latest
     restart: unless-stopped
     environment:
       - TZ
