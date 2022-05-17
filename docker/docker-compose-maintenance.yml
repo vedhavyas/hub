@@ -97,7 +97,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${CONF_DIR}/smb.conf:/etc/samba/smb.conf
-      - ${HUB_DIR}/time-machine:/home
+      - ${DATA_DIR}/time-machine:/home
     environment:
       - TZ
       - PUID
