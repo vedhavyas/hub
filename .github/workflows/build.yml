@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+        build: [mullvad radicale samba webdav]
     runs-on: ${{ matrix.os }}
     env:
       DOCKER_USERNAME: ${{ secrets.docker_username }}
@@ -21,8 +22,8 @@ jobs:
       - name: Install zsh
         run: sudo apt-get update; sudo apt-get install zsh
       - name: Build docker images
-        run: ./builds/script.sh build
+        run: ./builds/script.sh build ${{ matrix.build }}
       - name: Push images to Docker Hub
         run: |
           echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-          ./builds/script.sh push
+          ./builds/script.sh push ${{ matrix.build }}

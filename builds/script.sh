@@ -5,14 +5,10 @@ build)
   echo "Building docker images..."
   script_path=$(realpath "$0")
   dir=$(dirname "${script_path}")
-  for build in radicale webdav mullvad samba; do
-    docker build -t vedhavyas/${build}:latest "${dir}/${build}"
-  done
+  docker build -t vedhavyas/"$2":latest "${dir}/$2"
   ;;
 push)
-  for build in radicale webdav mullvad samba; do
-    docker push vedhavyas/${build}:latest
-  done
+  docker push vedhavyas/"${2}":latest
   ;;
 *)
   echo "unknown command"
