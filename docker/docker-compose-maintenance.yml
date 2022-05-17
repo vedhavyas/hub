@@ -68,9 +68,6 @@ services:
       - SMB_USER
       - SMB_PASS
     networks:
-      - docker-direct
-    labels:
-      caddy: samba.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 445}}"
+      docker-direct:
+        ipv4_address: 10.10.2.253
 
