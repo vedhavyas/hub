@@ -57,12 +57,13 @@ services:
       - TM_GID=${PGID}
       - SMB_INHERIT_PERMISSIONS=yes
       - DEBUG_LEVEL=3
+      - WORKGROUP=Hub
     restart: unless-stopped
     networks:
       docker-direct:
         ipv4_address: 10.10.2.253
     volumes:
-      - ${DATA_DIR}/time-machine:/opt/timemachine
+      - ${HUB_DIR}/time-machine:/opt/timemachine
     ulimits:
       nofile:
         soft: 65536
