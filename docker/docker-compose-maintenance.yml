@@ -63,7 +63,7 @@ services:
       docker-direct:
         ipv4_address: 10.10.2.253
     volumes:
-      - ${HUB_DIR}/time-machine:/opt/${SMB_USER}
+      - ${HUB_DIR}/time-machine/${SMB_USER}:/opt/${SMB_USER}
     ulimits:
       nofile:
         soft: 65536
