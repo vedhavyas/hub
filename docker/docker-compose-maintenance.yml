@@ -51,6 +51,7 @@ services:
     image: solidnerd/avahi:latest
     restart: unless-stopped
     volumes:
+      - ${CONF_DIR}/avahi-daemon.conf:/etc/avahi/avahidaemon.conf:ro
       - ${CONF_DIR}/avahi_time_machine.service:/etc/avahi/services/timemachine.service:ro
     networks:
       - docker-direct
