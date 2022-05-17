@@ -59,6 +59,6 @@ services:
       - /tmp
     volumes:
       - ${HUB_DIR}/time-machine:/backup:z
-    command: ["-s", "TimeMachineBackup;/backup/${SMB_USER};yes;no;no;${SMB_USER}", "-u", "${SMB_USER};${SMB_PASS}", "-p"]
+    command: ["-s", "TimeMachineBackup;/backup/${SMB_USER};yes;no;no;${SMB_USER};${SMB_USER};${SMB_USER}", "-u", "${SMB_USER};${SMB_PASS}", "-p"]
 
 
