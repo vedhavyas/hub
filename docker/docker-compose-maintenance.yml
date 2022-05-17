@@ -97,9 +97,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${CONF_DIR}/smb.conf:/etc/samba/smb.conf
-      - ${SCRIPTS_DIR}/samba.sh:/entrypoint.sh
       - ${HUB_DIR}/time-machine:/home
-    command: [ "/entrypoint.sh" ]
     environment:
       - TZ
       - SMB_USER
