@@ -52,9 +52,6 @@ services:
     restart: unless-stopped
     environment:
       - TZ
-    read_only: true
-    stdin_open: true
-    tty: true
     networks:
       docker-direct:
         ipv4_address: 10.10.2.253
