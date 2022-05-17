@@ -46,30 +46,18 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
-  avahi:
-    container_name: avahi
-    image: solidnerd/avahi:latest
-    restart: unless-stopped
-    volumes:
-      - ${CONF_DIR}/avahi-daemon.conf:/etc/avahi/avahidaemon.conf:ro
-      - ${CONF_DIR}/avahi_time_machine.service:/etc/avahi/services/timemachine.service:ro
-    networks:
-      - docker-direct
-
   samba:
-    image: yaurora/samba:latest
     container_name: samba
+    image: dperson/samba:latest
     restart: unless-stopped
-    volumes:
-      - ${CONF_DIR}/smb.conf:/etc/samba/smb.conf
-      - ${SCRIPTS_DIR}/samba.sh:/entrypoint.sh
-      - ${HUB_DIR}/time-machine:/home
-    command: ["/entrypoint.sh"]
     environment:
       - TZ
-      - SMB_USER
-      - SMB_PASS
     networks:
       docker-direct:
         ipv4_address: 10.10.2.253
+    tmpfs:
+      - /tmp
+    volumes:
+      - ${HUB_DIR}/time-machine:/backup:z
+    command: ["-p" "-s" "Time Machine Backup;/backup;yes;no;no;${SMB_USER}" "-u" "${SMB_USER};${SMB_PASS}"'
 
