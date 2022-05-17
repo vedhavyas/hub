@@ -22,7 +22,6 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --vfs-cache-max-age 9999h \
 --vfs-read-ahead 1G
 ExecStop=+/usr/bin/fusermount -uz /hub
-RestartSec=5
 Restart=on-failure
 User=docker
 Group=docker
