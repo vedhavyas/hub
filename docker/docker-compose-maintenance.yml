@@ -100,8 +100,8 @@ services:
       - ${HUB_DIR}/time-machine:/home
     environment:
       - TZ
-      - PUID
-      - PGID
+      - PUID=501
+      - PGID=20
       - SMB_USER
       - SMB_PASS
     networks:
