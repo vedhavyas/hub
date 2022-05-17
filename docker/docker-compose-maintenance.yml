@@ -100,6 +100,8 @@ services:
       - ${HUB_DIR}/time-machine:/home
     environment:
       - TZ
+      - PUID
+      - PGID
       - SMB_USER
       - SMB_PASS
     networks:
