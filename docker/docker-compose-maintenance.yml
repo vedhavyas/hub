@@ -52,6 +52,7 @@ services:
     environment:
       - TM_UID=$PUID
       - TM_GID=$PGID
+      - SET_PERMISSIONS=true
     restart: unless-stopped
     networks:
       docker-direct:
