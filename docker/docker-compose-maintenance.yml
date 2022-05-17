@@ -85,6 +85,8 @@ services:
     tty: true
     volumes:
       - ${HUB_DIR}/time-machine:/backup
-    command: [ "-s", "TimeMachineBackup;/backup/${SMB_USER};yes;no;no;${SMB_USER},smbuser;${SMB_USER},smbuser;${SMB_USER},smbuser",
+    command: [ "-s", "TimeMachineBackup;/backup/${SMB_USER};no;no;no;${SMB_USER},smbuser;${SMB_USER},smbuser;${SMB_USER},smbuser",
                "-u", "${SMB_USER};${SMB_PASS};${PUID};;${PGID}",
-               "-g", "log level = 2"]
+               "-g", "log level = 2",
+               "-g", "fruit:metadata = stream"
+              ]
