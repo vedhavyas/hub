@@ -11,7 +11,7 @@ done
 
 docker run --rm --name certbot \
             --net docker-direct \
-            --ip 10.10.2.253 \
+            --ip 10.10.2.252 \
             -v "${DATA_DIR}/certbot/certs:/etc/letsencrypt" \
             -v "${DATA_DIR}/certbot/logs:/var/log/letsencrypt" \
             certbot/certbot certonly --standalone -d mail."${SERVER_DOMAIN}" -m "${SERVER_DOMAIN_EMAIL}" --non-interactive --agree-tos
