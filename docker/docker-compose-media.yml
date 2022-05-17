@@ -189,7 +189,6 @@ services:
     image: akhilrex/podgrab:latest
     container_name: podcasts
     restart: unless-stopped
-    user: $PUID:$PGID
     environment:
       - CHECK_FREQUENCY=240
     networks:
