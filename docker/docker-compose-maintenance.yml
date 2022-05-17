@@ -46,27 +46,43 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9000}}"
 
-  timemachine:
-    image: mbentley/timemachine:smb
-    container_name: timemachine
-    environment:
-      - TM_USERNAME=${SMB_USER}
-      - PASSWORD=${SMB_PASS}
-      #- SET_PERMISSIONS=true
-      - TM_UID=${PUID}
-      - TM_GID=${PGID}
-      #- SMB_INHERIT_PERMISSIONS=yes
-      - DEBUG_LEVEL=3
-      - WORKGROUP=Hub
+#  timemachine:
+#    image: mbentley/timemachine:smb
+#    container_name: timemachine
+#    environment:
+#      - TM_USERNAME=${SMB_USER}
+#      - PASSWORD=${SMB_PASS}
+#      - SET_PERMISSIONS=true
+#      - TM_UID=${PUID}
+#      - TM_GID=${PGID}
+#      - SMB_INHERIT_PERMISSIONS=yes
+#      - DEBUG_LEVEL=3
+#      - WORKGROUP=Hub
+#    restart: unless-stopped
+#    networks:
+#      docker-direct:
+#        ipv4_address: 10.10.2.253
+#    volumes:
+#      - ${HUB_DIR}/time-machine/${SMB_USER}:/opt/${SMB_USER}
+#    ulimits:
+#      nofile:
+#        soft: 65536
+#        hard: 65536
+
+  samba:
+    container_name: samba
+    image: dperson/samba:latest
     restart: unless-stopped
+    environment:
+      - TZ
     networks:
       docker-direct:
         ipv4_address: 10.10.2.253
+    read_only: true
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
     volumes:
-      - ${HUB_DIR}/time-machine/${SMB_USER}:/opt/${SMB_USER}
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-
-
+      - ${HUB_DIR}/time-machine:/backup
+    command: [ "-s", "TimeMachineBackup;/backup/${SMB_USER};yes;no;no;${SMB_USER};${SMB_USER};${SMB_USER}", "-u", "${SMB_USER};${SMB_PASS}", "-p" ]
