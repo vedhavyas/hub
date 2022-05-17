@@ -50,8 +50,6 @@ services:
     image: mbentley/timemachine:smb
     container_name: timemachine
     environment:
-      - TM_UID=$PUID
-      - TM_GID=$PGID
       - SET_PERMISSIONS=true
       - SMB_INHERIT_PERMISSIONS=yes
       - DEBUG_LEVEL=3
