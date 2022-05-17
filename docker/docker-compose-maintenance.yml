@@ -53,6 +53,8 @@ services:
       - TM_USERNAME=${SMB_USER}
       - PASSWORD=${SMB_PASS}
       - SET_PERMISSIONS=true
+      - TM_UID=${PUID}
+      - TM_GID=${PGID}
       - SMB_INHERIT_PERMISSIONS=yes
       - DEBUG_LEVEL=3
     restart: unless-stopped
