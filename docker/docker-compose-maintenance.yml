@@ -55,8 +55,11 @@ services:
     networks:
       docker-direct:
         ipv4_address: 10.10.2.253
+    read_only: true
     tmpfs:
       - /tmp
+    stdin_open: true
+    tty: true
     volumes:
       - ${HUB_DIR}/time-machine:/backup:z
     command: ["-s", "TimeMachineBackup;/backup/${SMB_USER};yes;no;no;${SMB_USER};${SMB_USER};${SMB_USER}", "-u", "${SMB_USER};${SMB_PASS}", "-p"]
