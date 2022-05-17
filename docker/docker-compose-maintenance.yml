@@ -52,6 +52,9 @@ services:
     restart: unless-stopped
     environment:
       - TZ
+    read_only: true
+    stdin_open: true
+    tty: true
     networks:
       docker-direct:
         ipv4_address: 10.10.2.253
@@ -59,5 +62,6 @@ services:
       - /tmp
     volumes:
       - ${HUB_DIR}/time-machine:/backup:z
-    command: ["-s", "TimeMachine;/backup/${SMB_USER};yes;no;no;${SMB_USER},${SMB_USER};${SMB_USER}", "-u", "${SMB_USER};${SMB_PASS}", "-p"]
+    command: ["-u", "${SMB_USER};${SMB_PASS}", "-s", "TimeMachineBackup;/backup/${SMB_USER};yes;no;no;${SMB_USER}", "-p"]
+
 
