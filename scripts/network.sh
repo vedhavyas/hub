@@ -4,6 +4,10 @@
 docker ps -aq | xargs docker stop
 docker system prune -a -f --volumes
 
+# pihole is not running yet
+rm /etc/resolv.conf
+echo "nameserver 1.1.1.1" > /etc/resolv.conf
+
 # generate wireguard hub interface
 ip link del wg-hub || true
 ip link add wg-hub type wireguard || true
