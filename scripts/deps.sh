@@ -51,12 +51,6 @@ cat > /etc/docker/daemon.json << EOF
 }
 EOF
 
-systemctl restart docker
-systemctl restart docker.socket
-#prune system
-docker ps -aq | xargs docker stop
-docker system prune -a -f --volumes
-
 # remove policy file to reset
 rm -f /usr/sbin/policy-rc.d
 

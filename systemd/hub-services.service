@@ -1,7 +1,7 @@
 [Unit]
 Description=Setup Hub services
-Requires=hub-firewall.service hub-mount.service
-After=hub-firewall.service hub-mount.service
+Requires=docker.service
+After=docker.service
 
 [Service]
 Type=oneshot
