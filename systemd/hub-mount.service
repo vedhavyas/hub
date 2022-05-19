@@ -2,6 +2,7 @@
 Description=Start Hub mount
 Requires=hub-deps.service
 After=hub-deps.service
+Before=docker.socket
 
 [Service]
 Type=notify
@@ -28,4 +29,5 @@ User=docker
 Group=docker
 
 [Install]
+RequiredBy=docker.socket
 WantedBy=multi-user.target
