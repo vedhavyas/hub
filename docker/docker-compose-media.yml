@@ -166,6 +166,25 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3579}}"
 
+  jellyseerr:
+    image: fallenbagel/jellyseerr:develop
+    container_name: jellyseerr
+    networks:
+      - docker-vpn
+    environment:
+      - TZ
+      - JELLYFIN_TYPE=emby
+    volumes:
+      - $DATA_DIR/ombi//jellyseerr/config:/app/config
+    healthcheck:
+      test: curl -f http://jellyseerr:5055 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    restart: unless-stopped
+    labels:
+      caddy: jellyseerr.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5055}}"
+
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     container_name: audiobookshelf
