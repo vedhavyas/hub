@@ -167,7 +167,7 @@ services:
       caddy.reverse_proxy: "{{upstreams 3579}}"
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:develop
+    image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     networks:
       - docker-vpn
