@@ -29,5 +29,4 @@ User=docker
 Group=docker
 
 [Install]
-RequiredBy=docker.socket
 WantedBy=multi-user.target
