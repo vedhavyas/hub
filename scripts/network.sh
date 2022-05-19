@@ -4,7 +4,7 @@
 docker ps -aq | xargs docker stop
 docker system prune -a -f --volumes
 
-# pihole is not running yet
+# pihole is not running yet if this was a restart
 rm /etc/resolv.conf
 echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
