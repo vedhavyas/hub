@@ -146,27 +146,7 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8096}}"
 
-  ombi:
-    image: linuxserver/ombi:latest
-    container_name: ombi
-    networks:
-      - docker-vpn
-    environment:
-      - PUID
-      - PGID
-      - TZ
-    volumes:
-      - $DATA_DIR/ombi/:/config
-    healthcheck:
-      test: curl -f http://ombi:3579 &> /dev/null && echo "OK" || exit 1
-      interval: 15s
-    restart: unless-stopped
-    labels:
-      caddy: ombi.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 3579}}"
-
-  jellyseerr:
+  entertainment:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     networks:
@@ -181,7 +161,7 @@ services:
       interval: 15s
     restart: unless-stopped
     labels:
-      caddy: jellyseerr.hub
+      caddy: entertainment.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 5055}}"
 
