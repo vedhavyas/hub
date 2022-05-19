@@ -1,7 +1,7 @@
 [Unit]
 Description=Setup Hub network
-Requires=hub-deps.service
-After=hub-deps.service
+Requires=docker.service
+After=docker.service
 
 [Service]
 Type=oneshot

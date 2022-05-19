@@ -1,5 +1,9 @@
 #!/bin/zsh
 
+# prune all docker related data
+docker ps -aq | xargs docker stop
+docker system prune -a -f --volumes
+
 # generate wireguard hub interface
 ip link del wg-hub || true
 ip link add wg-hub type wireguard || true

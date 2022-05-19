@@ -1,7 +1,7 @@
 [Unit]
 Description=Start Hub mount
-Requires=hub-firewall.service
-After=hub-firewall.service
+Requires=hub-deps.service
+After=hub-deps.service
 Before=docker.socket
 
 [Service]
