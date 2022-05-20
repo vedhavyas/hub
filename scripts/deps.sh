@@ -17,12 +17,12 @@ apt install wait-for-it -y &> /dev/null
 DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y &> /dev/null
 # setup unattended upgrades
 apt install -y unattended-upgrades
-sudo cp "${CONF_DIR}"/20auto-upgrades /etc/apt/apt.conf.d/
-sudo cp "${CONF_DIR}"/50unattended-upgrades /etc/apt/apt.conf.d/
+cp "${CONF_DIR}"/20auto-upgrades /etc/apt/apt.conf.d/
+cp "${CONF_DIR}"/50unattended-upgrades /etc/apt/apt.conf.d/
 
-sudo systemctl stop unattended-upgrades
-sudo systemctl daemon-reload
-sudo systemctl restart unattended-upgrades
+systemctl stop unattended-upgrades
+systemctl daemon-reload
+systemctl restart unattended-upgrades
 
 # install docker and compose
 # Prevent launch of docker after install
@@ -56,4 +56,4 @@ EOF
 rm -f /usr/sbin/policy-rc.d
 
 # install rclone
-curl https://rclone.org/install.sh | sudo bash || true
+curl https://rclone.org/install.sh | bash || true

@@ -38,7 +38,7 @@ function run_script() {
 
 cmd=${1}
 case $cmd in
-init )
+setup )
   # link the binary
   ln -sf  "${script_path}" /usr/bin/hub
 
@@ -49,12 +49,12 @@ init )
   systemctl daemon-reload
 
   # enable units
-  systemctl reenable hub-deps hub-mount hub-network hub-firewall hub-services
+  systemctl reenable hub-deps hub-mount hub-network hub-firewall hub-services docker.service
   ;;
 
 status )
-  systemctl list-unit-files 'hub-*'
-  systemctl list-units 'hub-*'
+  systemctl list-unit-files 'hub-*' docker.service
+  systemctl list-units 'hub-*' docker.service
   ;;
 
 apps )

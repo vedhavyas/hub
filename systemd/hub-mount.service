@@ -1,8 +1,8 @@
 [Unit]
 Description=Start Hub mount
-Requires=hub-deps.service
 After=hub-deps.service
-Before=docker.socket
+PartOf=docker.service
+Before=docker.service
 
 [Service]
 Type=notify
@@ -33,4 +33,4 @@ User=docker
 Group=docker
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=docker.service
