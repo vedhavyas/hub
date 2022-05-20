@@ -4,8 +4,9 @@ networks:
   docker-vpn:
     # https://chris.heald.me/2018/docker-default-routes/
     # cant use docker direct network for all except monies
-    # since docker defaults to lexico sort for to get default network when multiple are passed
-    # so defaulting to just vpn network
+    # since docker defaults to lexico sort to get default network when multiple are passed
+    # it will always pick docker-direct over docker-vpn
+    # so using vpn network for all containers
     external: true
 
 services:
