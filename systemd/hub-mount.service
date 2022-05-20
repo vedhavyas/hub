@@ -21,7 +21,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --gid ${PGID} \
 --cache-dir=/opt/rclone/cache/hub \
 --vfs-cache-mode full \
---vfs-cache-max-size 100G \
+--vfs-cache-max-size 150G \
 --vfs-write-back 5m \
 --vfs-cache-max-age 9999h \
 --vfs-read-ahead 5G \
