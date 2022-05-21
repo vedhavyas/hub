@@ -7,8 +7,8 @@ Before=docker.service
 [Service]
 Type=notify
 Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
-Environment=PUID=`id -u docker`
-Environment=PGID=`id -g docker`
+Environment="PUID=$(id -u docker)"
+Environment="PGID=$(id -g docker)"
 Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
 ExecStartPre=+/usr/bin/hub run-script pre-mount
 ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
