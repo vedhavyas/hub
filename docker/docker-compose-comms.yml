@@ -1,0 +1,22 @@
+version: "3.9"
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  notifier:
+    container_name: notifier
+    image: gotify/server
+    restart: unless-stopped
+    networks:
+      - docker-direct
+    environment:
+      - GOTIFY_DEFAULTUSER_NAME
+      - GOTIFY_DEFAULTUSER_PASS
+    volumes:
+      - "${DATA_DIR}/gotify:/app/data"
+    labels:
+      caddy: notifier.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"

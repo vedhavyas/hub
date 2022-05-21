@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-function core_pre_up() {
+function security_pre_up() {
   # add dns record for caddy reverse proxy
     mkdir -p "${DATA_DIR}/pihole/etc-dnsmasq.d/"
     custom_records="${DATA_DIR}/pihole/etc-dnsmasq.d/03-hub-dns.conf"
@@ -12,7 +12,7 @@ address=/hub/10.10.2.4
 EOF
 }
 
-function core_post_up() {
+function security_post_up() {
   # update resolve.conf with pihole container address
   echo "nameserver 10.10.2.2" > /etc/resolv.conf
 
@@ -50,7 +50,7 @@ function media_post_up() {
   wait-for-it -t 60 10.10.3.100:"${PEER_PORT}"
 }
 
-services=(core maintenance monitoring media utilities mailserver)
+services=(security comms maintenance monitoring media utilities mailserver)
 # start services
 for service in "${services[@]}"; do
   case $1 in
