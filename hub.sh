@@ -55,6 +55,7 @@ setup )
 status )
   systemctl list-unit-files 'hub-*' docker.service
   systemctl list-units 'hub-*' docker.service
+  docker compose ls
   ;;
 
 apps )
