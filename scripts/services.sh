@@ -63,6 +63,7 @@ for service in "${services[@]}"; do
     ;;
   stop)
     docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml down
+    echo "nameserver 1.1.1.1" > /etc/resolv.conf
   esac
 
 done
