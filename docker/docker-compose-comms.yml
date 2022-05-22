@@ -3,6 +3,8 @@ version: "3.9"
 networks:
   docker-direct:
     external: true
+  docker-vpn:
+    external: true
 
 services:
   notifier:
@@ -11,6 +13,7 @@ services:
     restart: unless-stopped
     networks:
       - docker-direct
+      - docker-vpn
     environment:
       - GOTIFY_DEFAULTUSER_NAME
       - GOTIFY_DEFAULTUSER_PASS
