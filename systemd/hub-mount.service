@@ -29,10 +29,10 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --vfs-cache-max-age 3h \
 --vfs-read-ahead 5G \
 --vfs-read-chunk-size 256M \
---vfs-read-chunk-size-limit 1G \
+--vfs-read-chunk-size-limit 2G \
 --vfs-used-is-size \
---tpslimit 10 \
---tpslimit-burst 10
+--tpslimit 15 \
+--tpslimit-burst 15
 ExecStop=+/usr/bin/fusermount -uz /hub
 Restart=on-failure
 User=docker
