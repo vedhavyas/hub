@@ -70,8 +70,8 @@ logs )
   -f)
     journalctl -u "hub-*" -f
     ;;
-  * )
-    journalctl -u "hub-*" --no-pager
+   * )
+    journalctl -u "hub-${2}" -f
   esac
   ;;
 
