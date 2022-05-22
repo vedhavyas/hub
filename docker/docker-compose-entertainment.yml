@@ -199,3 +199,22 @@ services:
       caddy: podcasts.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+
+
+  emulatorjs:
+    image: lscr.io/linuxserver/emulatorjs:latest
+    container_name: emulatorjs
+    restart: unless-stopped
+    networks:
+      - docker-vpn
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA_DIR/emulatorjs/config:/config
+      - $HUB_DIR/media/emulatorjs:/data
+    labels:
+      caddy: emulatorjs.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"

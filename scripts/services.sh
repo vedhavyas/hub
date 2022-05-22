@@ -30,7 +30,7 @@ function mailserver_post_up() {
   wait-for-it -t 60 10.10.2.254:993
 }
 
-function media_pre_up() {
+function entertainment_pre_up() {
   HOST_IP=$(curl https://icanhazip.com)
   export HOST_IP
   source "${DATA_DIR}"/mullvad/mullvad.env
@@ -44,13 +44,13 @@ function media_pre_up() {
   fi
 }
 
-function media_post_up() {
+function entertainment_post_up() {
   # wait for transmission to come up
   wait-for-it -t 60 10.10.3.100:9091
   wait-for-it -t 60 10.10.3.100:"${PEER_PORT}"
 }
 
-services=(security comms maintenance monitoring media utilities mailserver)
+services=(security comms maintenance monitoring entertainment utilities mailserver)
 # start services
 for service in "${services[@]}"; do
   case $1 in
