@@ -215,6 +215,9 @@ services:
       - $DATA_DIR/emulatorjs/config:/config
       - $HUB_DIR/media/emulatorjs:/data
     labels:
-      caddy: emulatorjs.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 80}}"
+      caddy_0: emulatorjs.hub
+      caddy_0.tls: internal
+      caddy_0.reverse_proxy: "{{upstreams 80}}"
+      caddy_1: data.emulatorjs.hub
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 3000}}"
