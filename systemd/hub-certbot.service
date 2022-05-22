@@ -1,0 +1,12 @@
+[Unit]
+Description=Certbot to create/renew certificates from letsencrypt
+Requires=hub-services.service
+After=hub-services.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hub apps certbot
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

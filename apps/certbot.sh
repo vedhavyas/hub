@@ -22,12 +22,3 @@ done
 
 chown docker:docker "${DATA_DIR}"/certbot
 chown -R docker:docker "${DATA_DIR}"/certbot/*
-
-# Setup a cron schedule to run every day at 12 am
-# TODO systemd timer
-echo "SHELL=/bin/zsh
-0 0 * * * /usr/bin/hub apps certbot
-# This extra line makes it a valid cron" > /tmp/scheduler.txt
-
-crontab /tmp/scheduler.txt
-rm -rf /tmp/scheduler.txt
