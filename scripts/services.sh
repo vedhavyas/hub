@@ -13,11 +13,11 @@ EOF
 }
 
 function security_post_up() {
-  # update resolve.conf with pihole container address
-  echo "nameserver 10.10.2.2" > /etc/resolv.conf
-
   # wait until dns starts
   wait-for-it -t 60 10.10.2.2:53
+
+  # update resolve.conf with pihole container address
+  echo "nameserver 10.10.2.2" > /etc/resolv.conf
 }
 
 function mailserver_pre_up() {
