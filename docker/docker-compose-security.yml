@@ -9,7 +9,7 @@ networks:
 services:
   caddy:
     container_name: caddy
-    image: lucaslorentz/caddy-docker-proxy:latest
+    image: lucaslorentz/caddy-docker-proxy:alpine
     restart: unless-stopped
     environment:
       - CADDY_INGRESS_NETWORKS=docker-direct,docker-vpn
