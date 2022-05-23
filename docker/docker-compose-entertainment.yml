@@ -34,6 +34,28 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9091}}"
 
+  qbittorrent:
+    container_name: qbittorrent
+    image: cr.hotio.dev/hotio/qbittorrent:latest
+    environment:
+      - PUID
+      - PGID
+      - UMASK=022
+      - TZ
+    volumes:
+      - $DATA_DIR/qbittorrent:/config
+      - $HUB_DIR/media/:/data
+    networks:
+      docker-vpn:
+        ipv4_address: 10.10.3.101
+    healthcheck:
+      test: [ "CMD-SHELL", "[[ $$(curl https://icanhazip.com) != ${HOST_IP} ]] && echo 'OK' || exit 1" ]
+      interval: 15s
+    labels:
+      caddy: qbittorrent.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
   flaresolverr:
     image: flaresolverr/flaresolverr:latest
     container_name: flaresolverr
