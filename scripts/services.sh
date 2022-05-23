@@ -37,7 +37,9 @@ function entertainment_pre_up() {
   PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
   export PEERPORT=${PEER_PORT}
   if [ -f "${DATA_DIR}"/transmission/settings.json ]; then
-    if [ -n "${PEER_PORT}" ]; then
+    current_port=$(grep -o -E '\"peer-port\": ([0-9]+)' hub/data/transmission/settings.json | awk '{print $2}')
+    if [ ! -v "$current_port" ] && [ ! -v "$PEER_PORT" ]  && [ "$current_port" != "$PEER_PORT" ]; then
+      docker stop transmission
       sed -i -r "s/\"peer-port\": [0-9]+/\"peer-port\": ${PEER_PORT}/" "${DATA_DIR}"/transmission/settings.json
     fi
   fi
