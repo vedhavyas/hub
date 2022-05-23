@@ -18,7 +18,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --poll-interval 0 \
 --log-file /opt/rclone/logs/hub.log \
 --log-level INFO \
---umask 000 \
+--umask 022 \
 # no need to set them expliclty as rclone seems to pick them up the called user which in this case is docker itself
 #--uid $(id -u docker)" \
 #--gid $(id -g docker)" \
