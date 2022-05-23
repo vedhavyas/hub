@@ -33,22 +33,12 @@ function mailserver_post_up() {
 function entertainment_pre_up() {
   HOST_IP=$(curl https://icanhazip.com)
   export HOST_IP
-  source "${DATA_DIR}"/mullvad/mullvad.env
-  PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
-  export PEERPORT=${PEER_PORT}
-  if [ -f "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf ]; then
-    current_port=$(grep -o -E 'Session\\Port=([0-9]+)' "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf | awk '{split($0,a,"="); print a[2]}')
-    if [ ! -v "$current_port" ] && [ ! -v "$PEER_PORT" ]  && [ "$current_port" != "$PEER_PORT" ]; then
-      docker stop qbittorrent
-      sed -i -r "s/Session\\Port=[0-9]+/Session\\Port=${PEER_PORT}/" "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf
-    fi
-  fi
 }
 
 function entertainment_post_up() {
   # wait for qbittorrent
   wait-for-it -t 60 10.10.3.100:8080
-  wait-for-it -t 60 10.10.3.100:"${PEER_PORT}"
+  wait-for-it -t 60 10.10.3.100:29850
 }
 
 services=(security comms maintenance monitoring entertainment utilities mailserver)
