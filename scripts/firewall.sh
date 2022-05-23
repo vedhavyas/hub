@@ -104,7 +104,7 @@ done
 # add postup iptable rules if any
 "${DATA_DIR}"/wireguard/post_up.sh
 
-# port forward host to transmission
+# port forward host to qbittorrent
 # set the mark so that right route table is picked
 source "${DATA_DIR}"/mullvad/mullvad.env
 PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}

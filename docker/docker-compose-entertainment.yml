@@ -25,7 +25,7 @@ services:
       - $HUB_DIR/media/:/data
     networks:
       docker-vpn:
-        ipv4_address: 10.10.3.100
+        ipv4_address: 10.10.3.101
     healthcheck:
       test: ["CMD-SHELL", "[[ $$(curl https://icanhazip.com) != ${HOST_IP} ]] && echo 'OK' || exit 1"]
       interval: 15s
@@ -47,7 +47,7 @@ services:
       - $HUB_DIR/media/:/data
     networks:
       docker-vpn:
-        ipv4_address: 10.10.3.101
+        ipv4_address: 10.10.3.100
     healthcheck:
       test: [ "CMD-SHELL", "[[ $$(curl https://icanhazip.com) != ${HOST_IP} ]] && echo 'OK' || exit 1" ]
       interval: 15s
