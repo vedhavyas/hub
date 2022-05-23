@@ -5,35 +5,6 @@ networks:
     external: true
 
 services:
-  transmission:
-    image: lscr.io/linuxserver/transmission:latest
-    container_name: transmission
-    restart: unless-stopped
-    environment:
-      - PUID
-      - PGID
-      - TZ
-      - TRANSMISSION_WEB_HOME=/flood-for-transmission/ #optional
-      # pick what you like from here - https://haugene.github.io/docker-transmission-openvpn/config-options/
-      - TRANSMISSION_WEB_UI=flood-for-transmission
-      - TRANSMISSION_DOWNLOAD_DIR=/data/downloads
-      - CURL_CA_BUNDLE=/certs/ca-certificates.crt
-      - PEERPORT
-    volumes:
-      - /etc/ssl/certs:/certs
-      - $DATA_DIR/transmission:/config
-      - $HUB_DIR/media/:/data
-    networks:
-      docker-vpn:
-        ipv4_address: 10.10.3.101
-    healthcheck:
-      test: ["CMD-SHELL", "[[ $$(curl https://icanhazip.com) != ${HOST_IP} ]] && echo 'OK' || exit 1"]
-      interval: 15s
-    labels:
-      caddy: transmission.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 9091}}"
-
   qbittorrent:
     container_name: qbittorrent
     image: cr.hotio.dev/hotio/qbittorrent:latest
