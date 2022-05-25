@@ -17,7 +17,7 @@ services:
     networks:
       - docker-direct
     environment:
-      - WATCHTOWER_NOTIFICATIONS_HOSTNAME=Watchtower-Hub
+      - WATCHTOWER_NOTIFICATIONS_HOSTNAME=Hub
       - WATCHTOWER_NO_STARTUP_MESSAGE=true
       - WATCHTOWER_ROLLING_RESTART=true
       - WATCHTOWER_NOTIFICATIONS_LEVEL=info
@@ -49,3 +49,28 @@ services:
       caddy: portainer.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9000}}"
+
+  timemachine:
+    image: mbentley/timemachine:latest
+    container_name: timemachine
+    restart: unless-stopped
+    environment:
+      - TM_USERNAME=macmini
+      - TM_GROUPNAME=timemachine
+      - TM_UID=$PUID
+      - TM_GID=$PGID
+      - PASSWORD=timemachine
+      - SHARE_NAME=TimeMachine
+      - VOLUME_SIZE_LIMIT=500G
+      - WORKGROUP=Hub
+    volumes:
+      - ${HUB_DIR}/timemachine-backups/macmini:/opt/macmini
+      - $DATA_DIR/timemachine/samba/lib:/var/lib/samba
+      - $DATA_DIR/timemachine/samba/cache:/var/cache/samba
+      - $DATA_DIR/timemachine/samba/run:/run/samba
+    networks:
+      - docker-direct
+    labels:
+      caddy: timemachine.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 445}}"
