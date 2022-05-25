@@ -64,7 +64,7 @@ services:
       - VOLUME_SIZE_LIMIT=500G
       - WORKGROUP=Hub
     volumes:
-      - ${HUB_DIR}/timemachine-backups/macmini:/opt/macmini
+      - $DATA_DIR/timemachine/macmini:/opt/macmini
       - $DATA_DIR/timemachine/samba/lib:/var/lib/samba
       - $DATA_DIR/timemachine/samba/cache:/var/cache/samba
       - $DATA_DIR/timemachine/samba/run:/run/samba
