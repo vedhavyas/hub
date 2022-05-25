@@ -69,8 +69,5 @@ services:
       - $DATA_DIR/timemachine/samba/cache:/var/cache/samba
       - $DATA_DIR/timemachine/samba/run:/run/samba
     networks:
-      - docker-direct
-    labels:
-      caddy: timemachine.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 445}}"
+      docker-direct:
+        - ipv4_address: 10.10.2.253

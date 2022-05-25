@@ -6,7 +6,7 @@ function security_pre_up() {
     custom_records="${DATA_DIR}/pihole/etc-dnsmasq.d/03-hub-dns.conf"
     cat > "${custom_records}" << EOF
 address=/host.hub/10.10.1.1
-address=/samba.hub/10.10.2.253
+address=/timemachine.hub/10.10.2.253
 address=/mailserver.hub/10.10.2.254
 address=/hub/10.10.2.4
 EOF
