@@ -70,4 +70,4 @@ services:
       - $DATA_DIR/timemachine/samba/run:/run/samba
     networks:
       docker-direct:
-        - ipv4_address: 10.10.2.253
+        ipv4_address: 10.10.2.253
