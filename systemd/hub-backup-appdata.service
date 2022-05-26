@@ -5,7 +5,7 @@ After=hub-services.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/hub run_script backup-appdata
+ExecStart=/usr/bin/hub run-script backup-appdata
 RemainAfterExit=true
 
 [Install]
