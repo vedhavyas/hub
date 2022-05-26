@@ -149,7 +149,7 @@ services:
       - TZ
       - JELLYFIN_TYPE=emby
     volumes:
-      - $DATA_DIR/ombi//jellyseerr/config:/app/config
+      - $DATA_DIR/jellyseerr/config:/app/config
     healthcheck:
       test: nc -z localhost 5055 && echo "OK" || exit 1
       interval: 15s
