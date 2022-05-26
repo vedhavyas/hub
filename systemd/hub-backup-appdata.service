@@ -5,21 +5,7 @@ After=hub-services.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/rsync --archive \
---delete \
---delete-excluded \
---hard-links \
---one-file-system \
---sparse \
---verbose \
---xattrs \
---executability \
---stats \
---partial \
---progress \
---human-readable \
---inplace \
-/home/admin/hub/data/ /hub/backups/hub/app-data
+ExecStart=/usr/bin/hub run_script backup-appdata
 RemainAfterExit=true
 
 [Install]
