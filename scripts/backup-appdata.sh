@@ -22,6 +22,7 @@ if test -z "${last_backup_at}"; then
         --executability \
         --stats \
         --progress \
+        --whole-file \
         --inplace \
         "$DATA_DIR"/ "${BACKUP_DIR}"/"${current_backup_at}"
 else
@@ -37,6 +38,7 @@ else
         --stats \
         --progress \
         --inplace \
+        --whole-file \
         --link-dest="${BACKUP_DIR}"/"${last_backup_at}" \
         "$DATA_DIR"/ "${BACKUP_DIR}"/"${current_backup_at}"
 fi

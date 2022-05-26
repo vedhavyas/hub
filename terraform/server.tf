@@ -36,10 +36,13 @@ resource "hcloud_server" "hub" {
   location = var.hetzner_server_location
   backups = true
   firewall_ids = [hcloud_firewall.hub.id]
+  delete_protection = true
+  rebuild_protection = true
 }
 
 # since automount is enabled
 # it is mounted at /mnt/HC_Volume_{hcloud_volume.cache.id}
+# df -h | grep HC_Volume | awk '{print $6}'
 resource "hcloud_volume" "cache" {
   name      = "cache"
   size      = 300
