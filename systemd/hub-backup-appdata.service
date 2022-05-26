@@ -2,8 +2,6 @@
 Description=Backup Hub app data.
 Requires=hub-services.service
 After=hub-services.service
-RefuseManualStart=no
-RefuseManualStop=yes
 
 [Service]
 Type=oneshot
