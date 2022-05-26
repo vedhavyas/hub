@@ -60,6 +60,9 @@ setup )
       hub-certbot.timer \
       hub-backup-appdata.service \
       hub-backup-appdata.timer
+
+  # start timers
+  systemctl start hub-backup-appdata.timer hub-certbot.timer
   ;;
 
 status )
