@@ -34,6 +34,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --vfs-used-is-size \
 --tpslimit 50 \
 --tpslimit-burst 30
+TimeoutStartSec=10min
 ExecStop=+/usr/bin/fusermount -uz /hub
 Restart=on-failure
 User=docker
