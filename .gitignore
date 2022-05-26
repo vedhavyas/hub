@@ -1,2 +1,6 @@
 .env
 /data/
+.terraform*
+*.tfstate*
+*.tfplan
+*.tfvars
