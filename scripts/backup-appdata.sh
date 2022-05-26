@@ -1,11 +1,10 @@
 #!/bin/zsh
 set -e
 
-SRC_DIR=/home/admin/hub/data/
-BACKUP_DIR=/hub/backups/hub/appdata
+BACKUP_DIR=$HUB_DIR/backups/hub/appdata
 
 # capture old time
-test -f ${BACKUP_DIR}/last_backup.txt && last_backup_at=$(cat ${BACKUP_DIR}/last_backup.txt) || touch ${BACKUP_DIR}/last_backup.txt
+test -f "${BACKUP_DIR}"/last_backup.txt && last_backup_at=$(cat "${BACKUP_DIR}"/last_backup.txt) || touch "${BACKUP_DIR}"/last_backup.txt
 
 # set current backup time
 current_backup_at=$(date +"%F-%I-%M%p")
@@ -24,7 +23,7 @@ if test -z "${last_backup_at}"; then
         --stats \
         --progress \
         --inplace \
-        ${SRC_DIR} ${BACKUP_DIR}/"${current_backup_at}"
+        "$DATA_DIR"/ "${BACKUP_DIR}"/"${current_backup_at}"
 else
   echo "Doing an incremental sync..."
   rsync --archive \
@@ -38,11 +37,11 @@ else
         --stats \
         --progress \
         --inplace \
-        --link-dest=${BACKUP_DIR}/"${last_backup_at}" \
-      ${SRC_DIR} ${BACKUP_DIR}/"${current_backup_at}"
+        --link-dest="${BACKUP_DIR}"/"${last_backup_at}" \
+        "$DATA_DIR"/ "${BACKUP_DIR}"/"${current_backup_at}"
 fi
 
 # update last backup time
-echo "${current_backup_at}" > ${BACKUP_DIR}/last_backup.txt
+echo "${current_backup_at}" > "${BACKUP_DIR}"/last_backup.txt
 
 #TODO gotify message
