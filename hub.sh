@@ -76,13 +76,8 @@ apps )
   ;;
 
 logs )
-  case ${2} in
-  -f)
-    journalctl -u "hub-*" -f
-    ;;
-   * )
-    journalctl -u "hub-${2}" -f
-  esac
+  service=${2:-*}
+  journalctl -u "hub-${service}" -f
   ;;
 
 run-script )
