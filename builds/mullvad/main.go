@@ -16,6 +16,7 @@ import (
 func main() {
 	acc := os.Getenv("MULLVAD_ACCOUNT")
 	// citycode is {country_code}-{city_code} from relay
+	// if set as "random" then we pick a random one form the all relays
 	cityCode := os.Getenv("MULLVAD_CITY_CODE")
 
 	if acc == "" || cityCode == "" {
@@ -47,7 +48,17 @@ func main() {
 	relayMap := try(wireguardRelays())
 
 	// filter relay
-	relays := relayMap[cityCode]
+	var relays []Relay
+	switch cityCode {
+	case "random":
+		for _, r := range relayMap {
+			relays = append(relays, r...)
+		}
+
+	default:
+		relays = relayMap[cityCode]
+	}
+
 	if len(relays) < 1 {
 		for code := range relayMap {
 			fmt.Println(code)
