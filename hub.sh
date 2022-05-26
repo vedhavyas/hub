@@ -49,7 +49,17 @@ setup )
   systemctl daemon-reload
 
   # enable units
-  systemctl reenable hub-deps hub-mount hub-network hub-firewall hub-services docker.service hub-certbot.service hub-certbot.timer
+  systemctl reenable \
+      hub-deps \
+      hub-mount \
+      hub-network \
+      hub-firewall \
+      hub-services \
+      docker.service \
+      hub-certbot.service \
+      hub-certbot.timer \
+      hub-backup-appdata.service \
+      hub-backup-appdata.timer
   ;;
 
 status )

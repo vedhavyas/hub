@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer to back up hub app data hourly
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

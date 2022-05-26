@@ -1,0 +1,26 @@
+[Unit]
+Description=Backup Hub app data.
+Requires=hub-services.service
+After=hub-services.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rsync --archive \
+--delete \
+--delete-excluded \
+--hard-links \
+--one-file-system \
+--sparse \
+--verbose \
+--xattrs \
+--executability \
+--stats \
+--partial \
+--progress \
+--human-readable \
+--inplace \
+/home/admin/hub/data/ /hub/backups/hub/app-data
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
