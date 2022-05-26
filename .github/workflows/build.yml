@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        build: [mullvad, radicale, samba, webdav]
+        build: [mullvad, radicale, webdav]
     runs-on: ${{ matrix.os }}
     env:
       DOCKER_USERNAME: ${{ secrets.docker_username }}
