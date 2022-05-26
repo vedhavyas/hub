@@ -16,6 +16,7 @@ services:
     volumes:
       - $DATA_DIR/qbittorrent:/config
       - $HUB_DIR/media/downloads:/config/downloads
+      - $HUB_DIR/media/downloads/incomplete:/config/downloads/temp
     networks:
       docker-vpn:
         ipv4_address: 10.10.3.100
