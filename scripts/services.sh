@@ -52,6 +52,7 @@ for service in "${services[@]}"; do
     command -v "$post" >/dev/null && $post
     ;;
   stop)
+    hub notify "Hub updates" "Stopping services..."
     docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml down
     echo "nameserver 1.1.1.1" > /etc/resolv.conf
   esac

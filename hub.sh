@@ -86,7 +86,13 @@ logs )
 backup )
   shift
   data="${1:-appdata}"
-  run_script diff-backup backup $DATA_DIR $HUB_DIR/backups/hub/${data}
+  run_script diff-backup backup "$DATA_DIR" $HUB_DIR/backups/hub/"${data}"
+  ;;
+
+# notify title message
+notify )
+  shift
+  GOTIFY_TOKEN=${HOST_HUB_GOTIFY_TOKEN} "${APPS_DIR}/gotify.sh" "$@"
   ;;
 run-script )
   shift

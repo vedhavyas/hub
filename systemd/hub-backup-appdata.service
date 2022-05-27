@@ -7,6 +7,7 @@ After=hub-services.service
 Type=oneshot
 ExecStart=/usr/bin/hub backup appdata
 RemainAfterExit=false
+ExecStartPost=/usr/bin/hub notify "Hub updates" "Appdata backup successful!"
 
 [Install]
 WantedBy=multi-user.target
