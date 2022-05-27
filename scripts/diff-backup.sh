@@ -4,14 +4,17 @@ set -e
 # we are doing a differential backup using tar
 # we always need the base.tgz. So we restore with this first
 # then we pick the diff-date.tgz to restore on top
+# Use it as
+# diff-backup.sh backup|restore src dest (no trailing / for both src and dest)
 
-#test -z $SRC_DIR && { echo "source directory not set"; exit 1 }
-#test -z $BACKUP_DIR && { echo "backup directory not set"; exit 1 }
+CMD=$1
+SRC_DIR=$2
+BACKUP_DIR=$3
 
-SRC_DIR=$DATA_DIR
-BACKUP_DIR=$HUB_DIR/backups/hub/appdata
+test -z $SRC_DIR && { echo "source directory not set"; exit 1 }
+test -z $BACKUP_DIR && { echo "backup directory not set"; exit 1 }
 
-case $1 in
+case $CMD in
 backup )
   # check if we have the backup before
   test -f "${BACKUP_DIR}"/last_backup.txt && last_backup_at=$(cat "${BACKUP_DIR}"/last_backup.txt) || touch "${BACKUP_DIR}"/last_backup.txt
