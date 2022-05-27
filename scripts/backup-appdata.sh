@@ -7,11 +7,8 @@ echo "Running rsync..."
 rsync --archive \
       --delete \
       --delete-excluded \
-      --hard-links \
       --one-file-system \
       --verbose \
-      --xattrs \
-      --executability \
       --stats \
       --progress \
       --whole-file \
