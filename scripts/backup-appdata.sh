@@ -22,6 +22,8 @@ backup )
   # is this a full sync
   if test -z "${last_backup_at}"; then
     echo "Doing a full backup..."
+    # remove the meta file to force fullback
+    rm -rf "${BACKUP_DIR}"/base.sngz
     tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base.sngz --file "${BACKUP_DIR}"/base.tgz "$SRC_DIR"
   else
     echo "Doing a differential backup..."
