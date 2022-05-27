@@ -22,11 +22,11 @@ backup )
   # is this a full sync
   if test -z "${last_backup_at}"; then
     echo "Doing a full backup..."
-    gtar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base.sngz --file "${BACKUP_DIR}"/base.tgz "$SRC_DIR"
+    tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base.sngz --file "${BACKUP_DIR}"/base.tgz "$SRC_DIR"
   else
     echo "Doing a differential backup..."
     cp "${BACKUP_DIR}"/base.sngz "${BACKUP_DIR}"/base-"${current_backup_at}".sngz
-    gtar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base-"${current_backup_at}".sngz --file "${BACKUP_DIR}"/diff-"${current_backup_at}".tgz "$SRC_DIR"
+    tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base-"${current_backup_at}".sngz --file "${BACKUP_DIR}"/diff-"${current_backup_at}".tgz "$SRC_DIR"
   fi
 
   # update last backup time
@@ -44,7 +44,7 @@ restore )
 
   # do the base backup
   # we use directory as / since we created with full path and tar tries to recreate it as is
-  gtar -vv --extract --file "${BACKUP_DIR}"/base.tgz --listed-incremental=/dev/null  --directory /
+  tar -vv --extract --file "${BACKUP_DIR}"/base.tgz --listed-incremental=/dev/null  --directory /
 
   # get latest backup diff
   test -f "${BACKUP_DIR}"/last_backup.txt && last_backup_at=$(cat "${BACKUP_DIR}"/last_backup.txt)
@@ -53,7 +53,7 @@ restore )
     exit 0
   fi
 
-  gtar -vv --extract --file "${BACKUP_DIR}"/diff-"${last_backup_at}".tgz --listed-incremental=/dev/null  --directory /
+  tar -vv --extract --file "${BACKUP_DIR}"/diff-"${last_backup_at}".tgz --listed-incremental=/dev/null  --directory /
   echo "done."
   ;;
 
