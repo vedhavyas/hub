@@ -36,8 +36,9 @@ resource "hcloud_server" "hub" {
   location = var.hetzner_server_location
   backups = true
   firewall_ids = [hcloud_firewall.hub.id]
-  delete_protection = true
-  rebuild_protection = true
+  # TODO enable later
+#  delete_protection = true
+#  rebuild_protection = true
 }
 
 # since automount is enabled

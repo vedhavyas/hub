@@ -1,8 +1,8 @@
 [Unit]
-Description=Timer to back up hub app data hourly
+Description=Timer to back up hub app data daily
 
 [Timer]
-OnCalendar=hourly
+OnCalendar=daily
 Persistent=true
 
 [Install]
