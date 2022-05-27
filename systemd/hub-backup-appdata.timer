@@ -2,7 +2,7 @@
 Description=Timer to back up hub app data daily
 
 [Timer]
-OnCalendar=daily
+OnCalendar=00/12:00
 Persistent=true
 
 [Install]
