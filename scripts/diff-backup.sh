@@ -1,5 +1,4 @@
 #!/bin/zsh
-set -e
 
 # we are doing a differential backup using tar
 # we always need the base.tgz. So we restore with this first
@@ -32,6 +31,14 @@ backup )
     echo "Doing a differential backup..."
     cp "${BACKUP_DIR}"/base.sngz "${BACKUP_DIR}"/base-"${current_backup_at}".sngz
     tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base-"${current_backup_at}".sngz --file "${BACKUP_DIR}"/diff-"${current_backup_at}".tgz "$SRC_DIR"
+  fi
+
+  # exit could be 0 or 1
+  # more on that here https://man7.org/linux/man-pages/man1/tar.1.html
+  # tldr; if file changed during the archive or file changed after archive, tar returns 1
+  exit_code=$?
+  if [ ${exit_code} -gt 1 ]; then
+    echo "tar failed with exit ${exit_code}. check logs"
   fi
 
   # update last backup time
