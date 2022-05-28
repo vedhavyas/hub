@@ -4,11 +4,13 @@
 # we always need the base.tgz. So we restore with this first
 # then we pick the diff-date.tgz to restore on top
 # Use it as
-# diff-backup.sh backup|restore src dest (no trailing / for both src and dest)
+# diff-backup.sh backup|restore src dest [extra-args for tar]
+# (no trailing / for both src and dest)
 
 CMD=$1
 SRC_DIR=$2
 BACKUP_DIR=$3
+TAR_BACKUP_ARGS=$4
 
 test -z $SRC_DIR && { echo "source directory not set"; exit 1 }
 test -z $BACKUP_DIR && { echo "backup directory not set"; exit 1 }
@@ -22,15 +24,17 @@ backup )
   current_backup_at=$(date +"%F-%H-%M-%S")
 
   # is this a full sync
+  extra_args=(${(s/,/)TAR_BACKUP_ARGS})
+  extra_args+=( ${SRC_DIR} )
   if test -z "${last_backup_at}"; then
     echo "Doing a full backup..."
     # remove the meta file to force fullback
     rm -rf "${BACKUP_DIR}"/base.sngz
-    tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base.sngz --file "${BACKUP_DIR}"/base.tgz "$SRC_DIR"
+    tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base.sngz --file "${BACKUP_DIR}"/base.tgz "${extra_args[@]}"
   else
     echo "Doing a differential backup..."
     cp "${BACKUP_DIR}"/base.sngz "${BACKUP_DIR}"/base-"${current_backup_at}".sngz
-    tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base-"${current_backup_at}".sngz --file "${BACKUP_DIR}"/diff-"${current_backup_at}".tgz "$SRC_DIR"
+    tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/base-"${current_backup_at}".sngz --file "${BACKUP_DIR}"/diff-"${current_backup_at}".tgz "${extra_args[@]}"
   fi
 
   # exit could be 0 or 1
