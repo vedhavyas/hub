@@ -43,7 +43,7 @@ backup )
 
   # update last backup time
   echo "${current_backup_at}" > "${BACKUP_DIR}"/last_backup.txt
-  echo "done."
+  echo "Done."
   ;;
 
 restore )
@@ -56,21 +56,22 @@ restore )
 
   # do the base backup
   # we use directory as / since we created with full path and tar tries to recreate it as is
+  # https://stackoverflow.com/questions/3153683/how-do-i-exclude-absolute-paths-for-tar may help if you want to exclude path
   tar -vv --extract --file "${BACKUP_DIR}"/base.tgz --listed-incremental=/dev/null  --directory /
 
   # get latest backup diff
   test -f "${BACKUP_DIR}"/last_backup.txt && last_backup_at=$(cat "${BACKUP_DIR}"/last_backup.txt)
   if test -z "${last_backup_at}"; then
-    echo "done."
+    echo "Done."
     exit 0
   fi
 
   tar -vv --extract --file "${BACKUP_DIR}"/diff-"${last_backup_at}".tgz --listed-incremental=/dev/null  --directory /
-  echo "done."
+  echo "Done."
   ;;
 
 * )
-  echo "unknown command: ${1}"
+  echo "diff-backup: unknown command: ${1}"
   exit 1
   ;;
 esac
