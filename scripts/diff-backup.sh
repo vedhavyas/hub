@@ -74,6 +74,21 @@ restore )
   echo "Done."
   ;;
 
+verify )
+  echo "Verifying base backup..."
+  gzip -t "${BACKUP_DIR}"/base.tgz || { echo "verification failed"; exit 1 }
+
+  # get latest backup diff
+  test -f "${BACKUP_DIR}"/last_backup.txt && last_backup_at=$(cat "${BACKUP_DIR}"/last_backup.txt)
+  if test -z "${last_backup_at}"; then
+    echo "Done."
+    exit 0
+  fi
+
+  echo "Verifying latest diff..."
+  gzip -t "${BACKUP_DIR}"/diff-"${last_backup_at}".tgz || { echo "verification failed"; exit 1 }
+  echo "Done."
+  ;;
 * )
   echo "diff-backup: unknown command: ${1}"
   exit 1
