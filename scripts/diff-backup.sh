@@ -19,7 +19,7 @@ backup )
   test -f "${BACKUP_DIR}"/last_backup.txt && last_backup_at=$(cat "${BACKUP_DIR}"/last_backup.txt) || touch "${BACKUP_DIR}"/last_backup.txt
 
   # set current backup time
-  current_backup_at=$(date +"%F-%I-%M-%S%p")
+  current_backup_at=$(date +"%F-%H-%M-%S")
 
   # is this a full sync
   if test -z "${last_backup_at}"; then
