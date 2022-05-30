@@ -94,6 +94,7 @@ notify )
   shift
   GOTIFY_TOKEN=${HOST_HUB_GOTIFY_TOKEN} "${APPS_DIR}/gotify.sh" "$@"
   ;;
+
 run-script )
   shift
   run_script "$@"

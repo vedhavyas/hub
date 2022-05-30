@@ -20,7 +20,7 @@ backup )
   # set current backup time
   current_backup_at=$(date +"%F-%H-%M-%S")
 
-  if test -s "${BACKUP_DIR}"/backups_order.txt; then
+  if test -f "${BACKUP_DIR}"/backups_order.txt; then
     echo "Doing an incremental backup..."
     cp "${BACKUP_DIR}"/state.sngz "${BACKUP_DIR}"/state-"${current_backup_at}".sngz
   else
