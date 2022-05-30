@@ -10,7 +10,7 @@ CONF_DIR="${root_dir}"/conf
 DATA_DIR="${root_dir}"/data
 mkdir -p "${DATA_DIR}"
 DOCKER_DIR="${root_dir}"/docker
-APPS_DIR="${root_dir}"/apps
+CMDS_DIR="${root_dir}"/commands
 SCRIPTS_DIR="${root_dir}"/scripts
 SYSTEMD_DIR="${root_dir}"/systemd
 HUB_DIR=/hub
@@ -71,11 +71,11 @@ status )
   docker compose ls
   ;;
 
-apps )
+cmd )
   shift
-  app="${1}"
+  cmd="${1}"
   shift
-  "${APPS_DIR}/${app}.sh" "$@"
+  "${CMDS_DIR}/${cmd}.sh" "$@"
   ;;
 
 logs )
@@ -92,7 +92,7 @@ backup)
 # notify title message
 notify )
   shift
-  GOTIFY_TOKEN=${HOST_HUB_GOTIFY_TOKEN} "${APPS_DIR}/gotify.sh" "$@"
+  GOTIFY_TOKEN=${HOST_HUB_GOTIFY_TOKEN} "${CMDS_DIR}/gotify.sh" "$@"
   ;;
 
 run-script )

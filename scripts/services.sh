@@ -21,7 +21,7 @@ function security_post_up() {
 
 function mailserver_pre_up() {
   # run certbot
-  "${APPS_DIR}"/certbot.sh
+  "${CMDS_DIR}"/certbot.sh
 }
 
 function mailserver_post_up() {
