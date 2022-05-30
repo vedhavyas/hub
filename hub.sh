@@ -83,10 +83,10 @@ logs )
   journalctl -u "hub-${service}" -f
   ;;
 
-backup|verify )
+backup)
   shift
   data="${1:-appdata}"
-  run_script diff-backup "${cmd}" "$DATA_DIR" $HUB_DIR/backups/hub/"${data}"
+  run_script archiver backup "$DATA_DIR" $HUB_DIR/backups/hub/"${data}"
   ;;
 
 # notify title message
