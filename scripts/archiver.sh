@@ -12,8 +12,8 @@ SRC_DIR=$2
 BACKUP_DIR=$3
 TAR_BACKUP_ARGS=$4
 
-test -z $SRC_DIR && { echo "source directory not set"; exit 1 }
-test -z $BACKUP_DIR && { echo "backup directory not set"; exit 1 }
+test -z "$SRC_DIR" && { echo "source directory not set"; exit 1; }
+test -z "$BACKUP_DIR" && { echo "backup directory not set"; exit 1; }
 
 case $CMD in
 backup )
@@ -29,7 +29,9 @@ backup )
   fi
 
   # construct args
+  # shellcheck disable=SC2206
   extra_args=(${(s/,/)TAR_BACKUP_ARGS})
+  # shellcheck disable=SC2206
   extra_args+=( ${SRC_DIR} )
   tar -vv --create --one-file-system --gzip --listed-incremental="${BACKUP_DIR}"/state-"${current_backup_at}".sngz --file "${BACKUP_DIR}"/backup-"${current_backup_at}".tgz "${extra_args[@]}"
 
@@ -44,7 +46,7 @@ backup )
   fi
 
   echo "Verifying backup..."
-  gzip -t "${BACKUP_DIR}"/backup-"${current_backup_at}".tgz || { echo "verification failed"; exit 1 }
+  gzip -t "${BACKUP_DIR}"/backup-"${current_backup_at}".tgz || { echo "verification failed"; exit 1; }
 
   # update the latest metadata and add the backup time
   mv "${BACKUP_DIR}"/state-"${current_backup_at}".sngz "${BACKUP_DIR}"/state.sngz
@@ -60,7 +62,7 @@ restore )
   mkdir -p "$SRC_DIR"
 
   # ensure directory is empty
-  test -z "$(ls -A "$SRC_DIR")" || { echo "Data directory must be empty"; exit 1 }
+  test -z "$(ls -A "$SRC_DIR")" || { echo "Data directory must be empty"; exit 1; }
 
   # do the base backup
   # we use directory as / since we created with full path and tar tries to recreate it as is
