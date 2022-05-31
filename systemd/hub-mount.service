@@ -25,7 +25,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 #--gid $(id -g docker)" \
 --cache-dir=/opt/rclone/cache/hub \
 --vfs-cache-mode full \
---vfs-cache-max-size 150G \
+--vfs-cache-max-size 500G \
 --vfs-write-back 5m \
 # keep in cache for 30 days
 --vfs-cache-max-age 720h \

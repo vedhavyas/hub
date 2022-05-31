@@ -1,16 +1,13 @@
 #!/bin/zsh
-HUB_OLD_DATA_DIR=${HUB_OLD_DATA_DIR:-cloud}
-HUB_NEW_DATA_DIR=${HUB_NEW_DATA_DIR:-data}
-
-HUB_OLD_SSH=${HUB_OLD_SSH:-cloud}
+HUB_OLD_HOSTNAME=${HUB_OLD_SSH:-hub}
 # this should resolve to public ip of the host
 # all need root password
-HUB_NEW_SSH=${HUB_NEW_SSH:-hub}
+HUB_NEW_HOSTNAME=${HUB_NEW_SSH:-hub-2}
 
 case ${1} in
 "")
   echo "Full data sync between machines..."
-  ssh -t admin@"$HUB_OLD_SSH" 'rsync -varlpogEtP /home/admin/my-cloud/'${HUB_OLD_DATA_DIR}/'  root@"'${HUB_NEW_SSH}'":/home/admin/hub/'${HUB_NEW_DATA_DIR}'' || exit 1
+  ssh -t admin@"$HUB_OLD_SSH" 'rsync -varlpogEtP /home/admin/hub/data/'  root@"'${HUB_NEW_SSH}'":/home/admin/hub/data || exit 1
   echo "Done..."
   ;;
 *)
