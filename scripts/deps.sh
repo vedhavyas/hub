@@ -10,7 +10,7 @@ apt update -y &> /dev/null
 apt upgrade -y &> /dev/null
 apt full-upgrade -y &> /dev/null
 apt autoremove -y &> /dev/null
-apt install jq apt-transport-https ca-certificates curl software-properties-common -y &> /dev/null
+apt install fuse unzip jq apt-transport-https ca-certificates curl software-properties-common -y &> /dev/null
 apt install traceroute -y &> /dev/null
 apt install wireguard qrencode -y &> /dev/null
 apt install wait-for-it -y &> /dev/null

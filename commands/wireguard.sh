@@ -52,7 +52,10 @@ create_hub_conf() {
 ListenPort = $WG_HUB_PORT
 PrivateKey = $(cat wghub.key)
 EOF
-    ln -sf  "$(pwd)"/wghub.conf /etc/wireguard/wghub.conf
+}
+
+link_wg_hub_conf() {
+  ln -sf  "$(pwd)"/wghub.conf /etc/wireguard/wghub.conf
 }
 
 create_post_up_script() {
@@ -136,6 +139,7 @@ main() {
     test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
     test -f wghub.conf || create_hub_conf
+    test -f /etc/wireguard/wghub.conf || link_wg_hub_conf
     test -f post_up.sh || create_post_up_script
     sync_wg_hub_conf
 
