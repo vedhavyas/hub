@@ -40,6 +40,11 @@ function entertainment_post_up() {
   wait-for-it -t 60 10.10.3.100:29850
 }
 
+function subspace_pre_up() {
+  mkdir -p /var/subspace/gemini-1b/archive-node
+  chown -R docker:docker /var/subspace/gemini-1b/archive-node/
+}
+
 services=(security comms maintenance monitoring entertainment utilities mailserver subspace)
 # start services
 for service in "${services[@]}"; do

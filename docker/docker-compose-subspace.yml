@@ -5,11 +5,11 @@ networks:
     external: true
 
 services:
-  gemini-1b-node:
-    container_name: gemini-1b-node
+  gemini-1b-archive-node:
+    container_name: gemini-1b-archive-node
     image: ghcr.io/nazar-pc/node:gemini-1b-pre-release
     volumes:
-      - /var/subspace/node:/var/subspace:rw
+      - /var/subspace/gemini-1b/archive-node:/var/subspace:rw
     user: $PUID:$PGID
     networks:
       docker-direct:
