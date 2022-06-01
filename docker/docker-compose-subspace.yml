@@ -16,7 +16,6 @@ services:
     restart: unless-stopped
     command: [
       "--chain", "gemini-1",
-      "--listen-addr", "/ip4/0.0.0.0/tcp/30333",
       "--base-path", "/var/subspace",
       "--execution", "wasm",
       "--pruning", "1024",
