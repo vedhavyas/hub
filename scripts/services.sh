@@ -40,7 +40,7 @@ function entertainment_post_up() {
   wait-for-it -t 60 10.10.3.100:29850
 }
 
-services=(security comms maintenance monitoring entertainment utilities mailserver)
+services=(security comms maintenance monitoring entertainment utilities mailserver subspace)
 # start services
 for service in "${services[@]}"; do
   case $1 in

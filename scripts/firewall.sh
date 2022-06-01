@@ -111,5 +111,8 @@ PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
 iptables -t nat -I PREROUTING -i wg-mullvad -j MARK --set-mark 100
 iptables -t nat -A PREROUTING -i wg-mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.100:29850
 
+# port forward 30333 to subspace node
+iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport 30333 -j DNAT --to 10.10.2.253:30333
+
 # save
 iptables-save
