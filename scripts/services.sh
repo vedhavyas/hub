@@ -57,4 +57,5 @@ for service in "${services[@]}"; do
     echo "nameserver 1.1.1.1" > /etc/resolv.conf
   esac
 
+exit 0
 done
