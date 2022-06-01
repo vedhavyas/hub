@@ -4,16 +4,12 @@ networks:
   docker-direct:
     external: true
 
-volumes:
-  node-data:
-  farmer-data:
-
 services:
   gemini-1b-node:
     container_name: gemini-1b-node
     image: ghcr.io/nazar-pc/node:gemini-1b-pre-release
     volumes:
-      - node-data:/var/subspace:rw
+      - /var/subspace/node:/var/subspace:rw
     networks:
       docker-direct:
         ipv4_address: 10.10.2.253
@@ -45,7 +41,7 @@ services:
     networks:
       - docker-direct
     volumes:
-      - farmer-data:/var/subspace:rw
+      - /var/subspace/node:/var/subspace:rw
     restart: unless-stopped
     command: [
       "--base-path", "/var/subspace",
