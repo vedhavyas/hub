@@ -11,7 +11,7 @@ volumes:
 services:
   gemini-1b-node:
     container_name: gemini-1b-node
-    image: ghcr.io/subspace/node:gemini-1b-pre-release
+    image: ghcr.io/nazar-pc/node:gemini-1b-pre-release
     volumes:
       - node-data:/var/subspace:rw
     networks:
@@ -41,7 +41,7 @@ services:
       node:
         condition: service_healthy
     container_name: gemini-1b-farmer
-    image: ghcr.io/subspace/farmer:gemini-1b-pre-release
+    image: ghcr.io/nazar-pc/farmer:gemini-1b-pre-release
     networks:
       - docker-direct
     volumes:
