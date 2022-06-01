@@ -38,7 +38,7 @@ services:
 
   gemini-1b-farmer:
     depends_on:
-      node:
+      gemini-1b-node:
         condition: service_healthy
     container_name: gemini-1b-farmer
     image: ghcr.io/nazar-pc/farmer:gemini-1b-pre-release
