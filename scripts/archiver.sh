@@ -56,7 +56,6 @@ backup )
   ;;
 
 restore )
-  # TODO: read from backups_order.txt file and implement in that order
   echo "Restoring data..."
   # ensure directory is present
   mkdir -p "$SRC_DIR"
@@ -64,20 +63,15 @@ restore )
   # ensure directory is empty
   test -z "$(ls -A "$SRC_DIR")" || { echo "Data directory must be empty"; exit 1; }
 
-  # do the base backup
-  # we use directory as / since we created with full path and tar tries to recreate it as is
-  # https://stackoverflow.com/questions/3153683/how-do-i-exclude-absolute-paths-for-tar may help if you want to exclude path
-  tar -vv --extract --file "${BACKUP_DIR}"/base.tgz --listed-incremental=/dev/null  --directory /
-
-  # get latest backup diff
-  test -f "${BACKUP_DIR}"/last_backup.txt && last_backup_at=$(cat "${BACKUP_DIR}"/last_backup.txt)
-  if test -z "${last_backup_at}"; then
+  # shellcheck disable=SC2207
+  OIFS="$IFS"; IFS=$'\n'; backups=($(<"${BACKUP_DIR}"/backups_order.txt)); IFS="$OIFS"
+  for backup in "${backups[@]}" ; do
+    echo "Restoring backup ${backup}..."
+    # we use directory as / since we created with full path and tar tries to recreate it as is
+    # https://stackoverflow.com/questions/3153683/how-do-i-exclude-absolute-paths-for-tar may help if you want to exclude path
+    tar -vv --extract --file "${BACKUP_DIR}"/backup-"${backup}".tgz --listed-incremental=/dev/null  --directory /
     echo "Done."
-    exit 0
-  fi
-
-  tar -vv --extract --file "${BACKUP_DIR}"/diff-"${last_backup_at}".tgz --listed-incremental=/dev/null  --directory /
-  echo "Done."
+  done
   ;;
 * )
   echo "archiver: unknown command: ${1}"
