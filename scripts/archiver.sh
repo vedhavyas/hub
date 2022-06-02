@@ -78,6 +78,3 @@ restore )
   exit 1
   ;;
 esac
-
-
-
