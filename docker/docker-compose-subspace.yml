@@ -5,36 +5,36 @@ networks:
     external: true
 
 services:
-  gemini-1b-archive-node:
-    container_name: gemini-1b-archive-node
-    image: ghcr.io/nazar-pc/node:gemini-1b-pre-release
-    volumes:
-      - /var/subspace/gemini-1b/archive-node:/var/subspace:rw
-    user: $PUID:$PGID
-    networks:
-      docker-direct:
-        ipv4_address: 10.10.2.253
-    restart: unless-stopped
-    command: [
-      "--chain", "gemini-1",
-      "--base-path", "/var/subspace",
-      "--execution", "wasm",
-      "--pruning", "archive",
-      "--keep-blocks", "1024",
-      "--port", "30333",
-#      "--rpc-cors", "all",
-#      "--rpc-methods", "safe",
-#      "--validator",
-      "--name", "mandalorian",
-      "--in-peers", "1000",
-      "--in-peers-light", "1000",
-      "--bootnodes", "/ip4/176.122.88.128/tcp/30334/p2p/12D3KooWPhmm8MV8EciomUyKrquHznPXWpSHcJAhWG1x2DHYwpZk",
-      "--bootnodes", "/ip4/176.122.88.128/tcp/30335/p2p/12D3KooWEWmUX8futkbi8YodaRGFuuuxyngmKWDPazVob4JwT1TE",
-    ]
-    healthcheck:
-      timeout: 5s
-      interval: 30s
-      retries: 5
+#  gemini-1b-archive-node:
+#    container_name: gemini-1b-archive-node
+#    image: ghcr.io/nazar-pc/node:gemini-1b-pre-release
+#    volumes:
+#      - /var/subspace/gemini-1b/archive-node:/var/subspace:rw
+#    user: $PUID:$PGID
+#    networks:
+#      docker-direct:
+#        ipv4_address: 10.10.2.253
+#    restart: unless-stopped
+#    command: [
+#      "--chain", "gemini-1",
+#      "--base-path", "/var/subspace",
+#      "--execution", "wasm",
+#      "--pruning", "archive",
+#      "--keep-blocks", "1024",
+#      "--port", "30333",
+##      "--rpc-cors", "all",
+##      "--rpc-methods", "safe",
+##      "--validator",
+#      "--name", "mandalorian",
+#      "--in-peers", "1000",
+#      "--in-peers-light", "1000",
+#      "--bootnodes", "/ip4/176.122.88.128/tcp/30334/p2p/12D3KooWPhmm8MV8EciomUyKrquHznPXWpSHcJAhWG1x2DHYwpZk",
+#      "--bootnodes", "/ip4/176.122.88.128/tcp/30335/p2p/12D3KooWEWmUX8futkbi8YodaRGFuuuxyngmKWDPazVob4JwT1TE",
+#    ]
+#    healthcheck:
+#      timeout: 5s
+#      interval: 30s
+#      retries: 5
 
 #  gemini-1b-farmer:
 #    depends_on:
