@@ -14,8 +14,6 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --fast-list \
 --auto-confirm \
 --allow-other \
-# keep in cache for 30 days
---dir-cache-time 720h \
 --poll-interval 0 \
 --log-systemd \
 --log-level DEBUG \

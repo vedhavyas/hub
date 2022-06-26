@@ -136,9 +136,11 @@ services:
     networks:
       - docker-vpn
     labels:
-      caddy: emby.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 8096}}"
+      caddy_0: emby.hub
+      caddy_0.tls: internal
+      caddy_0.reverse_proxy: "{{upstreams 8096}}"
+      caddy_1: emby.vedhavyas.dev
+      caddy_1.reverse_proxy: "{{upstreams 8096}}"
 
   entertainment:
     image: fallenbagel/jellyseerr:latest
