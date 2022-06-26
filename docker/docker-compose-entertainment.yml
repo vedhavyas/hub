@@ -140,6 +140,27 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8096}}"
 
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
+    restart: unless-stopped
+    networks:
+      - docker-vpn
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - $DATA_DIR/jellyfin/:/config
+      - $HUB_DIR/media/:/data
+    healthcheck:
+      test: curl -f http://jellyfin:8096 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: jellyfin.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8096}}"
+
   entertainment:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
