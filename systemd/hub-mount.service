@@ -16,7 +16,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --allow-other \
 --poll-interval 0 \
 --log-systemd \
---log-level DEBUG \
+--log-level INFO \
 --umask 022 \
 --cache-dir=/opt/rclone/cache/hub \
 --vfs-cache-mode full \
