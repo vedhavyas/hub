@@ -14,27 +14,17 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --fast-list \
 --auto-confirm \
 --allow-other \
-# keep in cache for 30 days
---dir-cache-time 720h \
 --poll-interval 0 \
 --log-systemd \
 --log-level INFO \
 --umask 022 \
-# no need to set them expliclty as rclone seems to pick them up the called user which in this case is docker itself
-#--uid $(id -u docker)" \
-#--gid $(id -g docker)" \
 --cache-dir=/opt/rclone/cache/hub \
 --vfs-cache-mode full \
 --vfs-cache-max-size 500G \
 --vfs-write-back 5m \
-# keep in cache for 30 days
---vfs-cache-max-age 720h \
---vfs-read-ahead 5G \
+--vfs-read-ahead 1G \
 --vfs-read-chunk-size 256M \
---vfs-read-chunk-size-limit 2G \
---vfs-used-is-size \
---tpslimit 50 \
---tpslimit-burst 30
+--vfs-used-is-size
 TimeoutStartSec=10min
 ExecStop=+/usr/bin/fusermount -uz /hub
 Restart=on-failure

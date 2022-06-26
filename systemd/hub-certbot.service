@@ -5,7 +5,7 @@ After=hub-services.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/hub apps certbot
+ExecStart=/usr/bin/hub cmd certbot
 RemainAfterExit=false
 ExecStartPost=/usr/bin/hub notify "Hub updates" "Certbot renewal successful!"
 
