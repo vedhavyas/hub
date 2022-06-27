@@ -13,6 +13,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --buffer-size 128M \
 --fast-list \
 --auto-confirm \
+--dir-cache-time 24h \
 --allow-other \
 --poll-interval 0 \
 --log-systemd \
@@ -22,7 +23,8 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --vfs-cache-mode full \
 --vfs-cache-max-size 500G \
 --vfs-write-back 5m \
---vfs-read-ahead 1G \
+--vfs-read-ahead 5G \
+--vfs-cache-max-age 24h \
 --vfs-read-chunk-size 256M \
 --vfs-used-is-size
 TimeoutStartSec=10min
