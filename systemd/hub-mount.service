@@ -23,9 +23,9 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --vfs-cache-mode full \
 --vfs-cache-max-size 500G \
 --vfs-write-back 5m \
---vfs-read-ahead 5G \
+--vfs-read-ahead 10G \
 --vfs-cache-max-age 24h \
---vfs-read-chunk-size 256M \
+--vfs-read-chunk-size 2G \
 --vfs-used-is-size
 TimeoutStartSec=10min
 ExecStop=+/usr/bin/fusermount -uz /hub
