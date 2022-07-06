@@ -118,7 +118,7 @@ iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport 30333 -j DNAT --to 10.
 # check here - https://www.reddit.com/r/WireGuard/comments/fp9h0s/comment/flk5ovw/?utm_source=share&utm_medium=web2x&context=3
 # After adjusting mtu and speed testing. 1476 seems to good for now
 # but you may have to play around a bit depending on where you are as well
-iptables -t mangle -A FORWARD -o "${eth0}"  -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1476
+# iptables -t mangle -A FORWARD -o "${eth0}"  -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1476
 
 # save
 iptables-save
