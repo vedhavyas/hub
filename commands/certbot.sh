@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+set -e
 echo "Issuing certificate for mail.${SERVER_DOMAIN} using email ${SERVER_DOMAIN_EMAIL}..."
 mkdir -p "${DATA_DIR}"/certbot
 # port forward host to certbot
