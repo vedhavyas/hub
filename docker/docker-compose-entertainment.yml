@@ -3,6 +3,8 @@ version: "3.9"
 networks:
   docker-vpn:
     external: true
+  docker-direct:
+    external: true
 
 services:
   qbittorrent:
@@ -144,7 +146,7 @@ services:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     networks:
-      - docker-vpn
+      - docker-direct
     environment:
       - TZ
       - JELLYFIN_TYPE=emby
