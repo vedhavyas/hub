@@ -1,0 +1,14 @@
+{{- /*gotype: hub.UnitFileConfig*/ -}}
+[Unit]
+Description={{.Name}}
+After={{.After}}
+
+[Service]
+Type=oneshot
+{{- range $start := .ExecStarts}}
+ExecStart={{$start}}
+{{- end}}
+RemainAfterExit=true
+
+[Install]
+WantedBy={{.WantedBy}}
