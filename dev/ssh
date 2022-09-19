@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+
+/usr/sbin/sshd -p 1022

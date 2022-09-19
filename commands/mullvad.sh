@@ -21,5 +21,3 @@ cp "${DATA_DIR}"/mullvad/mullvad.conf /etc/wireguard/
 ip address add "${MULLVAD_VPN_ID_ADDR}" dev wg-mullvad || true
 ip link set wg-mullvad up || true
 wg setconf wg-mullvad /etc/wireguard/mullvad.conf
-
-
