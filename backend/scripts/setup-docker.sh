@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# create docker user and group
+groupadd docker
+useradd -M docker -g docker -s /bin/bash
+usermod -aG docker docker
+
+# install docker and compose
+# Prevent launch of docker after install
+mkdir -p /usr/sbin/
+cat > /usr/sbin/policy-rc.d << EOF
+#!/bin/sh
+exit 101
+EOF
+chmod 755 /usr/sbin/policy-rc.d
+
+# install docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --batch --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt update -y
+apt-cache policy docker-ce # this ensures that docker is installed from the docker repo instead of ubuntu repo
+apt install docker-ce -y
+
+# install docker-compose
+curl -s -L "https://github.com/docker/compose/releases/download/$(curl -s -L https://api.github.com/repos/docker/compose/releases/latest | jq -r '.name')/docker-compose-$(uname -s)-$(uname -m)" -o /usr/libexec/docker/cli-plugins/docker-compose
+chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+
+mkdir -p /etc/docker
+cat > /etc/docker/daemon.json << EOF
+{
+    "bridge": "none",
+    "iptables": false
+}
+EOF
+
+# remove policy file to reset
+rm -f /usr/sbin/policy-rc.d
+
+# start docker
+systemctl daemon-reload
+systemctl start docker.service
+
+# prune all docker related data
+docker ps -aq | xargs docker stop
+docker system prune -a -f --volumes
+
+
+# setup docker direct network
+docker network create --subnet 10.10.2.0/24 docker-direct
+# setup docker vpn network
+docker network create --subnet 10.10.3.0/24 docker-vpn
+
+# forward packets from docker-direct and docker-vpn to any network
+networks=( docker-direct docker-vpn )
+for network in "${networks[@]}" ; do
+  network_id=$(docker network inspect -f {{.Id}} "${network}")
+  stripped=${network_id:0:12}
+  inf=br-${stripped}
+  iptables -A FORWARD -i "${inf}" -j ACCEPT
+  iptables -A FORWARD -o "${inf}" -j ACCEPT
+  # accept input requests from this docker network to host
+  # iptables -A INPUT -i "${inf}" -j ACCEPT
+done

@@ -33,5 +33,5 @@ RUN echo 'root:password' | chpasswd
 #Create a sshd folder in /run path. This allow sshd to start from terminal.
 RUN mkdir /run/sshd
 
-EXPOSE 1022
+EXPOSE 22
 CMD ["/sbin/init", "--log-target=journal"]

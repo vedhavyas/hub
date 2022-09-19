@@ -1,4 +1,4 @@
-module hub
+module github.com/vedhavyas/hub
 
 go 1.19
 

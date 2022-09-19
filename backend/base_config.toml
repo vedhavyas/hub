@@ -1,0 +1,6 @@
+[[components]]
+  name = "base"
+  enabled = true
+  type = "once"
+  scripts = ["setup-auto-upgrades", "allow-ssh", "setup-docker"]
+

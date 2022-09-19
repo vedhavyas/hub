@@ -7,7 +7,7 @@ cd .. || exit
 
 echo "Running server..."
 docker rm -f ssh
-docker run -d --privileged --cgroupns=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw --name ssh -p 1022:1022 vedhavyas/ubuntu-ssh:latest
+docker run -d --privileged --cgroupns=host -v /sys/fs/cgroup:/sys/fs/cgroup:rw --name ssh -p 1022:22 vedhavyas/ubuntu-ssh:latest
 
 echo "Starting sshd server at port 1022"
 sleep 2

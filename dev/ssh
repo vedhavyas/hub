@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 
-/usr/sbin/sshd -p 1022
+/usr/sbin/sshd -p 22
