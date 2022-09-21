@@ -31,4 +31,4 @@ RUN adduser \
     "$USER"
 
 USER $USER
-CMD ["sh", "-c", "./caddy run -adapter caddyfile -config ./Caddyfile"]
+CMD ["sh", "-c", "./caddy run --adapter caddyfile --config ./Caddyfile"]
