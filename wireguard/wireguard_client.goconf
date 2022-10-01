@@ -1,0 +1,12 @@
+{{/* gotype: hub/wireguard.clientConfWrapper*/}}
+[Interface]
+Address = {{.Peer.Address}}
+DNS = {{.Peer.DNS}}
+PrivateKey = {{.Peer.PrivateKey}}
+
+[Peer]
+PublicKey = {{.Server.PrivateKey.PublicKey}}
+PresharedKey = {{.Peer.PresharedKey}}
+AllowedIPs = 0.0.0.0/0
+Endpoint = {{.Peer.Endpoint}}
+PersistentKeepalive = {{.Peer.PersistentKeepaliveInterval}}

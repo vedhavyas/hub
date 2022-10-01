@@ -1,0 +1,16 @@
+app_dir = "/var/lib/hub/"
+
+[connection]
+addr = "127.0.0.1"
+port = 1022
+user = "root"
+passwd = "password"
+
+[network_config]
+wireguard_listen_port = 51820
+wireguard_network = "10.10.1.0/24"
+docker_host_gateway_network = "10.10.2.0/24"
+docker_vpn_gateway_network = "10.10.3.0/24"
+dns = "10.10.2.2"
+[network_config.gateway]
+enable_host = true

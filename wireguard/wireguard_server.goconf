@@ -1,0 +1,13 @@
+{{/* gotype: hub/wireguard.Server*/}}
+[Interface]
+Address = {{.Address}}
+PrivateKey = {{.PrivateKey}}
+ListenPort = {{.ListenPort}}
+DNS = {{.DNS}}
+
+{{range $id, $peer := .PeerMap}}
+[Peer]
+PublicKey = {{$peer.PrivateKey.PublicKey}}
+PresharedKey = {{$peer.PresharedKey}}
+AllowedIPs = {{$peer.AllowedIPs}}
+{{end}}

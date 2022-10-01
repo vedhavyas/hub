@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	logger "log"
 	"os"
 
 	"hub"
@@ -11,7 +10,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var log = logger.New(os.Stderr, "[hub] ", logger.Lmsgprefix)
+var log = hub.Logger()
 
 func main() {
 	hd, err := homedir.Dir()
@@ -30,11 +29,7 @@ func main() {
 				Name:  "sync",
 				Usage: "Sync hub components",
 				Action: func(context *cli.Context) error {
-					err = hub.SetupComponents(session, config.Components)
-					if err != nil {
-						return fmt.Errorf("failed to sync components: %v", err)
-					}
-					return nil
+					return hub.SyncUnits(config, session)
 				},
 			},
 			{
@@ -47,6 +42,56 @@ func main() {
 						Action: func(context *cli.Context) error {
 							fmt.Println(config)
 							return nil
+						},
+					},
+				},
+			},
+
+			{
+				Name:  "create",
+				Usage: "Create resource",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "config",
+						Usage: "Create hub config",
+						Action: func(context *cli.Context) error {
+							config := hub.Config{
+								Path:   fmt.Sprintf("%s/.config/hub.toml", hd),
+								AppDir: "/var/lib/hub",
+								Connection: hub.Connection{
+									Addr:   "127.0.0.1",
+									Port:   1022,
+									User:   "root",
+									Passwd: "password",
+								},
+								Network: hub.Network{
+									Gateway: hub.Gateway{
+										EnableHost: true,
+										Mullvad: hub.Mullvad{
+											Account:         "example",
+											DefaultLocation: "es-mad",
+											OtherLocations:  []string{"se-sto"},
+										},
+									},
+									WireguardListenPort:      51820,
+									WireGuardNetwork:         "10.10.1.0/24",
+									DockerHostGatewayNetwork: "10.10.2.0/24",
+									DockerVPNGatewayNetwork:  "10.10.3.0/24",
+									DNS:                      "10.10.2.2",
+								},
+								SFTPStorages: []hub.SFTPStorage{
+									{
+										LocalMountPath: "/hub",
+										Name:           "hub",
+										Host:           "https://host.com",
+										User:           "user",
+										Password:       "passwd",
+										CryptPassword1: "cryptpasswd1",
+										CryptPassword2: "cryptpasswd2",
+									},
+								},
+							}
+							return hub.SaveConfig(config)
 						},
 					},
 				},
@@ -68,7 +113,7 @@ func main() {
 				return fmt.Errorf("failed to read config file: %v", err)
 			}
 
-			session, err = hub.OpenSession(config.Remote)
+			session, err = hub.OpenSession(config.Connection)
 			if err != nil {
 				return fmt.Errorf("failed to open remote session: %v", err)
 			}

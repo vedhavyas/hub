@@ -1,6 +1,0 @@
-[[components]]
-  name = "base"
-  enabled = true
-  type = "single-exec"
-  scripts = ["auto-upgrades", "install-docker"]
-

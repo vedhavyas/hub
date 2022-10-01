@@ -8,28 +8,21 @@ import (
 	"github.com/melbahja/goph"
 )
 
-type Remote struct {
-	Addr   string `toml:"addr"`
-	Port   uint   `toml:"port"`
-	User   string `toml:"user"`
-	Passwd string `toml:"passwd"`
-}
-
 type Session struct {
 	client *goph.Client
 }
 
-func OpenSession(remote Remote) (*Session, error) {
+func OpenSession(sshConfig Connection) (*Session, error) {
 	callback, err := goph.DefaultKnownHosts()
 	if err != nil {
 		return nil, err
 	}
 
 	client, err := goph.NewConn(&goph.Config{
-		User:     remote.User,
-		Addr:     remote.Addr,
-		Port:     remote.Port,
-		Auth:     goph.Password(remote.Passwd),
+		User:     sshConfig.User,
+		Addr:     sshConfig.Addr,
+		Port:     sshConfig.Port,
+		Auth:     goph.Password(sshConfig.Passwd),
 		Timeout:  goph.DefaultTimeout,
 		Callback: callback,
 	})
