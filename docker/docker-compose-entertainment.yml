@@ -3,6 +3,8 @@ version: "3.9"
 networks:
   docker-vpn:
     external: true
+  docker-direct:
+    external: true
 
 services:
   qbittorrent:
@@ -209,3 +211,22 @@ services:
       caddy: podcasts.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: syncthing
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    networks:
+      - docker-direct
+    volumes:
+      - $DATA_DIR/syncthing/config:/config
+      - $HUB_DIR/media/downloads/games:/games
+    labels:
+      caddy: syncthing.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8384}}"
