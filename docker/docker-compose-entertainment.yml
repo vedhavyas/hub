@@ -222,7 +222,8 @@ services:
       - PGID
       - TZ
     networks:
-      - docker-direct
+      docker-direct:
+        ipv4_address: 10.10.2.252
     volumes:
       - $DATA_DIR/syncthing/config:/config
       - $HUB_DIR/media/downloads/games:/games
