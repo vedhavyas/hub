@@ -44,6 +44,8 @@ iptables -A INPUT -i "${eth0}" -p tcp --dport 22 -j ACCEPT
 iptables -t nat -A POSTROUTING -o "$eth0" -j MASQUERADE
 iptables -A FORWARD -o "${eth0}" -j ACCEPT
 
+# accept established connections from wireguard
+iptables -A INPUT -i wg-hub -m state --state=ESTABLISHED,RELATED -j ACCEPT
 # accept wireguard on udp
 iptables -A INPUT -i "${eth0}" -p udp --dport 51820 -j ACCEPT
 # accept ssh from wireguard as well
