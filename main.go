@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
+var log = logrus.New()
+
 func main() {
-	var session *Session
+	var session Session
 	var err error
 
 	app := cli.App{
@@ -18,11 +20,19 @@ func main() {
 		EnableBashCompletion: true,
 		Suggest:              true,
 		Before: func(context *cli.Context) error {
+			log.Println("Initiating SSH Connection...")
 			session, err = OpenSession()
 			if err != nil {
 				return fmt.Errorf("failed to open remote session: %v", err)
 			}
 
+			log.Println("Connected.")
+			return nil
+		},
+		After: func(context *cli.Context) error {
+			log.Println("Closing SSH Connection...")
+			session.Close()
+			log.Println("Closed.")
 			return nil
 		},
 		Commands: []*cli.Command{
@@ -30,13 +40,7 @@ func main() {
 				Name:  "sync",
 				Usage: "Sync hub components",
 				Action: func(context *cli.Context) error {
-					out, err := session.ExecuteCommand("uname -a")
-					if err != nil {
-						return err
-					}
-
-					fmt.Println(string(out))
-					return nil
+					return syncScripts(session)
 				},
 			},
 		},
