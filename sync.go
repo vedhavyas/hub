@@ -125,3 +125,38 @@ func loadSystemdUnits(session Session) error {
 
 	return nil
 }
+
+//go:embed docker
+var dockerFs embed.FS
+
+func syncDockerComposeFiles(session Session) error {
+	log.Infoln("Syncing Docker compose files...")
+	composeFiles, err := dockerFs.ReadDir("docker")
+	if err != nil {
+		return err
+	}
+
+	_, err = session.ExecuteCommand("mkdir -p /opt/hub/docker")
+	if err != nil {
+		return err
+	}
+
+	for _, file := range composeFiles {
+		if file.IsDir() {
+			continue
+		}
+
+		fileData, err := dockerFs.ReadFile(fmt.Sprintf("docker/%s", file.Name()))
+		if err != nil {
+			return err
+		}
+
+		remotePath := fmt.Sprintf("/opt/hub/docker/%s", file.Name())
+		err = session.WriteDataToFile(fileData, remotePath)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

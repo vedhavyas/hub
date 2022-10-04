@@ -50,6 +50,11 @@ func main() {
 						return fmt.Errorf("failed to sync systemd units: %v", err)
 					}
 
+					err = syncDockerComposeFiles(session)
+					if err != nil {
+						return fmt.Errorf("failed to sync docker compose files: %v", err)
+					}
+
 					return nil
 				},
 			},
