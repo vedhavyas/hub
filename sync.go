@@ -6,84 +6,56 @@ import (
 	"strings"
 )
 
-//go:embed scripts
-var s embed.FS
-
-func syncScripts(session Session) error {
-	log.Infoln("Syncing scripts...")
-	scripts, err := s.ReadDir("scripts")
+func SyncStaticFiles(session Session) error {
+	err := syncStaticFiles(session)
 	if err != nil {
 		return err
 	}
 
-	_, err = session.ExecuteCommand("mkdir -p /opt/hub/scripts")
+	// give execute permissions for scripts
+	res, err := session.ExecuteCommand("chmod +x /opt/hub/scripts/*")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to give exec permissions[%s]: %v", string(res), err)
 	}
 
-	for _, file := range scripts {
-		if file.IsDir() {
-			continue
-		}
+	// create symlinks for scripts
+	err = createSymLinks(session, "scripts", "/sbin/hub-script-%s")
+	if err != nil {
+		return fmt.Errorf("failed to create sym links for scripts: %v", err)
+	}
 
-		fileData, err := s.ReadFile(fmt.Sprintf("scripts/%s", file.Name()))
-		if err != nil {
-			return err
-		}
-
-		remotePath := fmt.Sprintf("/opt/hub/scripts/%s", file.Name())
-		err = session.WriteScriptToFile(fileData, remotePath)
-		if err != nil {
-			return err
-		}
-
-		binaryPath := fmt.Sprintf("/sbin/hub-script-%s", strings.TrimSuffix(file.Name(), ".sh"))
-		if file.Name() == "hub.sh" {
-			binaryPath = "/sbin/hub"
-		}
-
-		err = session.SymLink(remotePath, binaryPath)
-		if err != nil {
-			return fmt.Errorf("failed to symlink script: %v", err)
-		}
+	// create symlinks for systemd files
+	err = createSymLinks(session, "systemd", "/etc/systemd/system/%s")
+	if err != nil {
+		return fmt.Errorf("failed to create sym links for systemd unit files: %v", err)
 	}
 
 	return nil
 }
 
-//go:embed systemd
-var systemdFs embed.FS
-
-func syncSystemdUnitFiles(session Session) error {
-	log.Infoln("Syncing Systemd unit files...")
-	units, err := systemdFs.ReadDir("systemd")
+func createSymLinks(session Session, dir, linkPathTmpl string) error {
+	log.Infof("Creating Symlinks for files in %v...\n", dir)
+	files, err := staticFS.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 
-	_, err = session.ExecuteCommand("mkdir -p /opt/hub/systemd")
-	if err != nil {
-		return err
-	}
-
-	for _, file := range units {
+	for _, file := range files {
 		if file.IsDir() {
 			continue
 		}
 
-		fileData, err := systemdFs.ReadFile(fmt.Sprintf("systemd/%s", file.Name()))
-		if err != nil {
-			return err
+		oldPath := fmt.Sprintf("/opt/hub/%s/%s", dir, file.Name())
+		linkPath := fmt.Sprintf(linkPathTmpl, file.Name())
+
+		// special case for scripts
+		linkPath = strings.TrimSuffix(linkPath, ".sh")
+		if file.Name() == "hub.sh" {
+			linkPath = "/sbin/hub"
 		}
 
-		remotePath := fmt.Sprintf("/opt/hub/systemd/%s", file.Name())
-		err = session.WriteDataToFile(fileData, remotePath)
-		if err != nil {
-			return err
-		}
-
-		linkPath := fmt.Sprintf("/etc/systemd/system/%s", file.Name())
-		err = session.SymLink(remotePath, linkPath)
+		log.Infoln(oldPath, linkPath)
+		err = session.SymLink(oldPath, linkPath)
 		if err != nil {
 			return fmt.Errorf("failed to symlink script: %v", err)
 		}
@@ -94,7 +66,7 @@ func syncSystemdUnitFiles(session Session) error {
 
 func loadSystemdUnits(session Session) error {
 	log.Infoln("Enabling Systemd units...")
-	units, err := systemdFs.ReadDir("systemd")
+	units, err := staticFS.ReadDir("systemd")
 	if err != nil {
 		return err
 	}
@@ -126,37 +98,51 @@ func loadSystemdUnits(session Session) error {
 	return nil
 }
 
-//go:embed docker
-var dockerFs embed.FS
+//go:embed conf scripts docker systemd
+var staticFS embed.FS
 
-func syncDockerComposeFiles(session Session) error {
-	log.Infoln("Syncing Docker compose files...")
-	composeFiles, err := dockerFs.ReadDir("docker")
+func syncStaticFiles(session Session) error {
+	log.Infoln("Syncing static files...")
+	entries, err := staticFS.ReadDir(".")
 	if err != nil {
 		return err
 	}
 
-	_, err = session.ExecuteCommand("mkdir -p /opt/hub/docker")
-	if err != nil {
-		return err
-	}
-
-	for _, file := range composeFiles {
-		if file.IsDir() {
+	for _, dir := range entries {
+		if !dir.IsDir() {
+			log.Errorf("unknown file found in static: %v", dir)
 			continue
 		}
 
-		fileData, err := dockerFs.ReadFile(fmt.Sprintf("docker/%s", file.Name()))
+		log.Infof("Syncing %s files...\n", dir.Name())
+		files, err := staticFS.ReadDir(dir.Name())
 		if err != nil {
 			return err
 		}
 
-		remotePath := fmt.Sprintf("/opt/hub/docker/%s", file.Name())
-		err = session.WriteDataToFile(fileData, remotePath)
+		_, err = session.ExecuteCommand(fmt.Sprintf("mkdir -p /opt/hub/%s", dir.Name()))
 		if err != nil {
 			return err
 		}
+
+		for _, file := range files {
+			if file.IsDir() {
+				continue
+			}
+
+			fileData, err := staticFS.ReadFile(fmt.Sprintf("%s/%s", dir.Name(), file.Name()))
+			if err != nil {
+				return err
+			}
+
+			remotePath := fmt.Sprintf("/opt/hub/%s/%s", dir.Name(), file.Name())
+			err = session.WriteDataToFile(fileData, remotePath)
+			if err != nil {
+				return err
+			}
+		}
+
 	}
 
-	return nil
+	return err
 }

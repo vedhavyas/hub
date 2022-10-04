@@ -40,19 +40,9 @@ func main() {
 				Name:  "sync",
 				Usage: "Sync hub components",
 				Action: func(context *cli.Context) error {
-					err := syncScripts(session)
+					err := SyncStaticFiles(session)
 					if err != nil {
 						return fmt.Errorf("failed to sync scripts: %v", err)
-					}
-
-					err = syncSystemdUnitFiles(session)
-					if err != nil {
-						return fmt.Errorf("failed to sync systemd units: %v", err)
-					}
-
-					err = syncDockerComposeFiles(session)
-					if err != nil {
-						return fmt.Errorf("failed to sync docker compose files: %v", err)
 					}
 
 					return nil
