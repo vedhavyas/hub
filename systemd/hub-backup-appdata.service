@@ -5,8 +5,8 @@ After=hub-services.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/hub backup appdata
-ExecStart=/usr/bin/hub notify "Hub updates" "Appdata backup successful!"
+ExecStart=/sbin/hub backup appdata
+ExecStart=/sbin/hub notify "Hub updates" "Appdata backup successful!"
 RemainAfterExit=false
 
 [Install]

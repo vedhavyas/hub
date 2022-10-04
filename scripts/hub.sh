@@ -1,20 +1,16 @@
 #!/bin/zsh
 
-script_path=$(realpath "$0")
-root_dir=$(dirname "${script_path}")
-
 # export all variables from here
 set -a
-ROOT_DIR=${root_dir}
-CONF_DIR="${root_dir}"/conf
-DATA_DIR="${root_dir}"/data
+ROOT_DIR=/opt/hub
+CONF_DIR="${ROOT_DIR}"/conf
+DATA_DIR=/var/hub/data
 mkdir -p "${DATA_DIR}"
-DOCKER_DIR="${root_dir}"/docker
-CMDS_DIR="${root_dir}"/commands
-SCRIPTS_DIR="${root_dir}"/scripts
-SYSTEMD_DIR="${root_dir}"/systemd
+DOCKER_DIR="${ROOT_DIR}"/docker
+CMDS_DIR="${ROOT_DIR}"/commands
+SCRIPTS_DIR=/sbin/
 HUB_DIR=/hub
-source "${root_dir}"/.env
+source /etc/hub/.env
 
 # create a docker user
 groupadd docker &> /dev/null
@@ -32,19 +28,13 @@ function run_script() {
   echo "Running script ${1}..."
   script=${1}
   shift
-  "${SCRIPTS_DIR}"/"$script".sh "$@" || exit 1
+  "${SCRIPTS_DIR}/hub-script-$script" "$@" || exit 1
   echo "Done."
 }
 
 cmd=${1}
 case $cmd in
-setup )
-  # link the binary
-  ln -sf  "${script_path}" /usr/bin/hub
-
-  # copy units to system
-  cp  "${SYSTEMD_DIR}"/* /etc/systemd/system/
-
+reload-systemd )
   # reload systemctl
   systemctl daemon-reload
 

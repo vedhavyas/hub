@@ -40,7 +40,17 @@ func main() {
 				Name:  "sync",
 				Usage: "Sync hub components",
 				Action: func(context *cli.Context) error {
-					return syncScripts(session)
+					err := syncScripts(session)
+					if err != nil {
+						return fmt.Errorf("failed to sync scripts: %v", err)
+					}
+
+					err = syncSystemdUnitFiles(session)
+					if err != nil {
+						return fmt.Errorf("failed to sync systemd units: %v", err)
+					}
+
+					return nil
 				},
 			},
 		},

@@ -64,7 +64,12 @@ func (s Session) WriteDataToFile(data []byte, remotePath string) error {
 }
 
 func (s Session) SymLink(oldPath, newPath string) error {
-	return s.sftp.Symlink(oldPath, newPath)
+	_, err := s.ExecuteCommand(fmt.Sprintf("ln -sf %s %s", oldPath, newPath))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s Session) writeDataToFile(data io.Reader, remotePath string, executable bool) error {
