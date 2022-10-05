@@ -3,24 +3,49 @@ package main
 import (
 	"embed"
 	"fmt"
-	"os"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 func InitHub(session Session) error {
+	remoteWriter := log.WithField("remote", "init").WriterLevel(logrus.DebugLevel)
 	log.Infoln("Running init script...")
-	err := session.ExecuteCommandStream("hub-script-init", os.Stdout)
+	err := session.ExecuteCommandStream("hub-script-init", remoteWriter)
 	if err != nil {
 		return err
 	}
 
 	log.Infoln("Installing dependencies...")
-	err = session.ExecuteCommandStream("hub run-script deps", os.Stdout)
+	err = session.ExecuteCommandStream("hub run-script deps", remoteWriter)
 	if err != nil {
 		return err
 	}
 
 	err = loadSystemdUnits(session)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Status(session Session) error {
+	remoteWriter := log.WithField("remote", "status").WriterLevel(logrus.InfoLevel)
+	err := session.ExecuteCommandStream(`
+systemctl list-unit-files 'hub-*' docker.service
+systemctl list-units 'hub-*' docker.service
+docker compose ls`, remoteWriter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ShowLogs(session Session, service string) error {
+	remoteWriter := log.WithField("remote", "logs").WriterLevel(logrus.InfoLevel)
+	err := session.ExecuteCommandStream(fmt.Sprintf(`journalctl -u "hub-%s" -f`, service), remoteWriter)
 	if err != nil {
 		return err
 	}

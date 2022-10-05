@@ -33,43 +33,12 @@ function run_script() {
 
 cmd=${1}
 case $cmd in
-reload-systemd )
-  # reload systemctl
-  systemctl daemon-reload
-
-  # enable units
-  systemctl reenable \
-      hub-deps \
-      hub-mount \
-      hub-network \
-      hub-firewall \
-      hub-services \
-      docker.service \
-      hub-certbot.service \
-      hub-certbot.timer \
-      hub-backup-appdata.service \
-      hub-backup-appdata.timer
-
-  # start timers
-  systemctl restart hub-backup-appdata.timer hub-certbot.timer
-  ;;
-
-status )
-  systemctl list-unit-files 'hub-*' docker.service
-  systemctl list-units 'hub-*' docker.service
-  docker compose ls
-  ;;
 
 cmd )
   shift
   cmd="${1}"
   shift
   "${CMDS_DIR}/${cmd}.sh" "$@"
-  ;;
-
-logs )
-  service=${2:-*}
-  journalctl -u "hub-${service}" -f
   ;;
 
 backup)

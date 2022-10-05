@@ -12,6 +12,7 @@ var log = logrus.New()
 
 func main() {
 	var session Session
+	var config Config
 	var err error
 
 	app := cli.App{
@@ -43,6 +44,36 @@ func main() {
 					return InitHub(session)
 				},
 			},
+
+			{
+				Name:  "status",
+				Usage: "Status of hub",
+				Action: func(context *cli.Context) error {
+					return Status(session)
+				},
+			},
+
+			{
+				Name:  "show",
+				Usage: "Show hub info",
+				Subcommands: []*cli.Command{
+					{
+						Name:        "logs",
+						Aliases:     []string{"l"},
+						Description: "Show hub service(s) logs.",
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "services",
+								Value:   "*",
+								Aliases: []string{"s"},
+							},
+						},
+						Action: func(context *cli.Context) error {
+							return ShowLogs(session, context.String("services"))
+						},
+					},
+				},
+			},
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
@@ -60,7 +91,12 @@ func main() {
 			}
 
 			log.Println("Initiating SSH Connection...")
-			session, err = OpenSession()
+			config, err = LoadConfig()
+			if err != nil {
+				return err
+			}
+
+			session, err = OpenSession(config.Conn)
 			if err != nil {
 				return fmt.Errorf("failed to open remote session: %v", err)
 			}

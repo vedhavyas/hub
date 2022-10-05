@@ -2,9 +2,12 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"io"
+	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/melbahja/goph"
 	"github.com/pkg/sftp"
 )
@@ -14,20 +17,49 @@ type Session struct {
 	sftp *sftp.Client
 }
 
-func OpenSession() (Session, error) {
+type Connection struct {
+	User     string `toml:"user"`
+	Addr     string `toml:"addr"`
+	Port     uint   `toml:"port"`
+	Password string `toml:"passwd"`
+}
+
+//go:embed config.toml
+var configBytes string
+
+type Config struct {
+	Conn Connection `toml:"connection"`
+}
+
+func LoadConfig() (Config, error) {
+	var config Config
+	log.Infoln("Loading config...")
+	log.Debugf("Config data: %v", configBytes)
+	_, err := toml.Decode(configBytes, &config)
+	if err != nil {
+		return config, fmt.Errorf("failed to load config: %v", err)
+	}
+
+	return config, nil
+}
+
+func OpenSession(conn Connection) (Session, error) {
 	callback, err := goph.DefaultKnownHosts()
 	if err != nil {
 		return Session{}, err
 	}
 
 	ssh, err := goph.NewConn(&goph.Config{
-		User:     "root",
-		Addr:     "127.0.0.1",
-		Port:     1022,
-		Auth:     goph.Password("password"),
+		User:     conn.User,
+		Addr:     conn.Addr,
+		Port:     conn.Port,
+		Auth:     goph.Password(conn.Password),
 		Timeout:  goph.DefaultTimeout,
 		Callback: callback,
 	})
+	if err != nil {
+		return Session{}, err
+	}
 
 	sftp, err := ssh.NewSftp()
 	if err != nil {
@@ -38,14 +70,18 @@ func OpenSession() (Session, error) {
 }
 
 func (s Session) Close() {
-	err := s.sftp.Close()
-	if err != nil {
-		log.Infof("failed to close SFTP connection: %v", err)
+	if s.sftp != nil {
+		err := s.sftp.Close()
+		if err != nil {
+			log.Infof("failed to close SFTP connection: %v", err)
+		}
 	}
 
-	err = s.ssh.Close()
-	if err != nil {
-		log.Infof("failed to close SSH connection: %v", err)
+	if s.ssh != nil {
+		err := s.ssh.Close()
+		if err != nil {
+			log.Infof("failed to close SSH connection: %v", err)
+		}
 	}
 }
 
@@ -102,6 +138,7 @@ func (s Session) ExecuteCommandStream(command string, logger io.Writer) (err err
 
 	session.Stdout = logger
 	session.Stderr = logger
+	session.Stdin = os.Stdin
 	err = session.Run(command)
 	if err != nil {
 		return fmt.Errorf("failed to run command: %v", err)
