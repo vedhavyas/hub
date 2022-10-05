@@ -34,7 +34,7 @@ services:
     stop_grace_period: 1m
     networks:
       docker-direct:
-        ipv4_address: 10.10.2.254
+        ipv4_address: 10.10.2.5
         aliases:
           - mail.$SERVER_DOMAIN
     cap_add:

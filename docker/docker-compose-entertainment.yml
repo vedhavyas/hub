@@ -21,7 +21,7 @@ services:
       - $HUB_DIR/media:/data
     networks:
       docker-vpn:
-        ipv4_address: 10.10.3.100
+        ipv4_address: 10.10.3.2
     healthcheck:
       test: [ "CMD-SHELL", "[[ $$(curl https://icanhazip.com) != ${HOST_IP} ]] && echo 'OK' || exit 1" ]
       interval: 15s
@@ -223,7 +223,7 @@ services:
       - TZ
     networks:
       docker-direct:
-        ipv4_address: 10.10.2.252
+        ipv4_address: 10.10.2.6
     volumes:
       - $DATA_DIR/syncthing/config:/config
       - $HUB_DIR/media/downloads/games:/games

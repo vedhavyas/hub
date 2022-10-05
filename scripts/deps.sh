@@ -6,14 +6,14 @@ systemctl stop systemd-resolved.service
 rm /etc/resolv.conf
 echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
-apt update -y &> /dev/null
-apt upgrade -y &> /dev/null
-apt full-upgrade -y &> /dev/null
-apt install fuse git man unzip jq apt-transport-https ca-certificates curl software-properties-common -y &> /dev/null
-apt install traceroute -y &> /dev/null
-apt install wireguard qrencode -y &> /dev/null
-apt install wait-for-it -y &> /dev/null
-DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y &> /dev/null
+apt update -y
+apt upgrade -y
+apt full-upgrade -y
+apt install fuse git man unzip jq apt-transport-https ca-certificates curl software-properties-common -y
+apt install traceroute -y
+apt install wireguard qrencode -y
+apt install wait-for-it -y
+DEBIAN_FRONTEND=noninteractive apt install iptables-persistent -y
 # setup unattended upgrades
 apt install -y unattended-upgrades
 cp "${CONF_DIR}"/20auto-upgrades /etc/apt/apt.conf.d/
@@ -62,4 +62,4 @@ systemctl reenable docker.service
 curl https://rclone.org/install.sh | bash || true
 
 # cleanup
-apt autoremove -y &> /dev/null
+apt autoremove -y

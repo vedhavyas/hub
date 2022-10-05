@@ -22,8 +22,15 @@ func main() {
 			{
 				Name:  "sync",
 				Usage: "Sync hub components",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:  "init",
+						Usage: "Initialize hub.",
+						Value: false,
+					},
+				},
 				Action: func(context *cli.Context) error {
-					err := SyncStaticFiles(session)
+					err := SyncStaticFiles(session, context.Bool("init"))
 					if err != nil {
 						return fmt.Errorf("failed to sync components: %v", err)
 					}
@@ -33,23 +40,11 @@ func main() {
 			},
 
 			{
-				Name:  "init",
-				Usage: "Initiate hub",
+				Name:  "reboot",
+				Usage: "Reboot of hub",
 				Action: func(context *cli.Context) error {
-					err := SyncStaticFiles(session)
-					if err != nil {
-						return fmt.Errorf("failed to sync components: %v", err)
-					}
-
-					return InitHub(session)
-				},
-			},
-
-			{
-				Name:  "status",
-				Usage: "Status of hub",
-				Action: func(context *cli.Context) error {
-					return Status(session)
+					_, err = session.ExecuteCommand("reboot")
+					return err
 				},
 			},
 
@@ -63,13 +58,21 @@ func main() {
 						Description: "Show hub service(s) logs.",
 						Flags: []cli.Flag{
 							&cli.StringFlag{
-								Name:    "services",
+								Name:    "service",
 								Value:   "*",
 								Aliases: []string{"s"},
 							},
 						},
 						Action: func(context *cli.Context) error {
-							return ShowLogs(session, context.String("services"))
+							return ShowLogs(session, context.String("service"))
+						},
+					},
+					{
+						Name:        "status",
+						Aliases:     []string{"l"},
+						Description: "Show hub status.",
+						Action: func(context *cli.Context) error {
+							return Status(session)
 						},
 					},
 				},

@@ -57,7 +57,7 @@ func (conn Connection) Auth() (goph.Auth, error) {
 		return goph.Key(conn.KeyPath, "")
 	}
 
-	log.Infof("Using agent...")
+	log.Infof("Using SSH agent...")
 	return goph.UseAgent()
 }
 

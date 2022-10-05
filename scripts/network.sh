@@ -18,10 +18,10 @@ ip link set wg-hub up || true
 "${CMDS_DIR}"/wireguard.sh
 
 # setup docker direct network
-docker network create --subnet 10.10.2.0/24 docker-direct &> /dev/null
+docker network create --subnet 10.10.2.0/24 --ip-range 10.10.2.200/25 docker-direct &> /dev/null
 
 # setup docker vpn network
-docker network create --subnet 10.10.3.0/24 docker-vpn &> /dev/null
+docker network create --subnet 10.10.3.0/24 --ip-range 10.10.3.200/25 docker-vpn &> /dev/null
 
 # generate wireguard mullvad interface
 ip link del wg-mullvad || true

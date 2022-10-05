@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func InitHub(session Session) error {
+func initHub(session Session) error {
 	remoteWriter := log.WithField("remote", "init").WriterLevel(logrus.DebugLevel)
 	log.Infoln("Running init script...")
 	err := session.ExecuteCommandStream("hub-script-init", remoteWriter)
@@ -53,8 +53,13 @@ func ShowLogs(session Session, service string) error {
 	return nil
 }
 
-func SyncStaticFiles(session Session) error {
-	err := syncStaticFiles(session)
+func SyncStaticFiles(session Session, init bool) error {
+	err := cleanStaticFiles(session)
+	if err != nil {
+		return err
+	}
+
+	err = syncStaticFiles(session)
 	if err != nil {
 		return err
 	}
@@ -89,7 +94,11 @@ func SyncStaticFiles(session Session) error {
 		return fmt.Errorf("failed to sync .env file: %v", err)
 	}
 
-	return nil
+	if init {
+		return initHub(session)
+	}
+
+	return loadSystemdUnits(session)
 }
 
 func createSymLinks(session Session, dir, linkPathTmpl string) error {
@@ -135,6 +144,10 @@ func loadSystemdUnits(session Session) error {
 			continue
 		}
 
+		if strings.Contains(file.Name(), "@") {
+			continue
+		}
+
 		unitNames = append(unitNames, file.Name())
 	}
 
@@ -148,7 +161,15 @@ func loadSystemdUnits(session Session) error {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	res, err = session.ExecuteCommand("systemctl restart hub-*.timer")
+	services := []string{"security", "comms", "maintenance", "monitoring", "entertainment", "utilities", "mailserver"}
+	for _, service := range services {
+		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-services@%s.service", service))
+		if err != nil {
+			return fmt.Errorf("%v(%v)", string(res), err)
+		}
+	}
+
+	res, err = session.ExecuteCommand("systemctl restart 'hub-*.timer'")
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
@@ -217,4 +238,20 @@ func syncStaticFiles(session Session) error {
 	}
 
 	return err
+}
+
+func cleanStaticFiles(session Session) error {
+	// remove /opt/hub
+	_, err := session.ExecuteCommand("rm -rf /opt/hub/*")
+	if err != nil {
+		return err
+	}
+
+	// remove copied systemd files
+	_, err = session.ExecuteCommand("rm -rf /etc/systemd/system/hub-*")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
