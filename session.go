@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
-	"time"
 
 	"github.com/melbahja/goph"
 	"github.com/pkg/sftp"
@@ -52,6 +50,7 @@ func (s Session) Close() {
 }
 
 func (s Session) ExecuteCommand(cmd string) (output []byte, err error) {
+	log.Debugf("Executing command: %v", cmd)
 	return s.ssh.Run(cmd)
 }
 
@@ -95,26 +94,7 @@ func (s Session) writeDataToFile(data io.Reader, remotePath string, executable b
 	return nil
 }
 
-func (s Session) CopyLocalFile(localPath, remotePath string, executable bool) error {
-	local, err := os.Open(localPath)
-	if err != nil {
-		return fmt.Errorf("failed to open local file: %v", err)
-	}
-	defer local.Close()
-
-	return s.writeDataToFile(local, remotePath, executable)
-}
-
-func (s Session) ExecuteLocalShellFile(localPath string, logger io.Writer) error {
-	remotePath := fmt.Sprintf("/tmp/hub-script-%d.sh", time.Now().UTC().UnixMilli())
-	err := s.CopyLocalFile(localPath, remotePath, true)
-	if err != nil {
-		return fmt.Errorf("failed to copy script: %v", err)
-	}
-	return s.ExecuteRemoteShellFile(remotePath, logger)
-}
-
-func (s Session) ExecuteRemoteShellFile(remotePath string, logger io.Writer) (err error) {
+func (s Session) ExecuteCommandStream(command string, logger io.Writer) (err error) {
 	session, err := s.ssh.NewSession()
 	if err != nil {
 		return fmt.Errorf("failed to start remote session: %v", err)
@@ -122,9 +102,9 @@ func (s Session) ExecuteRemoteShellFile(remotePath string, logger io.Writer) (er
 
 	session.Stdout = logger
 	session.Stderr = logger
-	err = session.Run(fmt.Sprintf("`which sh` %s", remotePath))
+	err = session.Run(command)
 	if err != nil {
-		return fmt.Errorf("failed to run script: %v", err)
+		return fmt.Errorf("failed to run command: %v", err)
 	}
 
 	return nil

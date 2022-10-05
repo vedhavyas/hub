@@ -16,7 +16,6 @@ source /etc/hub/.env
 groupadd docker &> /dev/null
 useradd -M docker -g docker -s /bin/zsh &> /dev/null
 usermod -aG docker docker
-usermod -aG docker admin
 chown docker:docker "${DATA_DIR}"
 
 PUID=$(id -u docker)

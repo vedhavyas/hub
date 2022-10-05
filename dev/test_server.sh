@@ -29,6 +29,10 @@ stop)
   echo "Stopping server..."
   docker rm -f ssh
   ;;
+ssh)
+  echo "SSH'ing into server..."
+  ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no  -p 1022 root@127.0.0.1
+  ;;
 *)
   echo "Unknown command ${cmd}"
   exit 1
