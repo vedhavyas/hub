@@ -45,7 +45,7 @@ docker compose ls`, remoteWriter)
 
 func ShowLogs(session Session, service string) error {
 	remoteWriter := log.WithField("remote", "logs").WriterLevel(logrus.InfoLevel)
-	err := session.ExecuteCommandStream(fmt.Sprintf(`journalctl -u "hub-%s" -f`, service), remoteWriter)
+	err := session.ExecuteCommandStream(fmt.Sprintf(`journalctl -u 'hub-%s' -f`, service), remoteWriter)
 	if err != nil {
 		return err
 	}

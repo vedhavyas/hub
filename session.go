@@ -5,11 +5,13 @@ import (
 	_ "embed"
 	"fmt"
 	"io"
+	"net"
 	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/melbahja/goph"
 	"github.com/pkg/sftp"
+	"golang.org/x/crypto/ssh"
 )
 
 type Session struct {
@@ -22,6 +24,7 @@ type Connection struct {
 	Addr     string `toml:"addr"`
 	Port     uint   `toml:"port"`
 	Password string `toml:"passwd"`
+	KeyPath  string `toml:"key_path"`
 }
 
 //go:embed config.toml
@@ -43,19 +46,37 @@ func LoadConfig() (Config, error) {
 	return config, nil
 }
 
+func (conn Connection) Auth() (goph.Auth, error) {
+	if conn.Password != "" {
+		log.Infof("Using password authentication...")
+		return goph.Password(conn.Password), nil
+	}
+
+	if conn.KeyPath != "" {
+		log.Infof("Using private key authentication...")
+		return goph.Key(conn.KeyPath, "")
+	}
+
+	log.Infof("Using agent...")
+	return goph.UseAgent()
+}
+
 func OpenSession(conn Connection) (Session, error) {
-	callback, err := goph.DefaultKnownHosts()
+	auth, err := conn.Auth()
 	if err != nil {
 		return Session{}, err
 	}
 
 	ssh, err := goph.NewConn(&goph.Config{
-		User:     conn.User,
-		Addr:     conn.Addr,
-		Port:     conn.Port,
-		Auth:     goph.Password(conn.Password),
-		Timeout:  goph.DefaultTimeout,
-		Callback: callback,
+		User:    conn.User,
+		Addr:    conn.Addr,
+		Port:    conn.Port,
+		Auth:    auth,
+		Timeout: goph.DefaultTimeout,
+		Callback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			log.Infof("Checking host %s at %s with key: %v", hostname, remote.String(), key.Type())
+			return nil
+		},
 	})
 	if err != nil {
 		return Session{}, err
