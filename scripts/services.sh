@@ -30,6 +30,7 @@ function mailserver_post_up() {
 }
 
 function entertainment_pre_up() {
+  test -f "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf && sed -i 's/Session\\Port=.*/Session\\Port='"${PEER_PORT}"'/' "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf
   HOST_IP=$(curl https://icanhazip.com)
   export HOST_IP
 }
@@ -37,11 +38,14 @@ function entertainment_pre_up() {
 function entertainment_post_up() {
   # wait for qbittorrent
   wait-for-it -t 60 10.10.3.2:8080
-  wait-for-it -t 60 10.10.3.2:29850
+  wait-for-it -t 60 10.10.3.2:"${PEER_PORT}"
 }
 
 action=$1
 service=$2
+
+source "${DATA_DIR}"/mullvad/mullvad.env
+PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
 
 case $action in
 pre-start)
