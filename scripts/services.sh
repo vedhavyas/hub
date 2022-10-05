@@ -40,23 +40,26 @@ function entertainment_post_up() {
   wait-for-it -t 60 10.10.3.100:29850
 }
 
-services=(security comms maintenance monitoring entertainment utilities mailserver)
-# start services
-for service in "${services[@]}"; do
-  case $1 in
-  start|reload)
-    pre=${service}_pre_up
-    command -v "$pre" >/dev/null && $pre
-    docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml up -d --quiet-pull --remove-orphans || exit 1
-    post=${service}_post_up
-    command -v "$post" >/dev/null && $post
-    ;;
-  stop)
-    hub notify "Hub updates" "Stopping services..."
-    docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml down
-    echo "nameserver 1.1.1.1" > /etc/resolv.conf
-  esac
+action=$1
+service=$2
 
-done
-
+case $action in
+pre-start)
+  hub notify "Hub updates" "starting ${service}..."
+  pre=${service}_pre_up
+  command -v "$pre" >/dev/null && $pre
+  ;;
+start)
+  docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml up --quiet-pull --remove-orphans || exit 1
+  ;;
+post-start)
+  post=${service}_post_up
+  command -v "$post" >/dev/null && $post
+  hub notify "Hub updates" "${service} successfully started"
+  ;;
+stop)
+  hub notify "Hub updates" "stopping ${service}..."
+  docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml down
+  echo "nameserver 1.1.1.1" > /etc/resolv.conf
+esac
 exit 0

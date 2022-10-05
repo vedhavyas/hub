@@ -46,10 +46,11 @@ func main() {
 			},
 
 			{
-				Name:  "status",
-				Usage: "Status of hub",
+				Name:  "reboot",
+				Usage: "Reboot of hub",
 				Action: func(context *cli.Context) error {
-					return Status(session)
+					_, err = session.ExecuteCommand("reboot")
+					return err
 				},
 			},
 
@@ -70,6 +71,14 @@ func main() {
 						},
 						Action: func(context *cli.Context) error {
 							return ShowLogs(session, context.String("services"))
+						},
+					},
+					{
+						Name:        "status",
+						Aliases:     []string{"l"},
+						Description: "Show hub status.",
+						Action: func(context *cli.Context) error {
+							return Status(session)
 						},
 					},
 				},
