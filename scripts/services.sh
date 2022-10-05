@@ -6,7 +6,7 @@ function security_pre_up() {
     custom_records="${DATA_DIR}/pihole/etc-dnsmasq.d/03-hub-dns.conf"
     cat > "${custom_records}" << EOF
 address=/host.hub/10.10.1.1
-address=/mailserver.hub/10.10.2.254
+address=/mailserver.hub/10.10.2.5
 address=/hub/10.10.2.4
 EOF
 }
@@ -26,7 +26,7 @@ function mailserver_pre_up() {
 
 function mailserver_post_up() {
   # wait for mailserver to come up
-  wait-for-it -t 60 10.10.2.254:993
+  wait-for-it -t 60 10.10.2.5:993
 }
 
 function entertainment_pre_up() {
@@ -36,8 +36,8 @@ function entertainment_pre_up() {
 
 function entertainment_post_up() {
   # wait for qbittorrent
-  wait-for-it -t 60 10.10.3.100:8080
-  wait-for-it -t 60 10.10.3.100:29850
+  wait-for-it -t 60 10.10.3.2:8080
+  wait-for-it -t 60 10.10.3.2:29850
 }
 
 action=$1

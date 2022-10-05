@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func InitHub(session Session) error {
+func initHub(session Session) error {
 	remoteWriter := log.WithField("remote", "init").WriterLevel(logrus.DebugLevel)
 	log.Infoln("Running init script...")
 	err := session.ExecuteCommandStream("hub-script-init", remoteWriter)
@@ -53,7 +53,7 @@ func ShowLogs(session Session, service string) error {
 	return nil
 }
 
-func SyncStaticFiles(session Session) error {
+func SyncStaticFiles(session Session, init bool) error {
 	err := cleanStaticFiles(session)
 	if err != nil {
 		return err
@@ -92,6 +92,10 @@ func SyncStaticFiles(session Session) error {
 	err = syncEnvFile(session)
 	if err != nil {
 		return fmt.Errorf("failed to sync .env file: %v", err)
+	}
+
+	if init {
+		return initHub(session)
 	}
 
 	return loadSystemdUnits(session)

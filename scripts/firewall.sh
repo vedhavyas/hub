@@ -100,7 +100,7 @@ ip route add blackhole default metric 101 table mullvad
 # port forward host to mailserver
 ports=(25 143 465 587 993)
 for port in ${ports[*]} ; do
-  iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport "${port}" -j DNAT --to 10.10.2.254:"${port}"
+  iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport "${port}" -j DNAT --to 10.10.2.5:"${port}"
 done
 
 # add postup iptable rules if any
@@ -111,7 +111,7 @@ done
 source "${DATA_DIR}"/mullvad/mullvad.env
 PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
 iptables -t nat -I PREROUTING -i wg-mullvad -j MARK --set-mark 100
-iptables -t nat -A PREROUTING -i wg-mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.100:29850
+iptables -t nat -A PREROUTING -i wg-mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.2:29850
 
 # save
 iptables-save
