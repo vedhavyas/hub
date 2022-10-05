@@ -8,7 +8,7 @@ Before=docker.service
 Type=notify
 Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
 Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
-ExecStartPre=+/usr/bin/hub run-script pre-mount
+ExecStartPre=+/sbin/hub run-script pre-mount
 ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --buffer-size 128M \
 --fast-list \

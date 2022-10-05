@@ -5,7 +5,7 @@ After=docker.service hub-mount.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/hub run-script network
+ExecStart=/sbin/hub run-script network
 RemainAfterExit=true
 
 [Install]

@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/hub run-script deps
+ExecStart=/sbin/hub run-script deps
 RemainAfterExit=true
 
 [Install]

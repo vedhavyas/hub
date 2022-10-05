@@ -5,11 +5,11 @@ After=hub-firewall.service hub-mount.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/hub run-script services start
-ExecStop=/usr/bin/hub run-script services stop
-ExecReload=/usr/bin/hub run-script services reload
+ExecStart=/sbin/hub run-script services start
+ExecStop=/sbin/hub run-script services stop
+ExecReload=/sbin/hub run-script services reload
 RemainAfterExit=true
-ExecStartPost=/usr/bin/hub notify "Hub updates" "Services started successfully"
+ExecStartPost=/sbin/hub notify "Hub updates" "Services started successfully"
 
 [Install]
 WantedBy=multi-user.target

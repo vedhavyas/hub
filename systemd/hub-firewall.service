@@ -5,7 +5,7 @@ After=hub-network.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/hub run-script firewall
+ExecStart=/sbin/hub run-script firewall
 RemainAfterExit=true
 
 [Install]
