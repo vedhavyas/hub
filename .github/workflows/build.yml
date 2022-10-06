@@ -1,4 +1,4 @@
-# build workflow builds docker images, pushes images to docker hub and updates swagger API
+# build workflow builds docker images, pushes images to docker hub
 on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight

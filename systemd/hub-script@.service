@@ -1,0 +1,12 @@
+[Unit]
+Description=Run %i
+Requires=hub-security.service
+After=hub-security.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/hub %i
+RemainAfterExit=false
+
+[Install]
+WantedBy=multi-user.target

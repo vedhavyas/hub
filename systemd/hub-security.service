@@ -1,11 +1,12 @@
 [Unit]
-Description=Setup Hub network
+Description=Setup Hub security
 Requires=docker.service
 After=docker.service hub-mount.service
 
 [Service]
 Type=oneshot
 ExecStart=/sbin/hub run-script network
+ExecStart=/sbin/hub run-script firewall
 RemainAfterExit=true
 
 [Install]
