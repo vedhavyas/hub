@@ -169,6 +169,19 @@ func loadSystemdUnits(session Session) error {
 		}
 	}
 
+	dailyScripts := []string{"backup", "certbot"}
+	for _, script := range dailyScripts {
+		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-script@%s.service", script))
+		if err != nil {
+			return fmt.Errorf("%v(%v)", string(res), err)
+		}
+
+		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-daily@%s.timer", script))
+		if err != nil {
+			return fmt.Errorf("%v(%v)", string(res), err)
+		}
+	}
+
 	res, err = session.ExecuteCommand("systemctl restart 'hub-*.timer'")
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)

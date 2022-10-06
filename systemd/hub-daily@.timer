@@ -1,7 +1,8 @@
 [Unit]
-Description=Renew certbot certificates
+Description=Run %i
 
 [Timer]
+Unit=hub-script@%i.service
 OnCalendar=daily
 Persistent=true
 

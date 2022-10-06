@@ -1,4 +1,4 @@
-# build workflow builds docker images, pushes images to docker hub and updates swagger API
+# Workflow builds docker images of libs and pushes images to docker hub
 on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
@@ -22,7 +22,7 @@ jobs:
       - name: Install zsh
         run: sudo apt-get update; sudo apt-get install zsh
       - name: Build docker images
-        run: ./builds/script.sh build ${{ matrix.build }}
+        run: ./libs/build.sh build ${{ matrix.build }}
       - name: Push images to Docker Hub
         run: |
           echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin

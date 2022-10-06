@@ -41,10 +41,16 @@ cmd )
   "${CMDS_DIR}/${cmd}.sh" "$@"
   ;;
 
+certbot )
+  "${CMDS_DIR}/certbot.sh" || { hub notify "Hub updates" "Certbot renewal failed!"; }
+  hub notify "Hub updates" "Certbot renewal successful!"
+  ;;
+
 backup)
   shift
   data="${1:-appdata}"
-  run_script archiver backup "$DATA_DIR" $HUB_DIR/backups/hub/"${data}"
+  run_script archiver backup "$DATA_DIR" $HUB_DIR/backups/hub/"${data}" || { hub notify "Hub updates" "Appdata backup failed!"; }
+  hub notify "Hub updates" "Appdata backup successful!"
   ;;
 
 # notify title message

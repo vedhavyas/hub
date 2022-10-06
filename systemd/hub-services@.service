@@ -1,15 +1,13 @@
 [Unit]
 Description=Start Hub %i services
-Requires=hub-firewall.service hub-mount.service
-After=hub-firewall.service hub-mount.service
+Requires=hub-security.service
+After=hub-security.service
 
 [Service]
 ExecStartPre=/sbin/hub run-script services pre-start %i
 ExecStart=/sbin/hub run-script services start %i
 ExecStartPost=/sbin/hub run-script services post-start %i
-
 ExecStop=/sbin/hub run-script services stop %i
-
 Restart=on-failure
 User=root
 Group=docker
