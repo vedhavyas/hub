@@ -9,7 +9,7 @@ networks:
 services:
   notifier:
     container_name: notifier
-    image: gotify/server
+    image: gotify/server:latest
     restart: unless-stopped
     networks:
       - docker-direct
@@ -21,5 +21,28 @@ services:
       - "${DATA_DIR}/gotify:/app/data"
     labels:
       caddy: notifier.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"
+
+  rss:
+    container_name: rss
+    image: freshrss/freshrss:latest
+    restart: unless-stopped
+    networks:
+      - docker-vpn
+    environment:
+      - TZ
+      - CRON_MIN='2,32'
+      - SERVER_DNS=rss.hub
+      - ADMIN_EMAIL=${ADMINMAIL}
+      - ADMIN_PASSWORD=freshrss
+      - BASE_URL=https://rss.hub
+      - CRON_MIN='1,15'
+    volumes:
+      - "${DATA_DIR}/freshrss/data:/var/www/FreshRSS/data"
+      # Optional volume for storing third-party extensions
+      - "${DATA_DIR}/freshrss/extensions:/var/www/FreshRSS/extensions"
+    labels:
+      caddy: rss.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"

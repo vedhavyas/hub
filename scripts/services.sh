@@ -53,7 +53,7 @@ pre-start)
   pre=${service}_pre_up
   command -v "$pre" >/dev/null && $pre
   ;;
-start)
+start|restart)
   docker compose -p "${service}" -f "${DOCKER_DIR}"/docker-compose-"${service}".yml up --quiet-pull --remove-orphans || exit 1
   ;;
 post-start)

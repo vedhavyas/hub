@@ -53,6 +53,16 @@ func ShowLogs(session Session, service string) error {
 	return nil
 }
 
+func RestartServices(session Session, service string) error {
+	remoteWriter := log.WithField("remote", "restart").WriterLevel(logrus.InfoLevel)
+	err := session.ExecuteCommandStream(fmt.Sprintf(`systemctl restart 'hub-services@%s.service'`, service), remoteWriter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func SyncStaticFiles(session Session, init bool) error {
 	err := cleanStaticFiles(session)
 	if err != nil {

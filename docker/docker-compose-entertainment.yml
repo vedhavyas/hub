@@ -177,25 +177,6 @@ services:
     depends_on:
       - emby
 
-  audiobookshelf:
-    image: ghcr.io/advplyr/audiobookshelf:latest
-    container_name: audiobookshelf
-    restart: unless-stopped
-    environment:
-      - AUDIOBOOKSHELF_UID=$PUID
-      - AUDIOBOOKSHELF_GID=$PGID
-    networks:
-      - docker-vpn
-    volumes:
-      - $HUB_DIR/media/audio-books:/audiobooks
-      - $HUB_DIR/media/podcasts:/podcasts
-      - $DATA_DIR/audiobookshelf/config:/config
-      - $DATA_DIR/audiobookshelf/metadata:/metadata
-    labels:
-      caddy: audio.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 80}}"
-
   podcasts:
     image: akhilrex/podgrab:latest
     container_name: podcasts

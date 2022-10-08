@@ -77,6 +77,21 @@ func main() {
 					},
 				},
 			},
+
+			{
+				Name:  "restart",
+				Usage: "Restart hub services",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "service",
+						Aliases:  []string{"s"},
+						Required: true,
+					},
+				},
+				Action: func(context *cli.Context) error {
+					return RestartServices(session, context.String("service"))
+				},
+			},
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
