@@ -156,6 +156,7 @@ func wireguardRelays() (relays map[string][]Relay, err error) {
 		Active      bool   `json:"active"`
 		Owned       bool   `json:"owned"`
 		Ipv4AddrIn  string `json:"ipv4_addr_in"`
+		PortSpeed   int    `json:"network_port_speed"`
 		Pubkey      string `json:"pubkey"`
 	}
 	err = call("GET", url, "", nil, &response)
@@ -165,7 +166,7 @@ func wireguardRelays() (relays map[string][]Relay, err error) {
 
 	relays = make(map[string][]Relay)
 	for _, r := range response {
-		if !r.Active {
+		if !r.Active || r.PortSpeed < 10 {
 			continue
 		}
 
