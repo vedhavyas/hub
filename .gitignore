@@ -5,3 +5,10 @@
 *.tfplan
 *.tfvars
 /config.toml
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault!/.env.me
+
+!.env.vault
