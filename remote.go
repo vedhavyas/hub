@@ -120,9 +120,9 @@ func (r Remote) WriteDataToFile(data []byte, remotePath string) error {
 }
 
 func (r Remote) SymLink(oldPath, newPath string) error {
-	_, err := r.ExecuteCommand(fmt.Sprintf("ln -sf %r %r", oldPath, newPath))
+	res, err := r.ExecuteCommand(fmt.Sprintf("ln -sf %s %s", oldPath, newPath))
 	if err != nil {
-		return err
+		return fmt.Errorf("%v: %s", err, res)
 	}
 
 	return nil

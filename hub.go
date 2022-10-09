@@ -66,12 +66,12 @@ func RestartServices(session Remote, service string) error {
 func SyncStaticFiles(session Remote, init bool) error {
 	err := cleanStaticFiles(session)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to clean static files: %v", err)
 	}
 
 	err = syncStaticFiles(session)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to sync static files: %v", err)
 	}
 
 	// give execute permissions for scripts
@@ -108,7 +108,12 @@ func SyncStaticFiles(session Remote, init bool) error {
 		return initHub(session)
 	}
 
-	return loadSystemdUnits(session)
+	err = loadSystemdUnits(session)
+	if err != nil {
+		return fmt.Errorf("failed to load systemd units: %v", err)
+	}
+
+	return nil
 }
 
 func createSymLinks(session Remote, dir, linkPathTmpl string) error {
@@ -263,17 +268,28 @@ func syncStaticFiles(session Remote) error {
 	return err
 }
 
-func cleanStaticFiles(session Remote) error {
+func cleanStaticFiles(session Remote) (err error) {
+	defer func() {
+		if err == nil {
+			return
+		}
+
+		if strings.Contains(err.Error(), "no matches found") {
+			log.Debugf("static files doesn't exist")
+			err = nil
+		}
+	}()
+
 	// remove /opt/hub
-	_, err := session.ExecuteCommand("rm -rf /opt/hub/*")
+	res, err := session.ExecuteCommand("rm -rf /opt/hub/*")
 	if err != nil {
-		return err
+		return fmt.Errorf("%v: %s", err, res)
 	}
 
 	// remove copied systemd files
-	_, err = session.ExecuteCommand("rm -rf /etc/systemd/system/hub-*")
+	res, err = session.ExecuteCommand("rm -rf /etc/systemd/system/hub-*")
 	if err != nil {
-		return err
+		return fmt.Errorf("%v: %s", err, res)
 	}
 
 	return nil
