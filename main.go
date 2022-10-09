@@ -11,7 +11,7 @@ import (
 var log = logrus.New()
 
 func main() {
-	var session Session
+	var remote Remote
 	var config Config
 	var err error
 
@@ -30,7 +30,7 @@ func main() {
 					},
 				},
 				Action: func(context *cli.Context) error {
-					err := SyncStaticFiles(session, context.Bool("init"))
+					err := SyncStaticFiles(remote, context.Bool("init"))
 					if err != nil {
 						return fmt.Errorf("failed to sync components: %v", err)
 					}
@@ -43,7 +43,7 @@ func main() {
 				Name:  "reboot",
 				Usage: "Reboot of hub",
 				Action: func(context *cli.Context) error {
-					_, err = session.ExecuteCommand("reboot")
+					_, err = remote.ExecuteCommand("reboot")
 					return err
 				},
 			},
@@ -64,7 +64,7 @@ func main() {
 							},
 						},
 						Action: func(context *cli.Context) error {
-							return ShowLogs(session, context.String("service"))
+							return ShowLogs(remote, context.String("service"))
 						},
 					},
 					{
@@ -72,7 +72,7 @@ func main() {
 						Aliases:     []string{"l"},
 						Description: "Show hub status.",
 						Action: func(context *cli.Context) error {
-							return Status(session)
+							return Status(remote)
 						},
 					},
 				},
@@ -89,7 +89,7 @@ func main() {
 					},
 				},
 				Action: func(context *cli.Context) error {
-					return RestartServices(session, context.String("service"))
+					return RestartServices(remote, context.String("service"))
 				},
 			},
 		},
@@ -114,9 +114,9 @@ func main() {
 				return err
 			}
 
-			session, err = OpenSession(config.Conn)
+			remote, err = ConnectToRemote(config.Conn)
 			if err != nil {
-				return fmt.Errorf("failed to open remote session: %v", err)
+				return fmt.Errorf("failed to open remote remote: %v", err)
 			}
 
 			log.Println("Connected.")
@@ -124,7 +124,7 @@ func main() {
 		},
 		After: func(context *cli.Context) error {
 			log.Println("Closing SSH Connection...")
-			session.Close()
+			remote.Close()
 			log.Println("Closed.")
 			return nil
 		},

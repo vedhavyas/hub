@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func initHub(session Session) error {
+func initHub(session Remote) error {
 	remoteWriter := log.WithField("remote", "init").WriterLevel(logrus.DebugLevel)
 	log.Infoln("Running init script...")
 	err := session.ExecuteCommandStream("hub-script-init", remoteWriter)
@@ -30,7 +30,7 @@ func initHub(session Session) error {
 	return nil
 }
 
-func Status(session Session) error {
+func Status(session Remote) error {
 	remoteWriter := log.WithField("remote", "status").WriterLevel(logrus.InfoLevel)
 	err := session.ExecuteCommandStream(`
 systemctl list-unit-files 'hub-*' docker.service
@@ -43,7 +43,7 @@ docker compose ls`, remoteWriter)
 	return nil
 }
 
-func ShowLogs(session Session, service string) error {
+func ShowLogs(session Remote, service string) error {
 	remoteWriter := log.WithField("remote", "logs").WriterLevel(logrus.InfoLevel)
 	err := session.ExecuteCommandStream(fmt.Sprintf(`journalctl -u 'hub-%s' -f`, service), remoteWriter)
 	if err != nil {
@@ -53,7 +53,7 @@ func ShowLogs(session Session, service string) error {
 	return nil
 }
 
-func RestartServices(session Session, service string) error {
+func RestartServices(session Remote, service string) error {
 	remoteWriter := log.WithField("remote", "restart").WriterLevel(logrus.InfoLevel)
 	err := session.ExecuteCommandStream(fmt.Sprintf(`systemctl restart 'hub-services@%s.service'`, service), remoteWriter)
 	if err != nil {
@@ -63,7 +63,7 @@ func RestartServices(session Session, service string) error {
 	return nil
 }
 
-func SyncStaticFiles(session Session, init bool) error {
+func SyncStaticFiles(session Remote, init bool) error {
 	err := cleanStaticFiles(session)
 	if err != nil {
 		return err
@@ -111,7 +111,7 @@ func SyncStaticFiles(session Session, init bool) error {
 	return loadSystemdUnits(session)
 }
 
-func createSymLinks(session Session, dir, linkPathTmpl string) error {
+func createSymLinks(session Remote, dir, linkPathTmpl string) error {
 	log.Infof("Creating Symlinks for files in %v...\n", dir)
 	files, err := staticFS.ReadDir(dir)
 	if err != nil {
@@ -141,7 +141,7 @@ func createSymLinks(session Session, dir, linkPathTmpl string) error {
 	return nil
 }
 
-func loadSystemdUnits(session Session) error {
+func loadSystemdUnits(session Remote) error {
 	log.Infoln("Enabling Systemd units...")
 	units, err := staticFS.ReadDir("systemd")
 	if err != nil {
@@ -200,7 +200,7 @@ func loadSystemdUnits(session Session) error {
 	return nil
 }
 
-func syncEnvFile(session Session) error {
+func syncEnvFile(session Remote) error {
 	log.Infoln("Syncing .env file...")
 	file, err := staticFS.ReadFile(".env")
 	if err != nil {
@@ -218,7 +218,7 @@ func syncEnvFile(session Session) error {
 //go:embed conf scripts docker systemd commands .env
 var staticFS embed.FS
 
-func syncStaticFiles(session Session) error {
+func syncStaticFiles(session Remote) error {
 	log.Infoln("Syncing static files...")
 	entries, err := staticFS.ReadDir(".")
 	if err != nil {
@@ -263,7 +263,7 @@ func syncStaticFiles(session Session) error {
 	return err
 }
 
-func cleanStaticFiles(session Session) error {
+func cleanStaticFiles(session Remote) error {
 	// remove /opt/hub
 	_, err := session.ExecuteCommand("rm -rf /opt/hub/*")
 	if err != nil {

@@ -26,4 +26,4 @@ jobs:
       - name: Push images to Docker Hub
         run: |
           echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-          ./builds/script.sh push ${{ matrix.build }}
+          ./libs/build.sh push ${{ matrix.build }}

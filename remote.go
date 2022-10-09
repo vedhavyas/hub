@@ -14,7 +14,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type Session struct {
+type Remote struct {
 	ssh  *goph.Client
 	sftp *sftp.Client
 }
@@ -61,10 +61,10 @@ func (conn Connection) Auth() (goph.Auth, error) {
 	return goph.UseAgent()
 }
 
-func OpenSession(conn Connection) (Session, error) {
+func ConnectToRemote(conn Connection) (Remote, error) {
 	auth, err := conn.Auth()
 	if err != nil {
-		return Session{}, err
+		return Remote{}, err
 	}
 
 	ssh, err := goph.NewConn(&goph.Config{
@@ -79,48 +79,48 @@ func OpenSession(conn Connection) (Session, error) {
 		},
 	})
 	if err != nil {
-		return Session{}, err
+		return Remote{}, err
 	}
 
 	sftp, err := ssh.NewSftp()
 	if err != nil {
-		return Session{}, err
+		return Remote{}, err
 	}
 
-	return Session{ssh: ssh, sftp: sftp}, err
+	return Remote{ssh: ssh, sftp: sftp}, err
 }
 
-func (s Session) Close() {
-	if s.sftp != nil {
-		err := s.sftp.Close()
+func (r Remote) Close() {
+	if r.sftp != nil {
+		err := r.sftp.Close()
 		if err != nil {
 			log.Infof("failed to close SFTP connection: %v", err)
 		}
 	}
 
-	if s.ssh != nil {
-		err := s.ssh.Close()
+	if r.ssh != nil {
+		err := r.ssh.Close()
 		if err != nil {
 			log.Infof("failed to close SSH connection: %v", err)
 		}
 	}
 }
 
-func (s Session) ExecuteCommand(cmd string) (output []byte, err error) {
+func (r Remote) ExecuteCommand(cmd string) (output []byte, err error) {
 	log.Debugf("Executing command: %v", cmd)
-	return s.ssh.Run(cmd)
+	return r.ssh.Run(cmd)
 }
 
-func (s Session) WriteScriptToFile(script []byte, remotePath string) error {
-	return s.writeDataToFile(bytes.NewReader(script), remotePath, true)
+func (r Remote) WriteScriptToFile(script []byte, remotePath string) error {
+	return r.writeDataToFile(bytes.NewReader(script), remotePath, true)
 }
 
-func (s Session) WriteDataToFile(data []byte, remotePath string) error {
-	return s.writeDataToFile(bytes.NewReader(data), remotePath, false)
+func (r Remote) WriteDataToFile(data []byte, remotePath string) error {
+	return r.writeDataToFile(bytes.NewReader(data), remotePath, false)
 }
 
-func (s Session) SymLink(oldPath, newPath string) error {
-	_, err := s.ExecuteCommand(fmt.Sprintf("ln -sf %s %s", oldPath, newPath))
+func (r Remote) SymLink(oldPath, newPath string) error {
+	_, err := r.ExecuteCommand(fmt.Sprintf("ln -sf %r %r", oldPath, newPath))
 	if err != nil {
 		return err
 	}
@@ -128,8 +128,8 @@ func (s Session) SymLink(oldPath, newPath string) error {
 	return nil
 }
 
-func (s Session) writeDataToFile(data io.Reader, remotePath string, executable bool) error {
-	remote, err := s.sftp.Create(remotePath)
+func (r Remote) writeDataToFile(data io.Reader, remotePath string, executable bool) error {
+	remote, err := r.sftp.Create(remotePath)
 	if err != nil {
 		return fmt.Errorf("failed to create file on remote: %v", err)
 	}
@@ -151,8 +151,8 @@ func (s Session) writeDataToFile(data io.Reader, remotePath string, executable b
 	return nil
 }
 
-func (s Session) ExecuteCommandStream(command string, logger io.Writer) (err error) {
-	session, err := s.ssh.NewSession()
+func (r Remote) ExecuteCommandStream(command string, logger io.Writer) (err error) {
+	session, err := r.ssh.NewSession()
 	if err != nil {
 		return fmt.Errorf("failed to start remote session: %v", err)
 	}
