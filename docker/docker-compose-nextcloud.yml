@@ -20,12 +20,12 @@ services:
       - NEXTCLOUD_UPDATE=1
       - REDIS_HOST=redis
       - SMTP_HOST
-      - SMTP_SECURE=tls
+      - SMTP_SECURE=ssl
       - SMTP_PORT=465
       - MAIL_FROM_ADDRESS=nextcloud
       - MAIL_DOMAIN=$DOMAIN
-      - NEXTCLOUD_SMTP_USERNAME=nextcloud@$DOMAIN
-      - NEXTCLOUD_SMTP_PASSWORD
+      - SMTP_NAME=nextcloud@$DOMAIN
+      - SMTP_PASSWORD=$NEXTCLOUD_SMTP_PASSWORD
     healthcheck:
       test: (curl -f http://nextcloud:80 &> /dev/null && ping -c 1 -W 1 redis &> /dev/null) && echo "OK" || exit 1
       interval: 5s
