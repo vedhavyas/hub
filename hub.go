@@ -176,7 +176,8 @@ func loadSystemdUnits(session Remote) error {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	services := []string{"security", "comms", "maintenance", "monitoring", "entertainment", "utilities", "mailserver"}
+	services := []string{
+		"security", "comms", "maintenance", "monitoring", "entertainment", "utilities", "mailserver", "nextcloud"}
 	for _, service := range services {
 		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-services@%s.service", service))
 		if err != nil {
@@ -268,7 +269,7 @@ func syncStaticFiles(session Remote) error {
 	return err
 }
 
-func cleanStaticFiles(session Remote) (err error) {
+func cleanStaticFiles(remote Remote) (err error) {
 	defer func() {
 		if err == nil {
 			return
@@ -281,16 +282,22 @@ func cleanStaticFiles(session Remote) (err error) {
 	}()
 
 	// remove /opt/hub
-	res, err := session.ExecuteCommand("rm -rf /opt/hub/*")
+	res, err := remote.ExecuteCommand("rm -rf /opt/hub/*")
 	if err != nil {
 		return fmt.Errorf("%v: %s", err, res)
 	}
 
 	// remove copied systemd files
-	res, err = session.ExecuteCommand("rm -rf /etc/systemd/system/hub-*")
+	res, err = remote.ExecuteCommand("rm -rf /etc/systemd/system/hub-*")
 	if err != nil {
 		return fmt.Errorf("%v: %s", err, res)
 	}
 
 	return nil
+}
+
+func ExecMail(remote Remote, args ...string) error {
+	remoteWriter := log.WithField("remote", "mail").WriterLevel(logrus.InfoLevel)
+	return remote.ExecuteCommandStream(fmt.Sprintf("docker exec -it mailserver setup %s", strings.Join(args, " ")),
+		remoteWriter)
 }

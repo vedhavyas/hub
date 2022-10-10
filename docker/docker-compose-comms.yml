@@ -11,6 +11,7 @@ services:
     container_name: notifier
     image: gotify/server:latest
     restart: unless-stopped
+    hostname: notifier
     networks:
       - docker-direct
       - docker-vpn
@@ -28,6 +29,7 @@ services:
     container_name: rss
     image: lscr.io/linuxserver/freshrss:latest
     restart: unless-stopped
+    hostname: rss
     networks:
       - docker-vpn
     environment:

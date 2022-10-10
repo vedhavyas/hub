@@ -151,16 +151,50 @@ func (r Remote) writeDataToFile(data io.Reader, remotePath string, executable bo
 	return nil
 }
 
-func (r Remote) ExecuteCommandStream(command string, logger io.Writer) (err error) {
+func (r Remote) newTTYSession(logger io.Writer) (*ssh.Session, error) {
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0,     // disable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
 	session, err := r.ssh.NewSession()
 	if err != nil {
-		return fmt.Errorf("failed to start remote session: %v", err)
+		return nil, fmt.Errorf("failed to start remote session: %v", err)
 	}
 
-	session.Stdout = logger
-	session.Stderr = logger
-	session.Stdin = os.Stdin
-	err = session.Run(command)
+	err = session.RequestPty("xterm", 40, 80, modes)
+	if err != nil {
+		return nil, err
+	}
+
+	out, err := session.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+	go io.Copy(logger, out)
+
+	stdErr, err := session.StderrPipe()
+	if err != nil {
+		return nil, err
+	}
+	go io.Copy(logger, stdErr)
+
+	in, err := session.StdinPipe()
+	if err != nil {
+		return nil, err
+	}
+	go io.Copy(in, os.Stdin)
+	return session, nil
+}
+
+func (r Remote) ExecuteCommandStream(cmd string, logger io.Writer) (err error) {
+	log.Debugf("Executing cmd: %v", cmd)
+	session, err := r.newTTYSession(logger)
+	if err != nil {
+		return fmt.Errorf("failed to open pty session: %v", err)
+	}
+
+	err = session.Run(cmd)
 	if err != nil {
 		return fmt.Errorf("failed to run command: %v", err)
 	}

@@ -11,6 +11,7 @@ services:
     container_name: caddy
     image: lucaslorentz/caddy-docker-proxy:alpine
     restart: unless-stopped
+    hostname: caddy
     environment:
       - CADDY_INGRESS_NETWORKS=docker-direct,docker-vpn
     networks:
@@ -26,13 +27,14 @@ services:
     container_name: unbound
     image: mvance/unbound:latest
     restart: unless-stopped
+    hostname: unbound
     networks:
       docker-direct:
         ipv4_address: 10.10.2.3
 
   pihole:
     container_name: pihole
-    hostname: Pihole-Hub
+    hostname: pihole
     image: pihole/pihole:latest
     restart: unless-stopped
     networks:

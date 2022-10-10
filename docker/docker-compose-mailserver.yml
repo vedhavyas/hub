@@ -44,6 +44,7 @@ services:
   radicale:
     image: vedhavyas/radicale:latest
     container_name: radicale
+    hostname: radicale
     init: true
     read_only: true
     user: $PUID:$PGID

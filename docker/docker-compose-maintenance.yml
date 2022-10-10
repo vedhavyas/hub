@@ -9,6 +9,7 @@ services:
     container_name: watchtower
     image: containrrr/watchtower:latest
     restart: unless-stopped
+    hostname: watchtower
     user: $PUID:$PGID
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -37,6 +38,7 @@ services:
     container_name: portainer
     image: portainer/portainer-ce:2.11.1
     restart: unless-stopped
+    hostname: portainer
     user: $PUID:$PGID
     # https://github.com/portainer/portainer/issues/3092
     command: -H unix:///var/run/docker.sock

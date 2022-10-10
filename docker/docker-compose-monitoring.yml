@@ -13,6 +13,7 @@ services:
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
+    hostname: node-exporter
     restart: unless-stopped
     user: $PUID:$PGID
     networks:
@@ -30,6 +31,7 @@ services:
   cadvisor:
     container_name: cadvisor
     image: gcr.io/cadvisor/cadvisor:latest
+    hostname: cadvisor
     volumes:
       - '/var/run/docker.sock:/tmp/docker.sock:ro'
       - '/:/rootfs:ro'
@@ -48,6 +50,7 @@ services:
     container_name: prometheus
     restart: unless-stopped
     user: $PUID:$PGID
+    hostname: prometheus
     networks:
       - docker-vpn
     volumes:
@@ -69,6 +72,7 @@ services:
     image: grafana/grafana-enterprise:latest
     container_name: grafana
     restart: unless-stopped
+    hostname: grafana
     user: $PUID:$PGID
     networks:
       - docker-vpn
@@ -86,6 +90,7 @@ services:
   monies:
     image: vedhavyas/monies:latest
     container_name: monies
+    hostname: monies
     restart: unless-stopped
     user: $PUID:$PGID
     environment:

@@ -92,6 +92,14 @@ func main() {
 					return RestartServices(remote, context.String("service"))
 				},
 			},
+
+			{
+				Name:  "mail",
+				Usage: "Mailserver services",
+				Action: func(context *cli.Context) error {
+					return ExecMail(remote, context.Args().Slice()...)
+				},
+			},
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
