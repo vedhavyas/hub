@@ -154,6 +154,7 @@ services:
     container_name: jellyseerr
     hostname: jellyseerr
     networks:
+      - docker-direct
       - docker-vpn
     environment:
       - TZ
