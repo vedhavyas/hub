@@ -82,14 +82,14 @@ func main() {
 				Name:  "restart",
 				Usage: "Restart hub services",
 				Flags: []cli.Flag{
-					&cli.StringFlag{
+					&cli.StringSliceFlag{
 						Name:     "service",
 						Aliases:  []string{"s"},
 						Required: true,
 					},
 				},
 				Action: func(context *cli.Context) error {
-					return RestartServices(remote, context.String("service"))
+					return RestartServices(remote, context.StringSlice("service")...)
 				},
 			},
 

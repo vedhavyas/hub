@@ -91,6 +91,9 @@ ip route add default dev wg-mullvad metric 100 table mullvad
 # get default route from main table for destination to 10.10.3.0/24. ignore linkdown since docker network is not connected to any containers yet
 # shellcheck disable=SC2046
 ip route add $(ip route | grep 10.10.3.0/24 | sed 's/linkdown//') table mullvad
+# add docker direct network route
+# shellcheck disable=SC2046
+ip route add $(ip route | grep 10.10.2.0/24 | sed 's/linkdown//') table mullvad
 # add default route for 10.10.1.0/24 so that we can route the packets from wgext back to wghub
 # shellcheck disable=SC2046
 ip route add $(ip route | grep 10.10.1.0/24 | sed 's/linkdown//') table mullvad

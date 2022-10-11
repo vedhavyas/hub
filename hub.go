@@ -53,11 +53,14 @@ func ShowLogs(session Remote, service string) error {
 	return nil
 }
 
-func RestartServices(session Remote, service string) error {
+func RestartServices(session Remote, services ...string) error {
 	remoteWriter := log.WithField("remote", "restart").WriterLevel(logrus.InfoLevel)
-	err := session.ExecuteCommandStream(fmt.Sprintf(`systemctl restart 'hub-services@%s.service'`, service), remoteWriter)
-	if err != nil {
-		return err
+	for _, service := range services {
+		log.Infof("Restarting %s service...", service)
+		err := session.ExecuteCommandStream(fmt.Sprintf(`systemctl restart 'hub-services@%s.service'`, service), remoteWriter)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
