@@ -13,7 +13,7 @@ EOF
 
 function security_post_up() {
   # wait until dns starts
-  wait-for-it -t 60 10.10.2.2:53
+  wait-for-it -t 120 10.10.2.2:53 || exit 1
 
   # update resolve.conf with pihole container address
   echo "nameserver 10.10.2.2" > /etc/resolv.conf
@@ -26,7 +26,7 @@ function mailserver_pre_up() {
 
 function mailserver_post_up() {
   # wait for mailserver to come up
-  wait-for-it -t 60 10.10.2.5:993
+  wait-for-it -t 60 10.10.2.5:993 || exit 1
 }
 
 function entertainment_pre_up() {
@@ -37,8 +37,8 @@ function entertainment_pre_up() {
 
 function entertainment_post_up() {
   # wait for qbittorrent
-  wait-for-it -t 60 10.10.3.2:8080
-  wait-for-it -t 60 10.10.3.2:"${PEER_PORT}"
+  wait-for-it -t 60 10.10.3.2:8080 || exit 1
+  wait-for-it -t 60 10.10.3.2:"${PEER_PORT}" || exit 1
 }
 
 action=$1

@@ -100,6 +100,20 @@ func main() {
 					return ExecMail(remote, context.Args().Slice()...)
 				},
 			},
+
+			{
+				Name:  "shell",
+				Usage: "Open shell to Hub",
+				Flags: []cli.Flag{&cli.StringFlag{
+					Name:    "shell",
+					Aliases: []string{"s"},
+					Value:   "zsh",
+				}},
+				Action: func(context *cli.Context) error {
+					log.Infof("Opening a shell...")
+					return remote.OpenShell(context.String("shell"))
+				},
+			},
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
