@@ -120,6 +120,15 @@ func main() {
 			},
 
 			{
+				Name:  "wireguard",
+				Usage: "Wireguard services",
+				Action: func(context *cli.Context) error {
+					args := context.Args()
+					return AddWireguardPeer(hub, args.Get(0), args.Get(1))
+				},
+			},
+
+			{
 				Name:  "shell",
 				Usage: "Open shell to Hub",
 				Flags: []cli.Flag{&cli.StringFlag{

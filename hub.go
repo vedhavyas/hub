@@ -304,3 +304,8 @@ func ExecMail(remote Remote, args ...string) error {
 	return remote.ExecuteCommandStream(fmt.Sprintf("docker exec -it mailserver setup %s", strings.Join(args, " ")),
 		remoteWriter)
 }
+
+func AddWireguardPeer(hub Remote, name, gateway string) error {
+	remoteWriter := log.WithField("remote", "mail").WriterLevel(logrus.InfoLevel)
+	return hub.ExecuteCommandStream(fmt.Sprintf("hub cmd wireguard %s %s", name, gateway), remoteWriter)
+}
