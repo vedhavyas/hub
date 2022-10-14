@@ -11,7 +11,7 @@ import (
 var log = logrus.New()
 
 func main() {
-	var remote Remote
+	var hub, gateway Remote
 	var config Config
 	var err error
 
@@ -21,21 +21,39 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name:  "sync",
-				Usage: "Sync hub components",
+				Usage: "Sync components",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:  "init",
-						Usage: "Initialize hub.",
+						Usage: "Initialize components",
 						Value: false,
 					},
 				},
-				Action: func(context *cli.Context) error {
-					err := SyncStaticFiles(remote, context.Bool("init"))
-					if err != nil {
-						return fmt.Errorf("failed to sync components: %v", err)
-					}
+				Subcommands: []*cli.Command{
+					{
+						Name:  "hub",
+						Usage: "Sync hub components",
+						Action: func(context *cli.Context) error {
+							err := SyncStaticFiles(hub, context.Bool("init"))
+							if err != nil {
+								return fmt.Errorf("failed to sync components: %v", err)
+							}
 
-					return nil
+							return nil
+						},
+					},
+					{
+						Name:  "gateway",
+						Usage: "Sync gateway components",
+						Action: func(context *cli.Context) error {
+							err := SyncGateway(gateway)
+							if err != nil {
+								return fmt.Errorf("failed to sync components: %v", err)
+							}
+
+							return nil
+						},
+					},
 				},
 			},
 
@@ -43,7 +61,7 @@ func main() {
 				Name:  "reboot",
 				Usage: "Reboot of hub",
 				Action: func(context *cli.Context) error {
-					_, err = remote.ExecuteCommand("reboot")
+					_, err = hub.ExecuteCommand("reboot")
 					return err
 				},
 			},
@@ -64,7 +82,7 @@ func main() {
 							},
 						},
 						Action: func(context *cli.Context) error {
-							return ShowLogs(remote, context.String("service"))
+							return ShowLogs(hub, context.String("service"))
 						},
 					},
 					{
@@ -72,7 +90,7 @@ func main() {
 						Aliases:     []string{"l"},
 						Description: "Show hub status.",
 						Action: func(context *cli.Context) error {
-							return Status(remote)
+							return Status(hub)
 						},
 					},
 				},
@@ -89,7 +107,7 @@ func main() {
 					},
 				},
 				Action: func(context *cli.Context) error {
-					return RestartServices(remote, context.StringSlice("service")...)
+					return RestartServices(hub, context.StringSlice("service")...)
 				},
 			},
 
@@ -97,7 +115,7 @@ func main() {
 				Name:  "mail",
 				Usage: "Mailserver services",
 				Action: func(context *cli.Context) error {
-					return ExecMail(remote, context.Args().Slice()...)
+					return ExecMail(hub, context.Args().Slice()...)
 				},
 			},
 
@@ -111,7 +129,7 @@ func main() {
 				}},
 				Action: func(context *cli.Context) error {
 					log.Infof("Opening a shell...")
-					return remote.OpenShell(context.String("shell"))
+					return hub.OpenShell(context.String("shell"))
 				},
 			},
 		},
@@ -136,9 +154,14 @@ func main() {
 				return err
 			}
 
-			remote, err = ConnectToRemote(config.Conn)
+			hub, err = ConnectToRemote(config.Hub)
 			if err != nil {
-				return fmt.Errorf("failed to open remote remote: %v", err)
+				return fmt.Errorf("failed to connect to hub: %v", err)
+			}
+
+			gateway, err = ConnectToRemote(config.Gateway)
+			if err != nil {
+				return fmt.Errorf("failed to connect to gateway: %v", err)
 			}
 
 			log.Println("Connected.")
@@ -146,7 +169,8 @@ func main() {
 		},
 		After: func(context *cli.Context) error {
 			log.Println("Closing SSH Connection...")
-			remote.Close()
+			hub.Close()
+			gateway.Close()
 			log.Println("Closed.")
 			return nil
 		},

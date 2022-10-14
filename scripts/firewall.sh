@@ -128,6 +128,9 @@ ip route add $(ip route | grep 10.10.1.0/24 | sed 's/linkdown//') table gateway
 # add default blackhole with lower priority than above as backup
 ip route add blackhole default metric 101 table mullvad
 ip route add blackhole default metric 101 table gateway
+# also add gateway route to default and mullvad table so that we can access 10.10.4.0 networks when connected to default and mullvad gateway
+ip route add 10.10.4.0/24 dev wg-gateway proto kernel scope link src 10.10.4.1
+ip route add 10.10.4.0/24 dev wg-gateway proto kernel scope link src 10.10.4.1 table mullvad
 
 # port forward host to mailserver
 ports=(25 143 465 587 993)

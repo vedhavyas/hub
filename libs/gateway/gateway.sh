@@ -1,9 +1,9 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 
 # deps
 apt update -y
+apt upgrade -y
 apt install iptables iptables-persistent wireguard -y
-
 
 # set up dns to cloudflare
 systemctl disable systemd-resolved.service
@@ -33,17 +33,6 @@ fi
 # Force re-read of sysctl.conf
 sysctl -p /etc/sysctl.conf
 
-# flush iptables
-iptables -F
-iptables -X
-iptables -t nat -F
-iptables -t nat -X
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -P INPUT DROP
-iptables -P FORWARD DROP
-iptables -P OUTPUT ACCEPT
-
 # create wireguard config
 source /etc/default/gateway.env
 cat > /etc/wireguard/wg-hub-gateway.conf << EOF
@@ -64,8 +53,21 @@ ip link add wg-hub-gateway type wireguard || true
 ip address add 10.10.4.2/24 dev wg-hub-gateway || true
 ip link set wg-hub-gateway up || true
 wg setconf wg-hub-gateway /etc/wireguard/wg-hub-gateway.conf
+echo "Started wireguard client..."
 
 # setup firewall
+
+# flush iptables
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT ACCEPT
+
 eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
 
 # always accept already established and related packets

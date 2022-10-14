@@ -1,5 +1,6 @@
 [Unit]
 Description=Start Gateway
+Requires=network-online.target
 After=network-online.target
 
 [Service]

@@ -31,7 +31,8 @@ type Connection struct {
 var configBytes string
 
 type Config struct {
-	Conn Connection `toml:"connection"`
+	Hub     Connection `toml:"hub"`
+	Gateway Connection `toml:"gateway"`
 }
 
 func LoadConfig() (Config, error) {
