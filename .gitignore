@@ -12,3 +12,5 @@
 !.env.vault!/.env.me
 
 !.env.vault
+
+.env*
