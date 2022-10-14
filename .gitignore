@@ -6,7 +6,7 @@
 *.tfvars
 /config.toml
 .fleet
-.env*
+*.env*
 .flaskenv*
 !.env.project
 !.env.vault!/.env.me
