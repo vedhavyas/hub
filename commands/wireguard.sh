@@ -162,9 +162,7 @@ main() {
     sync_wg_hub_conf
 
     case $2 in
-    gateway)
-      # we only have one external vpn,
-      # so forward requests to it.
+    mullvad)
       # marking any requests bound to this vpn needs to be marked with 100
       # rest of the requests wont be marked
       # if already present, ignore it
@@ -172,10 +170,15 @@ main() {
         echo "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 100" >> post_up.sh
         iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}"${SEQNO}" ! -d 10.10.0.0/16 -j MARK --set-mark 100
       fi
-
-      # TODO for ip, need to create a new route table with different mark
+      ;;
+    gateway)
+      if ! grep -Fq "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 101" post_up.sh; then
+        echo "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 101" >> post_up.sh
+        iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}"${SEQNO}" ! -d 10.10.0.0/16 -j MARK --set-mark 101
+      fi
       ;;
     esac
+
 }
 
 main "$@"

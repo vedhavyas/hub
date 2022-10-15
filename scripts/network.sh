@@ -28,3 +28,6 @@ ip link del wg-mullvad || true
 ip link add wg-mullvad type wireguard || true
 # create mullvad conf and open tunnel
 "${CMDS_DIR}"/mullvad.sh
+
+# start wireguard gateway
+"${CMDS_DIR}"/gateway.sh

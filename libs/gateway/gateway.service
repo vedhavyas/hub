@@ -1,0 +1,12 @@
+[Unit]
+Description=Start Gateway
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/gateway
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

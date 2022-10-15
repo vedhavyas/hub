@@ -10,6 +10,7 @@ for port in ${ports[*]} ; do
   iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport "${port}" -j DNAT --to 10.10.2.253:"${port}"
 done
 
+docker rm -f certbot
 docker run --rm --name certbot \
             --net docker-direct \
             --ip 10.10.2.253 \
