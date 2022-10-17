@@ -11,7 +11,7 @@ import (
 var log = logrus.New()
 
 func main() {
-	var hub, gateway Remote
+	var hub Remote
 	var config Config
 	var err error
 
@@ -46,7 +46,13 @@ func main() {
 						Name:  "gateway",
 						Usage: "Sync gateway components",
 						Action: func(context *cli.Context) error {
-							err := SyncGateway(gateway)
+							gateway, err := ConnectToRemote(config.Gateway)
+							if err != nil {
+								return fmt.Errorf("failed to connect to gateway: %v", err)
+							}
+							defer gateway.Close()
+
+							err = SyncGateway(gateway)
 							if err != nil {
 								return fmt.Errorf("failed to sync components: %v", err)
 							}
@@ -168,18 +174,12 @@ func main() {
 				return fmt.Errorf("failed to connect to hub: %v", err)
 			}
 
-			gateway, err = ConnectToRemote(config.Gateway)
-			if err != nil {
-				return fmt.Errorf("failed to connect to gateway: %v", err)
-			}
-
 			log.Println("Connected.")
 			return nil
 		},
 		After: func(context *cli.Context) error {
 			log.Println("Closing SSH Connection...")
 			hub.Close()
-			gateway.Close()
 			log.Println("Closed.")
 			return nil
 		},

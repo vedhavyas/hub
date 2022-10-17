@@ -174,7 +174,7 @@ func loadSystemdUnits(session Remote) error {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable docker.service %s", strings.Join(unitNames, " ")))
+	res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable %s", strings.Join(unitNames, " ")))
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
