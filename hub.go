@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -179,8 +180,11 @@ func loadSystemdUnits(session Remote) error {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	services := []string{
-		"security", "comms", "maintenance", "monitoring", "entertainment", "utilities", "mailserver", "nextcloud"}
+	services, err := fetchDockerServices()
+	if err != nil {
+		return fmt.Errorf("failed to fetch docker services: %v", err)
+	}
+
 	for _, service := range services {
 		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-services@%s.service", service))
 		if err != nil {
@@ -226,6 +230,23 @@ func syncEnvFile(session Remote) error {
 
 //go:embed conf scripts docker systemd commands .env
 var staticFS embed.FS
+
+func fetchDockerServices() ([]string, error) {
+	entries, err := staticFS.ReadDir("docker")
+	if err != nil {
+		return nil, err
+	}
+
+	re := regexp.MustCompile("docker-compose-(?P<name>.*)\\.yml")
+	var services []string
+	for _, dockerService := range entries {
+		matches := re.FindStringSubmatch(dockerService.Name())
+		idx := re.SubexpIndex("name")
+		services = append(services, matches[idx])
+	}
+
+	return services, nil
+}
 
 func syncStaticFiles(session Remote) error {
 	log.Infoln("Syncing static files...")

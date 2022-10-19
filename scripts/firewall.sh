@@ -94,6 +94,18 @@ done
 source "${DATA_DIR}"/mullvad/mullvad.env
 PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
 iptables -t nat -A PREROUTING -i gateway-mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.2:"${PEER_PORT}"
+iptables -t nat -A PREROUTING -i gateway-mullvad -p udp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.2:"${PEER_PORT}"
+
+# add logging
+# log all incoming, forward and outgoing requests with 2/min avg burst
+iptables -I INPUT 1 -m limit --limit 2/min -j LOG --log-prefix "IPTables-Input: " --log-level info
+iptables -I FORWARD 1 -m limit --limit 2/min -j LOG --log-prefix "IPTables-Forward: " --log-level info
+iptables -I OUTPUT 1 -m limit --limit 2/min -j LOG --log-prefix "IPTables-Output: " --log-level info
+
+# log all dropped packets from input and forwarding
+iptables -A INPUT -m limit --limit 2/sec -j LOG --log-prefix "IPTables-Input-Dropped: " --log-level info
+iptables -A FORWARD -m limit --limit 2/sec -j LOG --log-prefix "IPTables-Forward-Dropped: " --log-level info
+
 
 # save
 iptables-save > /etc/iptables/rules.v4
