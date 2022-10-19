@@ -58,9 +58,11 @@ for network in "${networks[@]}" ; do
   iptables -A FORWARD -i "${inf}" -j ACCEPT
   iptables -A FORWARD -o "${inf}" -j ACCEPT
   # accept input requests from this docker network to host
-  iptables -A INPUT -i "${inf}" -j ACCEPT
+  # TODO(ved): enable this if required
+  # iptables -A INPUT -i "${inf}" -j ACCEPT
 done
 
+#Note: order of the following commands matter
 # setup firewall rules for gateway with fw_mark and routing table number
 hub run-script mullvad setup-firewall
 
@@ -70,19 +72,28 @@ hub run-script gateway setup-firewall gateway-india 51821 101 2
 # mark all outgoing connections from docker-vpn(10.10.3.0/24) to use mullvad routing table
 iptables -A PREROUTING -t nat -s 10.10.3.0/24 -j MARK --set-mark 100
 
+# add postup iptable rules if any
+"${DATA_DIR}"/wireguard/post_up.sh
+
+# setup save fw marks
+hub run-script mullvad setup-fw-mark
+hub run-script gateway setup-fw-mark gateway-india 101
+
+# restore this mark in the PREROUTING mangle so that rule can pick the right route table as per the mark
+# this will restore mark from conn to packet to incoming packets.
+# For outgoing packets mark the after first one since first one is already marked.
+iptables -A PREROUTING -t mangle -j CONNMARK --restore-mark
+
 # port forward host to mailserver
 ports=(25 143 465 587 993)
 for port in ${ports[*]} ; do
   iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport "${port}" -j DNAT --to 10.10.2.5:"${port}"
 done
 
-# add postup iptable rules if any
-"${DATA_DIR}"/wireguard/post_up.sh
-
 # port forward host to qbittorrent
 source "${DATA_DIR}"/mullvad/mullvad.env
 PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
-iptables -t nat -A PREROUTING -i wg-mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.2:"${PEER_PORT}"
+iptables -t nat -A PREROUTING -i gateway-mullvad -p tcp --dport "${PEER_PORT}" -j DNAT --to 10.10.3.2:"${PEER_PORT}"
 
 # save
 iptables-save > /etc/iptables/rules.v4

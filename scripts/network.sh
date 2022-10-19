@@ -25,10 +25,10 @@ docker network create --subnet 10.10.3.0/24 --ip-range 10.10.3.200/25 docker-vpn
 
 # setup mullvad interface
 # create mullvad conf and open tunnel
-hub run-script mullvad
+hub run-script mullvad setup-network
 
 # setup gateway interface
 hub run-script gateway \
-  create-network gateway-india '10.10.4.1/32' 51821 \
+  setup-network gateway-india '10.10.4.1/32' 51821 \
   "${WG_HUB_GATEWAY_INDIA_PRIVATE_KEY}" "${WG_GATEWAY_INDIA_PUBLIC_KEY}" "${WG_GATEWAY_INDIA_PRESHARED_KEY}"
 

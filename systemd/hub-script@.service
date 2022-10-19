@@ -1,7 +1,7 @@
 [Unit]
 Description=Run %i
-Requires=hub-security.service
-After=hub-security.service
+Requires=hub-mount.service
+After=hub-mount.service
 
 [Service]
 Type=oneshot

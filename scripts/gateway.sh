@@ -1,7 +1,7 @@
 #!/bin/zsh
 cmd=$1
 case "${cmd}" in
-create-network)
+setup-network)
   WG_INF_NAME=$2
   WG_INF_ADDR=$3
   WG_INF_PORT=$4
@@ -64,7 +64,7 @@ setup-firewall)
 
   # setup iptables
   # accept wireguard gateway on udp on eth0 interface if port is not 0
-  if "${WG_INF_PORT}" != 0; then
+  if [ "${WG_INF_PORT}" -ne "0" ]; then
     eth0=$(ip -o -4 route show to default | grep -E -o 'dev [^ ]*' | awk 'NR==1{print $2}')
     iptables -A INPUT -i "${eth0}" -p udp --dport "${WG_INF_PORT}" -j ACCEPT
   fi
@@ -73,15 +73,16 @@ setup-firewall)
   iptables -A FORWARD -o "${WG_INF_NAME}" -j ACCEPT
   # masquerade all out going requests from gateway interface
   iptables -t nat -A POSTROUTING -o "${WG_INF_NAME}" -j MASQUERADE
+  echo "Done."
+  ;;
 
+setup-fw-mark)
+  WG_INF_NAME=$2
+  WG_GATEWAY_FW_MARK=$3
+  # set mark to all incoming packets from this gateway interface
+  iptables -I PREROUTING 1 -t nat -i "${WG_INF_NAME}" -j MARK --set-mark "${WG_GATEWAY_FW_MARK}"
   # save fw mark
   iptables -A PREROUTING -t nat -m mark --mark "${WG_GATEWAY_FW_MARK}" -j CONNMARK --save-mark
-  # restore this mark in the PREROUTING mangle so that rule can pick the right route table as per the mark
-  # this will restore mark from conn to packet to incoming packets.
-  # For outgoing packets mark the after first one since first one is already marked.
-  iptables -A PREROUTING -t mangle --mark "${WG_GATEWAY_FW_MARK}" -j CONNMARK --restore-mark
-
-  echo "Done."
   ;;
 esac
 

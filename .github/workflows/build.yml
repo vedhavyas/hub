@@ -22,8 +22,8 @@ jobs:
       - name: Install zsh
         run: sudo apt-get update; sudo apt-get install zsh
       - name: Build docker images
-        run: ./libs/build.sh build ${{ matrix.build }}
+        run: ./libs/docker.sh build ${{ matrix.build }}
       - name: Push images to Docker Hub
         run: |
           echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-          ./libs/build.sh push ${{ matrix.build }}
+          ./libs/docker.sh push ${{ matrix.build }}

@@ -31,5 +31,8 @@ setup-network)
 setup-firewall)
   hub run-script gateway setup-firewall gateway-mullvad 0 100 1
   ;;
+setup-fw-mark)
+  hub run-script gateway setup-fw-mark gateway-mullvad 100
+  ;;
 esac
 
