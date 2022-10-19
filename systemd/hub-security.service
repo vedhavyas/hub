@@ -1,7 +1,7 @@
 [Unit]
 Description=Setup Hub security
 Requires=docker.service
-After=docker.service hub-mount.service
+After=docker.service hub-deps.service
 
 [Service]
 Type=oneshot

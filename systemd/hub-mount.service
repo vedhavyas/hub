@@ -1,8 +1,6 @@
 [Unit]
 Description=Start Hub mount
-After=hub-deps.service
-PartOf=docker.service
-Before=docker.service
+After=hub-security.service
 
 [Service]
 Type=notify
