@@ -32,9 +32,6 @@ iptables -P INPUT DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 
-# flush duplicate rule with mullvad mark
-while ip rule del fwmark 0x64; do :; done || true
-
 # always accept already established and related packets
 iptables -A INPUT -m state --state=ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -m state --state=ESTABLISHED,RELATED -j ACCEPT
@@ -46,11 +43,11 @@ iptables -A INPUT -i "${eth0}" -p tcp --dport 22 -j ACCEPT
 iptables -t nat -A POSTROUTING -o "$eth0" -j MASQUERADE
 iptables -A FORWARD -o "${eth0}" -j ACCEPT
 
-# accept wireguard on udp
+# accept hub connections on udp
 iptables -A INPUT -i "${eth0}" -p udp --dport 51820 -j ACCEPT
 # accept ssh from wireguard as well
 iptables -A INPUT -i wg-hub -p tcp --dport 22 -j ACCEPT
-# enable forwarding from wireguard
+# enable forwarding from/to wireguard
 iptables -A FORWARD -i wg-hub -j ACCEPT
 iptables -A FORWARD -o wg-hub -j ACCEPT
 
@@ -64,48 +61,14 @@ for network in "${networks[@]}" ; do
   iptables -A INPUT -i "${inf}" -j ACCEPT
 done
 
-# masquerade all out going requests from vpn interface
-iptables -t nat -A POSTROUTING -o wg-mullvad -j MASQUERADE
-iptables -A FORWARD -o wg-mullvad -j ACCEPT
-
-# create a new route table that will be used to find the default route for outgoing requests
-# originated from the network. This route will be picked up instead of default whenever a packet marked with 100(0x64)
-# create new routing table for external vpn
-if ! (grep -iq "1    mullvad" /etc/iproute2/rt_tables); then
-  echo "1    mullvad" >> /etc/iproute2/rt_tables
-fi
-
-# setup vpn firewall
-# We mark connection and save during the PREROUTING in nat table since only first packet in the outgoing connection is called.
-# mark only the connections that are destined to outside the network 10.10.0.0/16
-iptables -A PREROUTING -t nat -s 10.10.3.0/24 ! -d 10.10.0.0/16 -j MARK --set-mark 100
-iptables -A PREROUTING -t nat -s 10.10.4.0/24 ! -d 10.10.0.0/16 -j MARK --set-mark 101
-
-# save the mark to its connection
-iptables -A PREROUTING -t nat -m mark --mark 100 -j CONNMARK --save-mark
-# save gateway mark
-iptables -A PREROUTING -t nat -m mark --mark 101 -j CONNMARK --save-mark
-# restore this mark in the PREROUTING mangle so that rule can pick the right route table as per the mark
-# this will restore mark from conn to packet to incoming packets. For outgoing packets mark the after first one since first one is already marked.
-iptables -A PREROUTING -t mangle -j CONNMARK --restore-mark
-# add a rule to pick the above routing table whenever a packet with 100(0x64) mark is received for prerouting
-ip rule add fwmark 0x64 table mullvad
-# add default route with lower metric to new route table
-ip route add default dev wg-mullvad metric 100 table mullvad
-# get default route from main table for destination to 10.10.3.0/24. ignore linkdown since docker network is not connected to any containers yet
-# shellcheck disable=SC2046
-ip route add $(ip route | grep 10.10.3.0/24 | sed 's/linkdown//') table mullvad
-# add docker direct network route
-# shellcheck disable=SC2046
-ip route add $(ip route | grep 10.10.2.0/24 | sed 's/linkdown//') table mullvad
-# add default route for 10.10.1.0/24 so that we can route the packets from wgext back to wghub
-# shellcheck disable=SC2046
-ip route add $(ip route | grep 10.10.1.0/24 | sed 's/linkdown//') table mullvad
-# add default blackhole with lower priority than above as backup
-ip route add blackhole default metric 101 table mullvad
+# setup firewall rules for gateway with fw_mark and routing table number
+hub run-script mullvad setup-firewall
 
 # setup firewall rules for gateway with fw_mark and routing table number
-hub run-script gateway setup-firewall gateway-india 51821 '10.10.4.0/24' 101 2
+hub run-script gateway setup-firewall gateway-india 51821 101 2
+
+# mark all outgoing connections from docker-vpn(10.10.3.0/24) to use mullvad routing table
+iptables -A PREROUTING -t nat -s 10.10.3.0/24 -j MARK --set-mark 100
 
 # port forward host to mailserver
 ports=(25 143 465 587 993)
@@ -115,10 +78,6 @@ done
 
 # add postup iptable rules if any
 "${DATA_DIR}"/wireguard/post_up.sh
-
-# set the mark so that right route table is picked
-iptables -t nat -I PREROUTING -i wg-mullvad -j MARK --set-mark 100
-# iptables -t nat -I PREROUTING -i wg-gateway -j MARK --set-mark 101
 
 # port forward host to qbittorrent
 source "${DATA_DIR}"/mullvad/mullvad.env
