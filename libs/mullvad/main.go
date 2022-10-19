@@ -166,7 +166,7 @@ func wireguardRelays() (relays map[string][]Relay, err error) {
 
 	relays = make(map[string][]Relay)
 	for _, r := range response {
-		if !r.Active || r.PortSpeed < 10 {
+		if !r.Active || r.PortSpeed < 10 || !r.Owned {
 			continue
 		}
 
