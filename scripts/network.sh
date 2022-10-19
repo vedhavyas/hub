@@ -23,11 +23,14 @@ docker network create --subnet 10.10.2.0/24 --ip-range 10.10.2.200/25 docker-dir
 # setup docker vpn network
 docker network create --subnet 10.10.3.0/24 --ip-range 10.10.3.200/25 docker-vpn &> /dev/null
 
+# setup gateway interface
+hub run-script gateway \
+  create-network gateway-india '10.10.4.1/32' 51821 '10.10.4.0/24' \
+  "${WG_HUB_GATEWAY_INDIA_PRIVATE_KEY}" "${WG_GATEWAY_INDIA_PUBLIC_KEY}" "${WG_GATEWAY_INDIA_PRESHARED_KEY}"
+
 # generate wireguard mullvad interface
 ip link del wg-mullvad || true
 ip link add wg-mullvad type wireguard || true
 # create mullvad conf and open tunnel
 "${CMDS_DIR}"/mullvad.sh
 
-# start wireguard gateway
-"${CMDS_DIR}"/gateway.sh
