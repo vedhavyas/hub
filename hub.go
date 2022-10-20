@@ -96,12 +96,6 @@ func SyncStaticFiles(session Remote, init bool) error {
 		return fmt.Errorf("failed to create sym links for systemd unit files: %v", err)
 	}
 
-	// give execute permissions for commands
-	res, err = session.ExecuteCommand("chmod +x /opt/hub/commands/*")
-	if err != nil {
-		return fmt.Errorf("failed to give exec permissions[%s]: %v", string(res), err)
-	}
-
 	// sync env file
 	err = syncEnvFile(session)
 	if err != nil {
@@ -228,7 +222,7 @@ func syncEnvFile(session Remote) error {
 	return session.WriteDataToFile(file, "/etc/hub/.env")
 }
 
-//go:embed conf scripts docker systemd commands .env
+//go:embed conf scripts docker systemd .env
 var staticFS embed.FS
 
 func fetchDockerServices() ([]string, error) {
