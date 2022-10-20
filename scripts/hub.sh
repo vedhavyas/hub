@@ -33,16 +33,8 @@ function run_script() {
 
 cmd=${1}
 case $cmd in
-
-cmd )
-  shift
-  cmd="${1}"
-  shift
-  "${CMDS_DIR}/${cmd}.sh" "$@"
-  ;;
-
 certbot )
-  "${CMDS_DIR}/certbot.sh" || { hub notify "Hub updates" "Certbot renewal failed!"; }
+  run_script certbot || { hub notify "Hub updates" "Certbot renewal failed!"; }
   hub notify "Hub updates" "Certbot renewal successful!"
   ;;
 
@@ -63,7 +55,7 @@ restore)
 # notify title message
 notify )
   shift
-  GOTIFY_TOKEN=${HOST_HUB_GOTIFY_TOKEN} "${CMDS_DIR}/gotify.sh" "$@"
+  GOTIFY_TOKEN=${HOST_HUB_GOTIFY_TOKEN} run_script notify "$@"
   ;;
 
 # wireguard
