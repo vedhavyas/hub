@@ -1,15 +1,19 @@
 #!/bin/zsh
-
-# deps
-apt update -y
-apt upgrade -y
-apt install iptables iptables-persistent wireguard -y
+source /etc/default/gateway.env
 
 # set up dns to cloudflare
 systemctl disable systemd-resolved.service
 systemctl stop systemd-resolved.service
 rm /etc/resolv.conf
 echo "nameserver 1.1.1.1" > /etc/resolv.conf
+
+# deps
+apt update -y
+apt upgrade -y
+apt install iptables iptables-persistent wireguard -y
+
+# set hostname
+hostnamectl hostname "${GATEWAY_HOST_NAME}"
 
 # setup firewall
 # remove ufw
@@ -34,7 +38,6 @@ fi
 sysctl -p /etc/sysctl.conf
 
 # create wireguard config
-source /etc/default/gateway.env
 cat > /etc/wireguard/wg-hub-gateway.conf << EOF
 [Interface]
 PrivateKey = $GATEWAY_PRIVATE_KEY
@@ -43,14 +46,14 @@ PrivateKey = $GATEWAY_PRIVATE_KEY
 PublicKey = $HUB_PUBLIC_KEY
 PresharedKey = $PRE_SHARED_KEY
 AllowedIPs = 0.0.0.0/0
-Endpoint = $HUB_DOMAIN:51821
+Endpoint = $HUB_ADDRESS:51821
 PersistentKeepalive = 10
 EOF
 
 # start wireguard
 ip link del wg-hub-gateway || true
 ip link add wg-hub-gateway type wireguard || true
-ip address add 10.10.4.2/24 dev wg-hub-gateway || true
+ip address add "${GATEWAY_ADDRESS}" dev wg-hub-gateway || true
 ip link set wg-hub-gateway up || true
 wg setconf wg-hub-gateway /etc/wireguard/wg-hub-gateway.conf
 echo "Started wireguard client..."
@@ -83,6 +86,17 @@ iptables -t nat -A POSTROUTING -o "$eth0" -j MASQUERADE
 
 # forward packet from gateway to eth0
 iptables -A FORWARD -i wg-hub-gateway -o "${eth0}" -j ACCEPT
+
+# TODO: figure out logging. Extensions limit and log-prefix are missing
+# add logging
+## log all incoming, forward and outgoing requests with 2/min avg burst
+#iptables -I INPUT 1 -j LOG --log-prefix "IPTables-Input: " --log-level info
+#iptables -I FORWARD 1 -j LOG --log-prefix "IPTables-Forward: " --log-level info
+#iptables -I OUTPUT 1 -j LOG --log-prefix "IPTables-Output: " --log-level info
+#
+## log all dropped packets from input and forwarding
+#iptables -A INPUT -j LOG --log-prefix "IPTables-Input-Dropped: " --log-level info
+#iptables -A FORWARD -j LOG --log-prefix "IPTables-Forward-Dropped: " --log-level info
 
 # save iptables to persist across reboots
 iptables-save > /etc/iptables/rules.v4

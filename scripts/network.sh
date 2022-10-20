@@ -29,6 +29,6 @@ hub run-script mullvad setup-network
 
 # setup gateway interface
 hub run-script gateway \
-  setup-network gateway-india '10.10.4.1/32' 51821 \
+  setup-network gateway-india '10.10.4.1/24' 51821 \
   "${WG_HUB_GATEWAY_INDIA_PRIVATE_KEY}" "${WG_GATEWAY_INDIA_PUBLIC_KEY}" "${WG_GATEWAY_INDIA_PRESHARED_KEY}"
 

@@ -65,10 +65,29 @@ func main() {
 
 			{
 				Name:  "reboot",
-				Usage: "Reboot of hub",
-				Action: func(context *cli.Context) error {
-					_, err = hub.ExecuteCommand("reboot")
-					return err
+				Usage: "Reboot services",
+				Subcommands: []*cli.Command{
+					{
+						Name:        "hub",
+						Description: "Reboot of hub",
+						Action: func(context *cli.Context) error {
+							_, err = hub.ExecuteCommand("reboot")
+							return err
+						},
+					},
+					{
+						Name:        "gateway",
+						Description: "Reboot of gateway",
+						Action: func(context *cli.Context) error {
+							gateway, err := ConnectToRemote(config.Gateway)
+							if err != nil {
+								return fmt.Errorf("failed to connect to gateway: %v", err)
+							}
+							defer gateway.Close()
+							_, err = gateway.ExecuteCommand("reboot")
+							return err
+						},
+					},
 				},
 			},
 
