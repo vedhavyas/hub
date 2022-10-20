@@ -64,46 +64,46 @@ func RestartServices(session Remote, services ...string) error {
 	return nil
 }
 
-func SyncStaticFiles(session Remote, init bool) error {
-	err := cleanStaticFiles(session)
+func SyncHub(remote Remote, init bool) error {
+	err := cleanStaticFiles(remote)
 	if err != nil {
 		return fmt.Errorf("failed to clean static files: %v", err)
 	}
 
-	err = syncStaticFiles(session)
+	err = syncStaticFiles(remote)
 	if err != nil {
 		return fmt.Errorf("failed to sync static files: %v", err)
 	}
 
 	// give execute permissions for scripts
-	res, err := session.ExecuteCommand("chmod +x /opt/hub/scripts/*")
+	res, err := remote.ExecuteCommand("chmod +x /opt/hub/scripts/*")
 	if err != nil {
 		return fmt.Errorf("failed to give exec permissions[%s]: %v", string(res), err)
 	}
 
 	// create symlinks for scripts
-	err = createSymLinks(session, "scripts", "/sbin/hub-script-%s")
+	err = createSymLinks(remote, "scripts", "/sbin/hub-script-%s")
 	if err != nil {
 		return fmt.Errorf("failed to create symlinks for scripts: %v", err)
 	}
 
 	// copy systemd unit files
-	_, err = session.ExecuteCommand("cp /opt/hub/systemd/* /etc/systemd/system/")
+	_, err = remote.ExecuteCommand("cp /opt/hub/systemd/* /etc/systemd/system/")
 	if err != nil {
 		return fmt.Errorf("failed to create sym links for systemd unit files: %v", err)
 	}
 
 	// sync env file
-	err = syncEnvFile(session)
+	err = syncEnvFile(remote)
 	if err != nil {
 		return fmt.Errorf("failed to sync .env file: %v", err)
 	}
 
 	if init {
-		return initHub(session)
+		return initHub(remote)
 	}
 
-	err = loadSystemdUnits(session)
+	err = loadSystemdUnits(remote)
 	if err != nil {
 		return fmt.Errorf("failed to load systemd units: %v", err)
 	}
@@ -204,22 +204,17 @@ func loadSystemdUnits(session Remote) error {
 	return nil
 }
 
-func syncEnvFile(session Remote) error {
+func syncEnvFile(remote Remote) error {
 	log.Infoln("Syncing .env file...")
-	file, err := staticFS.ReadFile(".env")
+	_, err := remote.ExecuteCommand("mkdir -p /etc/hub")
 	if err != nil {
 		return err
 	}
 
-	_, err = session.ExecuteCommand("mkdir -p /etc/hub")
-	if err != nil {
-		return err
-	}
-
-	return session.WriteDataToFile(file, "/etc/hub/.env")
+	return remote.WriteDataToFile([]byte(remote.connection.EnvVars()), "/etc/hub/.env")
 }
 
-//go:embed conf scripts docker systemd .env
+//go:embed conf scripts docker systemd
 var staticFS embed.FS
 
 func fetchDockerServices() ([]string, error) {

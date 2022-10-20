@@ -34,7 +34,7 @@ func main() {
 						Name:  "hub",
 						Usage: "Sync hub components",
 						Action: func(context *cli.Context) error {
-							err := SyncStaticFiles(hub, context.Bool("init"))
+							err := SyncHub(hub, context.Bool("init"))
 							if err != nil {
 								return fmt.Errorf("failed to sync components: %v", err)
 							}

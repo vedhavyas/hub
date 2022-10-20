@@ -33,7 +33,7 @@ type Connection struct {
 func (conn Connection) EnvVars() string {
 	var buf strings.Builder
 	for k, v := range conn.Envs {
-		buf.WriteString(fmt.Sprintf("%s='%s'\n", k, v))
+		buf.WriteString(fmt.Sprintf("%s=\"%v\"\n", k, v))
 	}
 
 	return buf.String()
