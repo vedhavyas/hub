@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/melbahja/goph"
@@ -15,16 +16,27 @@ import (
 )
 
 type Remote struct {
-	ssh  *goph.Client
-	sftp *sftp.Client
+	connection Connection
+	ssh        *goph.Client
+	sftp       *sftp.Client
 }
 
 type Connection struct {
-	User     string `toml:"user"`
-	Addr     string `toml:"addr"`
-	Port     uint   `toml:"port"`
-	Password string `toml:"passwd"`
-	KeyPath  string `toml:"key_path"`
+	User     string                 `toml:"user"`
+	Addr     string                 `toml:"addr"`
+	Port     uint                   `toml:"port"`
+	Password string                 `toml:"passwd"`
+	KeyPath  string                 `toml:"key_path"`
+	Envs     map[string]interface{} `toml:"envs"`
+}
+
+func (conn Connection) EnvVars() string {
+	var buf strings.Builder
+	for k, v := range conn.Envs {
+		buf.WriteString(fmt.Sprintf("%s='%s'\n", k, v))
+	}
+
+	return buf.String()
 }
 
 //go:embed config.toml
@@ -88,7 +100,7 @@ func ConnectToRemote(conn Connection) (Remote, error) {
 		return Remote{}, err
 	}
 
-	return Remote{ssh: ssh, sftp: sftp}, err
+	return Remote{connection: conn, ssh: ssh, sftp: sftp}, err
 }
 
 func (r Remote) Close() {
@@ -152,7 +164,28 @@ func (r Remote) writeDataToFile(data io.Reader, remotePath string, executable bo
 	return nil
 }
 
-func (r Remote) newTTYSession(stdOut, stdError io.Writer) (*ssh.Session, error) {
+func setupStreams(session *ssh.Session, stdOut, stdError io.Writer, stdIn io.Reader) error {
+	out, err := session.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	go io.Copy(stdOut, out)
+
+	stdErr, err := session.StderrPipe()
+	if err != nil {
+		return err
+	}
+	go io.Copy(stdError, stdErr)
+
+	in, err := session.StdinPipe()
+	if err != nil {
+		return err
+	}
+	go io.Copy(in, stdIn)
+	return nil
+}
+
+func (r Remote) newTTYSession() (*ssh.Session, error) {
 	modes := ssh.TerminalModes{
 		ssh.ECHO:  0, // disable echoing
 		ssh.IGNCR: 1,
@@ -162,36 +195,23 @@ func (r Remote) newTTYSession(stdOut, stdError io.Writer) (*ssh.Session, error) 
 		return nil, fmt.Errorf("failed to start remote session: %v", err)
 	}
 
-	err = session.RequestPty("xterm-256color", 40, 80, modes)
+	err = session.RequestPty("xterm", 40, 80, modes)
 	if err != nil {
 		return nil, err
 	}
-
-	out, err := session.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	go io.Copy(stdOut, out)
-
-	stdErr, err := session.StderrPipe()
-	if err != nil {
-		return nil, err
-	}
-	go io.Copy(stdError, stdErr)
-
-	in, err := session.StdinPipe()
-	if err != nil {
-		return nil, err
-	}
-	go io.Copy(in, os.Stdin)
 	return session, nil
 }
 
-func (r Remote) ExecuteCommandStream(cmd string, logger io.Writer) (err error) {
+func (r Remote) ExecuteCommandStream(cmd string, writer io.Writer) (err error) {
 	log.Debugf("Executing cmd: %v", cmd)
-	session, err := r.newTTYSession(logger, logger)
+	session, err := r.ssh.NewSession()
 	if err != nil {
-		return fmt.Errorf("failed to open pty session: %v", err)
+		return fmt.Errorf("failed to open session: %v", err)
+	}
+	defer session.Close()
+	err = setupStreams(session, writer, writer, os.Stdin)
+	if err != nil {
+		return fmt.Errorf("failed to start steam: %v", err)
 	}
 
 	err = session.Run(cmd)
@@ -203,14 +223,20 @@ func (r Remote) ExecuteCommandStream(cmd string, logger io.Writer) (err error) {
 }
 
 func (r Remote) OpenShell(shell string) (err error) {
-	session, err := r.newTTYSession(os.Stdout, os.Stderr)
+	session, err := r.newTTYSession()
 	if err != nil {
 		return fmt.Errorf("failed to open pty session: %v", err)
+	}
+	defer session.Close()
+
+	err = setupStreams(session, os.Stdout, os.Stderr, os.Stdin)
+	if err != nil {
+		return fmt.Errorf("failed to start steam: %v", err)
 	}
 
 	err = session.Run(shell)
 	if err != nil {
-		return fmt.Errorf("failed to run command: %v", err)
+		return fmt.Errorf("failed to start shell: %v", err)
 	}
 
 	return nil

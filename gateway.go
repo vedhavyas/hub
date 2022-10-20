@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//go:embed libs/gateway .env.gateway
+//go:embed libs/gateway
 var gatewayFS embed.FS
 
 func SyncGateway(gateway Remote) error {
@@ -40,15 +40,10 @@ func SyncGateway(gateway Remote) error {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	file, err := gatewayFS.ReadFile(".env.gateway")
-	if err != nil {
-		return err
-	}
-
 	_, err = gateway.ExecuteCommand("mkdir -p /etc/default")
 	if err != nil {
 		return err
 	}
 
-	return gateway.WriteDataToFile(file, "/etc/default/gateway.env")
+	return gateway.WriteDataToFile([]byte(gateway.connection.EnvVars()), "/etc/default/gateway.env")
 }

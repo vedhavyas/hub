@@ -33,6 +33,11 @@ function run_script() {
 
 cmd=${1}
 case $cmd in
+status)
+  systemctl list-unit-files 'hub-*' docker.service
+  systemctl list-units 'hub-*' docker.service
+  docker compose ls
+  ;;
 certbot )
   run_script certbot || { hub notify "Hub updates" "Certbot renewal failed!"; }
   hub notify "Hub updates" "Certbot renewal successful!"

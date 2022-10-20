@@ -33,10 +33,7 @@ func initHub(session Remote) error {
 
 func Status(session Remote) error {
 	remoteWriter := log.WithField("remote", "status").WriterLevel(logrus.InfoLevel)
-	err := session.ExecuteCommandStream(`
-systemctl list-unit-files 'hub-*' docker.service
-systemctl list-units 'hub-*' docker.service
-docker compose ls`, remoteWriter)
+	err := session.ExecuteCommandStream("hub status", remoteWriter)
 	if err != nil {
 		return err
 	}
