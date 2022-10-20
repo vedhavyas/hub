@@ -154,6 +154,25 @@ main() {
         exit 0
     fi
 
+    if [ -z "$2" ]; then
+        echo "no gateway selected."
+        exit 1
+    fi
+
+    # fetch the fwmark for the gateway passed
+    gateway=$2
+    split_data=$(ip rule  | grep -w gateway-"$gateway" | tr ' ' '\n')
+    split_data=("${(f)split_data}")
+    fw_mark="${split_data[4]}"
+
+    if [ -z "${fw_mark}" ]; then
+        echo "no valid gateway present for the name: gateway-${gateway}"
+        exit 1
+    fi
+
+    # convert from hex to decimal
+    fw_mark=$(([##10]fw_mark))
+
     SEQNO="$(get_seq_no)"
     create_new_client "$SEQNO" "$CLIENT_NAME"
     print_client_qrcode "$CLIENT_NAME"
@@ -161,23 +180,10 @@ main() {
     # sync wireguard hub
     sync_wg_hub_conf
 
-    case $2 in
-    mullvad)
-      # marking any requests bound to this vpn needs to be marked with 100
-      # rest of the requests wont be marked
-      # if already present, ignore it
-      if ! grep -Fq "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 100" post_up.sh; then
-        echo "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 100" >> post_up.sh
-        iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}"${SEQNO}" ! -d 10.10.0.0/16 -j MARK --set-mark 100
-      fi
-      ;;
-    gateway)
-      if ! grep -Fq "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 101" post_up.sh; then
-        echo "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} ! -d 10.10.0.0/16 -j MARK --set-mark 101" >> post_up.sh
-        iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}"${SEQNO}" ! -d 10.10.0.0/16 -j MARK --set-mark 101
-      fi
-      ;;
-    esac
+    if ! grep -Fq "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} -j MARK --set-mark ${fw_mark}" post_up.sh; then
+        echo "iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}${SEQNO} -j MARK --set-mark ${fw_mark}" >> post_up.sh
+        iptables -t nat -I PREROUTING 1 -s ${WG_NET_ADDRESS}"${SEQNO}" -j MARK --set-mark ${fw_mark}
+    fi
 
 }
 
