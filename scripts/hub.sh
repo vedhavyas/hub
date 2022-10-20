@@ -66,6 +66,12 @@ notify )
   GOTIFY_TOKEN=${HOST_HUB_GOTIFY_TOKEN} "${CMDS_DIR}/gotify.sh" "$@"
   ;;
 
+# wireguard
+wireguard )
+  shift
+  run_script wireguard "$@"
+  ;;
+
 run-script )
   shift
   run_script "$@"

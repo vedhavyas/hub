@@ -327,6 +327,6 @@ func ExecMail(remote Remote, args ...string) error {
 }
 
 func AddWireguardPeer(hub Remote, name, gateway string) error {
-	remoteWriter := log.WithField("remote", "mail").WriterLevel(logrus.InfoLevel)
-	return hub.ExecuteCommandStream(fmt.Sprintf("hub cmd wireguard %s %s", name, gateway), remoteWriter)
+	remoteWriter := log.WithField("remote", "wireguard").WriterLevel(logrus.InfoLevel)
+	return hub.ExecuteCommandStream(fmt.Sprintf("hub wireguard %s %s", name, gateway), remoteWriter)
 }
