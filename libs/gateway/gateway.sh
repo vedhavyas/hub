@@ -10,6 +10,8 @@ echo "nameserver 1.1.1.1" > /etc/resolv.conf
 # deps
 apt update -y
 apt upgrade -y
+echo "Reboot once kernel is upgraded"
+
 apt install iptables iptables-persistent wireguard -y
 
 # set hostname
@@ -52,9 +54,9 @@ EOF
 
 # start wireguard
 ip link del wg-hub-gateway || true
-ip link add wg-hub-gateway type wireguard || true
-ip address add "${GATEWAY_ADDRESS}" dev wg-hub-gateway || true
-ip link set wg-hub-gateway up || true
+ip link add wg-hub-gateway type wireguard
+ip address add "${GATEWAY_ADDRESS}" dev wg-hub-gateway
+ip link set wg-hub-gateway up
 wg setconf wg-hub-gateway /etc/wireguard/wg-hub-gateway.conf
 echo "Started wireguard client..."
 

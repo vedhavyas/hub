@@ -52,7 +52,7 @@ func main() {
 							}
 							defer gateway.Close()
 
-							err = SyncGateway(gateway)
+							err = SyncGateway(gateway, context.Bool("init"))
 							if err != nil {
 								return fmt.Errorf("failed to sync components: %v", err)
 							}
