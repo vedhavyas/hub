@@ -41,6 +41,16 @@ func Status(session Remote) error {
 	return nil
 }
 
+func Network(session Remote) error {
+	remoteWriter := log.WithField("remote", "network").WriterLevel(logrus.InfoLevel)
+	err := session.ExecuteCommandStream("wg", remoteWriter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func ShowLogs(session Remote, service string) error {
 	remoteWriter := log.WithField("remote", "logs").WriterLevel(logrus.InfoLevel)
 	err := session.ExecuteCommandStream(fmt.Sprintf(`journalctl -u 'hub-%s' -f`, service), remoteWriter)

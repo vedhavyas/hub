@@ -15,7 +15,7 @@ ip address add 10.10.1.1/24 dev wg-hub || true
 ip link set wg-hub up || true
 
 # generate wireguard server hub
-"${CMDS_DIR}"/wireguard.sh
+hub run-script wireguard
 
 # setup docker direct network
 docker network create --subnet 10.10.2.0/24 --ip-range 10.10.2.200/25 docker-direct &> /dev/null
@@ -27,8 +27,15 @@ docker network create --subnet 10.10.3.0/24 --ip-range 10.10.3.200/25 docker-vpn
 # create mullvad conf and open tunnel
 hub run-script mullvad setup-network
 
-# setup gateway interface
-hub run-script gateway \
-  setup-network gateway-india '10.10.4.1/24' 51821 \
-  "${WG_HUB_GATEWAY_INDIA_PRIVATE_KEY}" "${WG_GATEWAY_INDIA_PUBLIC_KEY}" "${WG_GATEWAY_INDIA_PRESHARED_KEY}"
-
+# setup gateway interfaces
+gateways=("${(s[,])WG_GATEWAYS}")
+for gateway in $gateways ; do
+  address=WG_HUB_GATEWAY_${gateway}_ADDRESS
+  port=WG_HUB_GATEWAY_${gateway}_PORT
+  pv_key=WG_HUB_GATEWAY_${gateway}_PRIVATE_KEY
+  gateway_pub_key=WG_GATEWAY_${gateway}_PUBLIC_KEY
+  pre_shared_key=WG_GATEWAY_${gateway}_PRESHARED_KEY
+  hub run-script gateway \
+    setup-network gateway-"${gateway:l}" "${(P)address}" "${(P)port}" \
+    "${(P)pv_key}" "${(P)gateway_pub_key}" "${(P)pre_shared_key}"
+done

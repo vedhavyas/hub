@@ -48,7 +48,7 @@ PrivateKey = $GATEWAY_PRIVATE_KEY
 PublicKey = $HUB_PUBLIC_KEY
 PresharedKey = $PRE_SHARED_KEY
 AllowedIPs = 0.0.0.0/0
-Endpoint = $HUB_ADDRESS:51821
+Endpoint = $HUB_ADDRESS
 PersistentKeepalive = 10
 EOF
 

@@ -21,7 +21,7 @@ function security_post_up() {
 
 function mailserver_pre_up() {
   # run certbot
-  "${CMDS_DIR}"/certbot.sh
+  hub certbot
 }
 
 function mailserver_post_up() {

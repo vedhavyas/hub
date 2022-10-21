@@ -7,7 +7,6 @@ CONF_DIR="${ROOT_DIR}"/conf
 DATA_DIR=/var/hub/data
 mkdir -p "${DATA_DIR}"
 DOCKER_DIR="${ROOT_DIR}"/docker
-CMDS_DIR="${ROOT_DIR}"/commands
 SCRIPTS_DIR=/sbin/
 HUB_DIR=/hub
 source /etc/hub/.env

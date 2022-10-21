@@ -112,10 +112,19 @@ func main() {
 					},
 					{
 						Name:        "status",
-						Aliases:     []string{"l"},
+						Aliases:     []string{"s"},
 						Description: "Show hub status.",
 						Action: func(context *cli.Context) error {
 							return Status(hub)
+						},
+					},
+
+					{
+						Name:        "network",
+						Aliases:     []string{"n"},
+						Description: "Show hub network.",
+						Action: func(context *cli.Context) error {
+							return Network(hub)
 						},
 					},
 				},

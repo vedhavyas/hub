@@ -1,18 +1,14 @@
 package main
 
 import (
-	"embed"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
 )
 
-//go:embed libs/gateway
-var gatewayFS embed.FS
-
 func SyncGateway(gateway Remote, init bool) error {
 	log.Infof("Syncing gateway files...\n")
-	fileData, err := gatewayFS.ReadFile("libs/gateway/gateway.sh")
+	fileData, err := staticFS.ReadFile("scripts/gateway_exit_node.sh")
 	if err != nil {
 		return err
 	}
@@ -28,7 +24,7 @@ func SyncGateway(gateway Remote, init bool) error {
 		return fmt.Errorf("failed to give exec permissions[%s]: %v", string(res), err)
 	}
 
-	fileData, err = gatewayFS.ReadFile("libs/gateway/gateway.service")
+	fileData, err = staticFS.ReadFile("systemd/gateway_exit_node.service")
 	if err != nil {
 		return err
 	}

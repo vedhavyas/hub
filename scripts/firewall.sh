@@ -67,7 +67,13 @@ done
 hub run-script mullvad setup-firewall
 
 # setup firewall rules for gateway with fw_mark and routing table number
-hub run-script gateway setup-firewall gateway-india 51821 101 2
+gateways=("${(s[,])WG_GATEWAYS}")
+for gateway in $gateways ; do
+  port=WG_HUB_GATEWAY_${gateway}_PORT
+  fw_mark=WG_HUB_GATEWAY_${gateway}_FW_MARK
+  rt_table_number=WG_HUB_GATEWAY_${gateway}_RT_TABLE_NUMBER
+  hub run-script gateway setup-firewall gateway-"${gateway:l}" "${(P)port}" "${(P)fw_mark}" "${(P)rt_table_number}"
+done
 
 # mark all outgoing connections from docker-vpn(10.10.3.0/24) to use mullvad routing table
 iptables -A PREROUTING -t nat -s 10.10.3.0/24 -j MARK --set-mark 100
@@ -77,7 +83,11 @@ iptables -A PREROUTING -t nat -s 10.10.3.0/24 -j MARK --set-mark 100
 
 # setup save fw marks
 hub run-script mullvad setup-fw-mark
-hub run-script gateway setup-fw-mark gateway-india 101
+gateways=("${(s[,])WG_GATEWAYS}")
+for gateway in $gateways ; do
+  fw_mark=WG_HUB_GATEWAY_${gateway}_FW_MARK
+  hub run-script gateway setup-fw-mark gateway-"${gateway:l}" "${(P)fw_mark}"
+done
 
 # restore this mark in the PREROUTING mangle so that rule can pick the right route table as per the mark
 # this will restore mark from conn to packet to incoming packets.
