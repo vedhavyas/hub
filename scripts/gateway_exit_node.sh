@@ -8,6 +8,7 @@ rm /etc/resolv.conf
 echo "nameserver 1.1.1.1" > /etc/resolv.conf
 
 # deps
+export DEBIAN_FRONTEND=noninteractive
 apt update -y
 apt upgrade -y
 echo "Reboot once kernel is upgraded"
@@ -89,7 +90,16 @@ iptables -t nat -A POSTROUTING -o "$eth0" -j MASQUERADE
 # forward packet from gateway to eth0
 iptables -A FORWARD -i wg-hub-gateway -o "${eth0}" -j ACCEPT
 
-# TODO: add logging. Extensions limit and log-prefix are missing from iptables on armbian
+# add logging
+# log all incoming, forward and outgoing requests with 2/min avg burst
+iptables -I INPUT 1 -m limit --limit 2/min -j LOG --log-prefix "IPTables-Input: " --log-level info
+iptables -I FORWARD 1 -m limit --limit 2/min -j LOG --log-prefix "IPTables-Forward: " --log-level info
+iptables -I OUTPUT 1 -m limit --limit 2/min -j LOG --log-prefix "IPTables-Output: " --log-level info
+
+# log all dropped packets from input and forwarding
+iptables -A INPUT -m limit --limit 2/sec -j LOG --log-prefix "IPTables-Input-Dropped: " --log-level info
+iptables -A FORWARD -m limit --limit 2/sec -j LOG --log-prefix "IPTables-Forward-Dropped: " --log-level info
+
 # save iptables to persist across reboots
 iptables-save > /etc/iptables/rules.v4
 

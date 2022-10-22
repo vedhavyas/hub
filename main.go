@@ -8,7 +8,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var log = logrus.New()
+var log = &logrus.Logger{
+	Out: os.Stderr,
+	Formatter: &strippedFormatter{txtFmtr: logrus.TextFormatter{
+		ForceColors: true,
+	}},
+	Hooks:        make(logrus.LevelHooks),
+	Level:        logrus.InfoLevel,
+	ExitFunc:     os.Exit,
+	ReportCaller: false,
+}
 
 func main() {
 	var hub Remote
@@ -45,8 +54,15 @@ func main() {
 					{
 						Name:  "gateway",
 						Usage: "Sync gateway components",
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "name",
+								Usage:    "Gateway name",
+								Required: true,
+							},
+						},
 						Action: func(context *cli.Context) error {
-							gateway, err := ConnectToRemote(config.Gateway)
+							gateway, err := ConnectToGateway(config, context.String("name"))
 							if err != nil {
 								return fmt.Errorf("failed to connect to gateway: %v", err)
 							}
@@ -78,8 +94,15 @@ func main() {
 					{
 						Name:        "gateway",
 						Description: "Reboot of gateway",
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "name",
+								Usage:    "Gateway name",
+								Required: true,
+							},
+						},
 						Action: func(context *cli.Context) error {
-							gateway, err := ConnectToRemote(config.Gateway)
+							gateway, err := ConnectToGateway(config, context.String("name"))
 							if err != nil {
 								return fmt.Errorf("failed to connect to gateway: %v", err)
 							}
@@ -187,28 +210,28 @@ func main() {
 		Before: func(context *cli.Context) error {
 			verbose := context.Bool("verbose")
 			if verbose {
-				log.Infof("Logging debug info...")
 				log.SetLevel(logrus.DebugLevel)
+				log.Debugf("Logging debug info...")
 			}
 
-			log.Println("Initiating SSH Connection...")
+			log.Debug("Initiating SSH Connection...")
 			config, err = LoadConfig()
 			if err != nil {
 				return err
 			}
 
-			hub, err = ConnectToRemote(config.Hub)
+			hub, err = ConnectToHub(config)
 			if err != nil {
 				return fmt.Errorf("failed to connect to hub: %v", err)
 			}
 
-			log.Println("Connected.")
+			log.Debug("Connected.")
 			return nil
 		},
 		After: func(context *cli.Context) error {
-			log.Println("Closing SSH Connection...")
+			log.Debug("Closing SSH Connection...")
 			hub.Close()
-			log.Println("Closed.")
+			log.Debug("Closed.")
 			return nil
 		},
 		Suggest: true,

@@ -11,14 +11,12 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/melbahja/goph"
-	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
 
 type Remote struct {
 	connection Connection
-	ssh        *goph.Client
-	sftp       *sftp.Client
+	client     *goph.Client
 }
 
 type Connection struct {
@@ -27,6 +25,7 @@ type Connection struct {
 	Port     uint                   `toml:"port"`
 	Password string                 `toml:"passwd"`
 	KeyPath  string                 `toml:"key_path"`
+	Name     string                 `toml:"name"`
 	Envs     map[string]interface{} `toml:"envs"`
 }
 
@@ -43,13 +42,13 @@ func (conn Connection) EnvVars() string {
 var configBytes string
 
 type Config struct {
-	Hub     Connection `toml:"hub"`
-	Gateway Connection `toml:"gateway"`
+	Hub     Connection   `toml:"hub"`
+	Gateway []Connection `toml:"gateway"`
 }
 
 func LoadConfig() (Config, error) {
 	var config Config
-	log.Infoln("Loading config...")
+	log.Debug("Loading config...")
 	log.Debugf("Config data: %v", configBytes)
 	_, err := toml.Decode(configBytes, &config)
 	if err != nil {
@@ -61,33 +60,53 @@ func LoadConfig() (Config, error) {
 
 func (conn Connection) Auth() (goph.Auth, error) {
 	if conn.Password != "" {
-		log.Infof("Using password authentication...")
+		log.Debug("Using password authentication...")
 		return goph.Password(conn.Password), nil
 	}
 
 	if conn.KeyPath != "" {
-		log.Infof("Using private key authentication...")
+		log.Debug("Using private key authentication...")
 		return goph.Key(conn.KeyPath, "")
 	}
 
-	log.Infof("Using SSH agent...")
+	log.Debug("Using SSH agent...")
 	return goph.UseAgent()
 }
 
-func ConnectToRemote(conn Connection) (Remote, error) {
+func ConnectToGateway(config Config, gateway string) (Remote, error) {
+	if !strings.HasPrefix(gateway, "gateway-") {
+		gateway = fmt.Sprintf("gateway-%s", gateway)
+	}
+
+	for _, conn := range config.Gateway {
+		if conn.Name != gateway {
+			continue
+		}
+
+		return connectToRemote(conn)
+	}
+
+	return Remote{}, fmt.Errorf("gateway with name %s not found", gateway)
+}
+
+func ConnectToHub(config Config) (Remote, error) {
+	return connectToRemote(config.Hub)
+}
+
+func connectToRemote(conn Connection) (Remote, error) {
 	auth, err := conn.Auth()
 	if err != nil {
 		return Remote{}, err
 	}
 
-	ssh, err := goph.NewConn(&goph.Config{
+	client, err := goph.NewConn(&goph.Config{
 		User:    conn.User,
 		Addr:    conn.Addr,
 		Port:    conn.Port,
 		Auth:    auth,
 		Timeout: goph.DefaultTimeout,
 		Callback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			log.Infof("Checking host %s at %s with key: %v", hostname, remote.String(), key.Type())
+			log.Debugf("Checking host %s at %s with key: %v", hostname, remote.String(), key.Type())
 			return nil
 		},
 	})
@@ -95,24 +114,12 @@ func ConnectToRemote(conn Connection) (Remote, error) {
 		return Remote{}, err
 	}
 
-	sftp, err := ssh.NewSftp()
-	if err != nil {
-		return Remote{}, err
-	}
-
-	return Remote{connection: conn, ssh: ssh, sftp: sftp}, err
+	return Remote{connection: conn, client: client}, err
 }
 
 func (r Remote) Close() {
-	if r.sftp != nil {
-		err := r.sftp.Close()
-		if err != nil {
-			log.Infof("failed to close SFTP connection: %v", err)
-		}
-	}
-
-	if r.ssh != nil {
-		err := r.ssh.Close()
+	if r.client != nil {
+		err := r.client.Close()
 		if err != nil {
 			log.Infof("failed to close SSH connection: %v", err)
 		}
@@ -121,7 +128,7 @@ func (r Remote) Close() {
 
 func (r Remote) ExecuteCommand(cmd string) (output []byte, err error) {
 	log.Debugf("Executing command: %v", cmd)
-	return r.ssh.Run(cmd)
+	return r.client.Run(cmd)
 }
 
 func (r Remote) WriteScriptToFile(script []byte, remotePath string) error {
@@ -142,7 +149,13 @@ func (r Remote) SymLink(oldPath, newPath string) error {
 }
 
 func (r Remote) writeDataToFile(data io.Reader, remotePath string, executable bool) error {
-	remote, err := r.sftp.Create(remotePath)
+	sftp, err := r.client.NewSftp()
+	if err != nil {
+		return err
+	}
+	defer sftp.Close()
+
+	remote, err := sftp.Create(remotePath)
 	if err != nil {
 		return fmt.Errorf("failed to create file on remote: %v", err)
 	}
@@ -190,7 +203,7 @@ func (r Remote) newTTYSession() (*ssh.Session, error) {
 		ssh.ECHO:  0, // disable echoing
 		ssh.IGNCR: 1,
 	}
-	session, err := r.ssh.NewSession()
+	session, err := r.client.NewSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed to start remote session: %v", err)
 	}
@@ -204,7 +217,7 @@ func (r Remote) newTTYSession() (*ssh.Session, error) {
 
 func (r Remote) ExecuteCommandStream(cmd string, writer io.Writer) (err error) {
 	log.Debugf("Executing cmd: %v", cmd)
-	session, err := r.ssh.NewSession()
+	session, err := r.client.NewSession()
 	if err != nil {
 		return fmt.Errorf("failed to open session: %v", err)
 	}

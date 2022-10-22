@@ -7,21 +7,15 @@ import (
 )
 
 func SyncGateway(gateway Remote, init bool) error {
-	log.Infof("Syncing gateway files...\n")
+	log.Infof("Syncing %s files...\n", gateway.connection.Name)
 	fileData, err := staticFS.ReadFile("scripts/gateway_exit_node.sh")
 	if err != nil {
 		return err
 	}
 
-	err = gateway.WriteDataToFile(fileData, "/usr/sbin/gateway")
+	err = gateway.WriteScriptToFile(fileData, "/usr/sbin/gateway")
 	if err != nil {
 		return err
-	}
-
-	// give execute permissions for gateway script
-	res, err := gateway.ExecuteCommand("chmod +x /usr/sbin/gateway")
-	if err != nil {
-		return fmt.Errorf("failed to give exec permissions[%s]: %v", string(res), err)
 	}
 
 	fileData, err = staticFS.ReadFile("systemd/gateway_exit_node.service")
@@ -34,7 +28,7 @@ func SyncGateway(gateway Remote, init bool) error {
 		return err
 	}
 
-	res, err = gateway.ExecuteCommand("systemctl daemon-reload")
+	res, err := gateway.ExecuteCommand("systemctl daemon-reload")
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
@@ -54,6 +48,8 @@ func SyncGateway(gateway Remote, init bool) error {
 		return err
 	}
 
+	log.Infof("Done.")
+
 	if !init {
 		return nil
 	}
@@ -63,8 +59,18 @@ func SyncGateway(gateway Remote, init bool) error {
 
 func initGateway(gateway Remote) error {
 	log.Info("Running init script...")
+	fileData, err := staticFS.ReadFile("scripts/init.sh")
+	if err != nil {
+		return err
+	}
+
+	err = gateway.WriteScriptToFile(fileData, "/usr/sbin/gateway-init")
+	if err != nil {
+		return err
+	}
+
 	remoteWriter := log.WithField("gateway", "init").WriterLevel(logrus.DebugLevel)
-	err := gateway.ExecuteCommandStream("gateway", remoteWriter)
+	err = gateway.ExecuteCommandStream("gateway-init", remoteWriter)
 	if err != nil {
 		return err
 	}
