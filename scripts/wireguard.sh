@@ -108,6 +108,12 @@ print_client_qrcode() {
     echo "Scan QR code with your phone or use \"wgclient_$1.conf\" file."
 }
 
+print_client_conf() {
+    echo "========= Wireguard Conf ========="
+    cat "wgclient_$1.conf"
+    echo "=================================="
+}
+
 remove_temporary_client_key_file() {
     rm -f "wgclient_$1.key"
 }
@@ -151,6 +157,7 @@ main() {
 
     if check_client_config_is_available "$CLIENT_NAME"; then
         print_client_qrcode "$CLIENT_NAME"
+        print_client_conf "$CLIENT_NAME"
         exit 0
     fi
 
@@ -176,6 +183,7 @@ main() {
     SEQNO="$(get_seq_no)"
     create_new_client "$SEQNO" "$CLIENT_NAME"
     print_client_qrcode "$CLIENT_NAME"
+    print_client_conf "$CLIENT_NAME"
 
     # sync wireguard hub
     sync_wg_hub_conf
