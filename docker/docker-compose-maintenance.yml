@@ -3,6 +3,8 @@ version: "3.9"
 networks:
   docker-direct:
     external: true
+  docker-vpn:
+    external: true
 
 services:
   watchtower:
@@ -51,3 +53,25 @@ services:
       caddy: portainer.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 9000}}"
+
+  librespeed:
+    image: lscr.io/linuxserver/librespeed:latest
+    container_name: librespeed
+    hostname: librespeed
+    networks:
+      - docker-direct
+      - docker-vpn
+    environment:
+      - PUID
+      - PGID
+      - TZ
+      - PASSWORD=librespeed
+      - CUSTOM_RESULTS=true
+      - DB_TYPE=sqlite
+    volumes:
+      - $DATA_DIR/librespeed:/config
+    restart: unless-stopped
+    labels:
+      caddy: fast.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"
