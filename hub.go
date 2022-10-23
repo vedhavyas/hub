@@ -10,15 +10,15 @@ import (
 )
 
 func initHub(session Remote) error {
-	remoteWriter := log.WithField("remote", "init").WriterLevel(logrus.DebugLevel)
+	remoteWriter := log.WithField("hub", "init").WriterLevel(logrus.DebugLevel)
 	log.Infoln("Running init script...")
-	err := session.ExecuteCommandStream("hub-script-init", remoteWriter)
+	err := session.StreamCmd("hub-script-init", remoteWriter)
 	if err != nil {
 		return err
 	}
 
 	log.Infoln("Installing dependencies...")
-	err = session.ExecuteCommandStream("hub run-script deps", remoteWriter)
+	err = session.StreamCmd("hub run-script deps", remoteWriter)
 	if err != nil {
 		return err
 	}
@@ -31,41 +31,22 @@ func initHub(session Remote) error {
 	return nil
 }
 
-func Status(session Remote) error {
-	remoteWriter := log.WithField("remote", "status").WriterLevel(logrus.InfoLevel)
-	err := session.ExecuteCommandStream("hub status", remoteWriter)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func Status(remote Remote) error {
+	return remote.RunCmdToLog("hub status")
 }
 
-func Network(session Remote) error {
-	remoteWriter := log.WithField("remote", "network").WriterLevel(logrus.InfoLevel)
-	err := session.ExecuteCommandStream("wg", remoteWriter)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func Network(remote Remote) error {
+	return remote.RunCmdToLog("wg")
 }
 
-func ShowLogs(session Remote, service string) error {
-	remoteWriter := log.WithField("remote", "logs").WriterLevel(logrus.InfoLevel)
-	err := session.ExecuteCommandStream(fmt.Sprintf(`journalctl -u 'hub-%s' -f`, service), remoteWriter)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func ShowLogs(remote Remote, service string) error {
+	return remote.StreamCmd(fmt.Sprintf(`journalctl -u 'hub-%s' -f`, service), log.Writer())
 }
 
 func RestartServices(session Remote, services ...string) error {
-	remoteWriter := log.WithField("remote", "restart").WriterLevel(logrus.InfoLevel)
 	for _, service := range services {
 		log.Infof("Restarting %s service...", service)
-		err := session.ExecuteCommandStream(fmt.Sprintf(`systemctl restart 'hub-services@%s.service'`, service), remoteWriter)
+		err := session.RunCmdToLog(fmt.Sprintf(`systemctl restart 'hub-services@%s.service'`, service))
 		if err != nil {
 			return err
 		}
@@ -86,7 +67,7 @@ func SyncHub(remote Remote, init bool) error {
 	}
 
 	// give execute permissions for scripts
-	res, err := remote.ExecuteCommand("chmod +x /opt/hub/scripts/*")
+	res, err := remote.RunCmd("chmod +x /opt/hub/scripts/*")
 	if err != nil {
 		return fmt.Errorf("failed to give exec permissions[%s]: %v", string(res), err)
 	}
@@ -98,7 +79,7 @@ func SyncHub(remote Remote, init bool) error {
 	}
 
 	// copy systemd unit files
-	_, err = remote.ExecuteCommand("cp /opt/hub/systemd/* /etc/systemd/system/")
+	_, err = remote.RunCmd("cp /opt/hub/systemd/* /etc/systemd/system/")
 	if err != nil {
 		return fmt.Errorf("failed to create sym links for systemd unit files: %v", err)
 	}
@@ -171,12 +152,12 @@ func loadSystemdUnits(session Remote) error {
 		unitNames = append(unitNames, file.Name())
 	}
 
-	res, err := session.ExecuteCommand("systemctl daemon-reload")
+	res, err := session.RunCmd("systemctl daemon-reload")
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable %s", strings.Join(unitNames, " ")))
+	res, err = session.RunCmd(fmt.Sprintf("systemctl reenable %s", strings.Join(unitNames, " ")))
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
@@ -187,7 +168,7 @@ func loadSystemdUnits(session Remote) error {
 	}
 
 	for _, service := range services {
-		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-services@%s.service", service))
+		res, err = session.RunCmd(fmt.Sprintf("systemctl reenable hub-services@%s.service", service))
 		if err != nil {
 			return fmt.Errorf("%v(%v)", string(res), err)
 		}
@@ -195,18 +176,18 @@ func loadSystemdUnits(session Remote) error {
 
 	dailyScripts := []string{"backup", "certbot"}
 	for _, script := range dailyScripts {
-		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-script@%s.service", script))
+		res, err = session.RunCmd(fmt.Sprintf("systemctl reenable hub-script@%s.service", script))
 		if err != nil {
 			return fmt.Errorf("%v(%v)", string(res), err)
 		}
 
-		res, err = session.ExecuteCommand(fmt.Sprintf("systemctl reenable hub-daily@%s.timer", script))
+		res, err = session.RunCmd(fmt.Sprintf("systemctl reenable hub-daily@%s.timer", script))
 		if err != nil {
 			return fmt.Errorf("%v(%v)", string(res), err)
 		}
 	}
 
-	res, err = session.ExecuteCommand("systemctl restart 'hub-*.timer'")
+	res, err = session.RunCmd("systemctl restart 'hub-*.timer'")
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
@@ -216,7 +197,7 @@ func loadSystemdUnits(session Remote) error {
 
 func syncEnvFile(remote Remote) error {
 	log.Infoln("Syncing .env file...")
-	_, err := remote.ExecuteCommand("mkdir -p /etc/hub")
+	_, err := remote.RunCmd("mkdir -p /etc/hub")
 	if err != nil {
 		return err
 	}
@@ -262,7 +243,7 @@ func syncStaticFiles(session Remote) error {
 			return err
 		}
 
-		_, err = session.ExecuteCommand(fmt.Sprintf("mkdir -p /opt/hub/%s", dir.Name()))
+		_, err = session.RunCmd(fmt.Sprintf("mkdir -p /opt/hub/%s", dir.Name()))
 		if err != nil {
 			return err
 		}
@@ -302,13 +283,13 @@ func cleanStaticFiles(remote Remote) (err error) {
 	}()
 
 	// remove /opt/hub
-	res, err := remote.ExecuteCommand("rm -rf /opt/hub/*")
+	res, err := remote.RunCmd("rm -rf /opt/hub/*")
 	if err != nil {
 		return fmt.Errorf("%v: %s", err, res)
 	}
 
 	// remove copied systemd files
-	res, err = remote.ExecuteCommand("rm -rf /etc/systemd/system/hub-*")
+	res, err = remote.RunCmd("rm -rf /etc/systemd/system/hub-*")
 	if err != nil {
 		return fmt.Errorf("%v: %s", err, res)
 	}
@@ -316,13 +297,10 @@ func cleanStaticFiles(remote Remote) (err error) {
 	return nil
 }
 
-func ExecMail(remote Remote, args ...string) error {
-	remoteWriter := log.WithField("remote", "mail").WriterLevel(logrus.InfoLevel)
-	return remote.ExecuteCommandStream(fmt.Sprintf("docker exec -it mailserver setup %s", strings.Join(args, " ")),
-		remoteWriter)
+func ExecMail(hub Remote, args ...string) error {
+	return hub.RunCmdToLog(fmt.Sprintf("docker exec mailserver setup %s", strings.Join(args, " ")))
 }
 
 func AddWireguardPeer(hub Remote, name, gateway string) error {
-	remoteWriter := log.WithField("remote", "wireguard").WriterLevel(logrus.InfoLevel)
-	return hub.ExecuteCommandStream(fmt.Sprintf("hub wireguard %s %s", name, gateway), remoteWriter)
+	return hub.RunCmdToLog(fmt.Sprintf("hub wireguard %s %s", name, gateway))
 }

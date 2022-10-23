@@ -126,9 +126,19 @@ func (r Remote) Close() {
 	}
 }
 
-func (r Remote) ExecuteCommand(cmd string) (output []byte, err error) {
+func (r Remote) RunCmd(cmd string) (output []byte, err error) {
 	log.Debugf("Executing command: %v", cmd)
 	return r.client.Run(cmd)
+}
+
+func (r Remote) RunCmdToLog(cmd string) error {
+	out, err := r.RunCmd(cmd)
+	if err != nil {
+		return err
+	}
+
+	log.Info(string(out))
+	return nil
 }
 
 func (r Remote) WriteScriptToFile(script []byte, remotePath string) error {
@@ -140,7 +150,7 @@ func (r Remote) WriteDataToFile(data []byte, remotePath string) error {
 }
 
 func (r Remote) SymLink(oldPath, newPath string) error {
-	res, err := r.ExecuteCommand(fmt.Sprintf("ln -sf %s %s", oldPath, newPath))
+	res, err := r.RunCmd(fmt.Sprintf("ln -sf %s %s", oldPath, newPath))
 	if err != nil {
 		return fmt.Errorf("%v: %s", err, res)
 	}
@@ -215,7 +225,7 @@ func (r Remote) newTTYSession() (*ssh.Session, error) {
 	return session, nil
 }
 
-func (r Remote) ExecuteCommandStream(cmd string, writer io.Writer) (err error) {
+func (r Remote) StreamCmd(cmd string, writer io.WriteCloser) (err error) {
 	log.Debugf("Executing cmd: %v", cmd)
 	session, err := r.client.NewSession()
 	if err != nil {
@@ -232,7 +242,7 @@ func (r Remote) ExecuteCommandStream(cmd string, writer io.Writer) (err error) {
 		return fmt.Errorf("failed to run command: %v", err)
 	}
 
-	return nil
+	return writer.Close()
 }
 
 func (r Remote) OpenShell(shell string) (err error) {

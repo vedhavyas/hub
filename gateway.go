@@ -28,17 +28,17 @@ func SyncGateway(gateway Remote, init bool) error {
 		return err
 	}
 
-	res, err := gateway.ExecuteCommand("systemctl daemon-reload")
+	res, err := gateway.RunCmd("systemctl daemon-reload")
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	res, err = gateway.ExecuteCommand("systemctl reenable gateway.service")
+	res, err = gateway.RunCmd("systemctl reenable gateway.service")
 	if err != nil {
 		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
-	_, err = gateway.ExecuteCommand("mkdir -p /etc/default")
+	_, err = gateway.RunCmd("mkdir -p /etc/default")
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func initGateway(gateway Remote) error {
 	}
 
 	remoteWriter := log.WithField("gateway", "init").WriterLevel(logrus.DebugLevel)
-	err = gateway.ExecuteCommandStream("gateway-init", remoteWriter)
+	err = gateway.StreamCmd("gateway-init", remoteWriter)
 	if err != nil {
 		return err
 	}

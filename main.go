@@ -87,7 +87,7 @@ func main() {
 						Name:        "hub",
 						Description: "Reboot of hub",
 						Action: func(context *cli.Context) error {
-							_, err = hub.ExecuteCommand("reboot")
+							_, err = hub.RunCmd("reboot")
 							return err
 						},
 					},
@@ -107,7 +107,7 @@ func main() {
 								return fmt.Errorf("failed to connect to gateway: %v", err)
 							}
 							defer gateway.Close()
-							_, err = gateway.ExecuteCommand("reboot")
+							_, err = gateway.RunCmd("reboot")
 							return err
 						},
 					},
