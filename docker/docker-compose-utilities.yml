@@ -5,44 +5,6 @@ networks:
     external: true
 
 services:
-  bitwarden:
-    image: vaultwarden/server:alpine
-    container_name: bitwarden
-    hostname: bitwarden
-    restart: unless-stopped
-    user: $PUID:$PGID
-    networks:
-      - docker-direct
-    volumes:
-      - $DATA_DIR/bitwarden/:/data
-    environment:
-      - WEBSOCKET_ENABLED=true
-      - DOMAIN=https://bitwarden.hub
-      - SIGNUPS_ALLOWED=false
-      - ADMIN_TOKEN=admin
-      - SIGNUPS_VERIFY=true
-      - INVITATIONS_ALLOWED=true
-      - SMTP_HOST
-      - SMTP_FROM=$BITWARDEN_SMTP_FROM
-      - SMTP_FROM_NAME
-      - SMTP_PORT
-      - SMTP_SSL
-      - SMTP_USERNAME
-      - SMTP_PASSWORD
-    healthcheck:
-      test: curl -f http://bitwarden:80 &> /dev/null && echo "OK" || exit 1
-      interval: 5s
-    labels:
-      caddy: bitwarden.hub
-      caddy.reverse_proxy_0: "{{upstreams 80}}"
-      caddy.tls: internal
-      caddy.encode: gzip
-      caddy.header.X-XSS-Protection: '"1; mode=block;"'
-      caddy.header.X-Frame-Options: "DENY"
-      caddy.header.X-Content-Type-Options: "none"
-      caddy.reverse_proxy_1: "/notifications/hub/negotiate {{upstreams 80}}"
-      caddy.reverse_proxy_2: "/notifications/hub {{upstreams 3012}}"
-
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser:v2

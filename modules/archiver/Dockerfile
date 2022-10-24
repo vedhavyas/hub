@@ -1,5 +1,4 @@
 FROM golang:bullseye as builder
-
 RUN mkdir -p /go/archiver
 WORKDIR /go/archiver
 COPY . .
@@ -9,6 +8,4 @@ FROM debian:bullseye
 
 COPY --from=builder /go/archiver/archiver /app/archiver
 
-VOLUME /data
-
-ENTRYPOINT /app/archiver
+ENTRYPOINT ["/app/archiver"]
