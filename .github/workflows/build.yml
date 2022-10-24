@@ -3,6 +3,7 @@ on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
   workflow_dispatch:
+  push:
 name: Build
 jobs:
   build:

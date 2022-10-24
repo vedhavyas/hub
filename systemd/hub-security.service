@@ -5,7 +5,7 @@ After=docker.service hub-deps.service
 
 [Service]
 Type=oneshot
-ExecStart=/sbin/hub run-script exctract_executables
+ExecStart=/sbin/hub run-script extract_executables
 ExecStart=/sbin/hub run-script network
 ExecStart=/sbin/hub run-script firewall
 RemainAfterExit=true
