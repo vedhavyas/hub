@@ -61,6 +61,11 @@ func main() {
 						log.Print("initiating backup dir...")
 					}
 
+					if time.Now().UTC().Sub(state.LastSuccessfulBackup) < 6*time.Hour {
+						log.Print("skipping backup...")
+						return nil
+					}
+
 					state.IsBackupRunning = true
 					err = saveStateFile(backupDir, state)
 					if err != nil {

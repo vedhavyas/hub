@@ -99,6 +99,7 @@ services:
     image: vedhavyas/archiver:latest
     container_name: archiver
     hostname: archiver
+    pull_policy: always
     # we need to give root access
     user: root:root
     networks:
