@@ -107,9 +107,7 @@ services:
     volumes:
       - $DATA_DIR:$DATA_DIR
       - $HUB_DIR/backups/hub:$HUB_DIR/backups/hub
-    command: backup $DATA_DIR $HUB_DIR/backups/hub
-    deploy:
-      restart_policy:
-        condition: unless-stopped
-        # run every 12 hrs
-        delay: 12h
+    restart: unless-stopped
+    environment:
+      - SRC=$DATA_DIR
+      - BACKUP=$HUB_DIR/backups/hub

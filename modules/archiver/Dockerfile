@@ -5,7 +5,10 @@ COPY . .
 RUN go build ./...
 
 FROM debian:bullseye
-
 COPY --from=builder /go/archiver/archiver /app/archiver
+# Install cron
+RUN apt-get update && apt-get install -y cron
 
-ENTRYPOINT ["/app/archiver"]
+WORKDIR /
+COPY entrypoint.sh .
+ENTRYPOINT /entrypoint.sh
