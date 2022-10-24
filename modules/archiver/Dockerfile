@@ -10,5 +10,6 @@ COPY --from=builder /go/archiver/archiver /app/archiver
 RUN apt-get update && apt-get install -y cron
 
 WORKDIR /
-COPY entrypoint.sh .
+COPY entrypoint.sh entrypoint.sh
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT /entrypoint.sh
