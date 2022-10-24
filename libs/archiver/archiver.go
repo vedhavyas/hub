@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
+	logger "log"
 	"os"
 	"os/exec"
 	"strings"
@@ -13,8 +13,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// DefaultRetentionWeeks number of weeks backups are kept
+const DefaultRetentionWeeks = 4
+
 // we are doing an incremental backups using tar
-// restoring would be just extracting from oldest archive
+// restoring would be just extracting from the oldest archive
 // Use it as
 // archiver.sh backup|restore src dest [extra-args for tar]
 // (no trailing / for both src and dest)
@@ -22,15 +25,23 @@ import (
 
 // State of the backup.
 type State struct {
-	LastSuccessfulBackup time.Time           `toml:"last_successful_backup"`
-	IsBackupRunning      bool                `toml:"is_backup_running"`
-	Backups              map[string][]string `toml:"backups"`
+	LastSuccessfulBackup time.Time      `toml:"last_successful_backup"`
+	IsBackupRunning      bool           `toml:"is_backup_running"`
+	WeeklyBackups        []WeeklyBackup `toml:"weekly_backups"`
 }
+
+// WeeklyBackup contains a base tar with
+type WeeklyBackup struct {
+	YearWeek     string   `toml:"year_week"`
+	DailyBackups []string `toml:"daily_backups"`
+}
+
+var log = logger.New(os.Stdout, "", 0)
 
 func main() {
 	app := cli.App{
-		Name:  "hub",
-		Usage: "Hub",
+		Name:  "archiver",
+		Usage: "Archiver",
 		Commands: []*cli.Command{
 			{
 				Name:        "backup",
@@ -47,9 +58,7 @@ func main() {
 
 					state, err := loadStateFile(backupDir)
 					if err != nil {
-						state = State{
-							Backups: map[string][]string{},
-						}
+						log.Print("initiating backup dir...")
 					}
 
 					state.IsBackupRunning = true
@@ -58,16 +67,31 @@ func main() {
 						return err
 					}
 
-					log.Print("test")
 					yearWeek, tarFileName, err := backup(src, backupDir)
 					if err != nil {
 						return err
 					}
 
+					weeklyBackup := WeeklyBackup{YearWeek: yearWeek}
+					if len(state.WeeklyBackups) > 0 {
+						wb := state.WeeklyBackups[len(state.WeeklyBackups)-1]
+						if wb.YearWeek == yearWeek {
+							state.WeeklyBackups = state.WeeklyBackups[:len(state.WeeklyBackups)-1]
+							weeklyBackup = wb
+						}
+					}
+
+					weeklyBackup.DailyBackups = append(weeklyBackup.DailyBackups, tarFileName)
 					state.LastSuccessfulBackup = time.Now().UTC()
 					state.IsBackupRunning = false
-					state.Backups[yearWeek] = append(state.Backups[yearWeek], tarFileName)
-					return saveStateFile(backupDir, state)
+					state.WeeklyBackups = append(state.WeeklyBackups, weeklyBackup)
+					err = saveStateFile(backupDir, state)
+					if err != nil {
+						return err
+					}
+
+					log.Print("cleaning up...")
+					return cleanup(state, backupDir)
 				},
 			},
 			{
@@ -96,10 +120,30 @@ func main() {
 	}
 }
 
+func cleanup(state State, backupDir string) error {
+	if len(state.WeeklyBackups) <= DefaultRetentionWeeks {
+		return nil
+	}
+
+	toRemove := len(state.WeeklyBackups) - DefaultRetentionWeeks
+	var toRemoveDirs []WeeklyBackup
+	toRemoveDirs, state.WeeklyBackups = state.WeeklyBackups[:toRemove], state.WeeklyBackups[toRemove:]
+	for _, backup := range toRemoveDirs {
+		dir := fmt.Sprintf("%s/%s", backupDir, backup.YearWeek)
+		log.Printf("deleting backup[%s]...", dir)
+		err := os.RemoveAll(dir)
+		if err != nil {
+			return fmt.Errorf("failed to remove weekly backup[%s], %v", dir, err)
+		}
+	}
+
+	return saveStateFile(backupDir, state)
+}
+
 func restore(backupDir, src string) error {
 	// (no trailing / for both src and dest)
 	src, backupDir = strings.TrimSuffix(src, "/"), strings.TrimSuffix(backupDir, "/")
-	yearWeek, backups, err := findLatestBackup(backupDir)
+	weeklyBackup, err := findLatestBackup(backupDir)
 	if err != nil {
 		return err
 	}
@@ -109,9 +153,9 @@ func restore(backupDir, src string) error {
 		return err
 	}
 
-	log.Print("starting restore...")
-	for _, backup := range backups {
-		tarfile := fmt.Sprintf("%s/%s/%s.tgz", backupDir, yearWeek, backup)
+	log.Printf("starting restore from backup[%s]...", weeklyBackup.YearWeek)
+	for _, backup := range weeklyBackup.DailyBackups {
+		tarfile := fmt.Sprintf("%s/%s/%s.tgz", backupDir, weeklyBackup.YearWeek, backup)
 		log.Printf("restoring %s...", tarfile)
 		err = restoreTar(tarfile)
 		if err != nil {
@@ -153,20 +197,17 @@ func ensureSrcIsEmpty(src string) error {
 	return fmt.Errorf("src directory must be empty")
 }
 
-func findLatestBackup(backupDir string) (yearWeek string, backups []string, err error) {
+func findLatestBackup(backupDir string) (weeklyBackup WeeklyBackup, err error) {
 	state, err := loadStateFile(backupDir)
 	if err != nil {
-		return yearWeek, nil, fmt.Errorf("failed to load back up state: %v", err)
+		return weeklyBackup, fmt.Errorf("failed to load back up state: %v", err)
 	}
 
-	yearWeek, _ = getYearWeekAndTime()
-	backups, ok := state.Backups[yearWeek]
-	if ok {
-		return yearWeek, backups, nil
+	if len(state.WeeklyBackups) < 1 {
+		return weeklyBackup, fmt.Errorf("no backup found")
 	}
 
-	// TODO: decrement week and check the older back up until max week stored.
-	return yearWeek, nil, fmt.Errorf("no backup found")
+	return state.WeeklyBackups[len(state.WeeklyBackups)-1], nil
 }
 
 func backup(src, backupDir string) (yearWeek, time string, err error) {
@@ -186,7 +227,6 @@ func backup(src, backupDir string) (yearWeek, time string, err error) {
 		log.Print("doing full backup...")
 	}
 
-	log.Print("starting backup...")
 	backupFileName := fmt.Sprintf("%s/%s", wd, time)
 	err = backupWithTar(src, stateFile, backupFileName)
 	if err != nil {
@@ -288,13 +328,13 @@ func getYearWeekAndTime() (yearWeek, date string) {
 	return yearWeek, date
 }
 
-func saveStateFile(dir string, state State) error {
-	err := os.MkdirAll(dir, 0755)
+func saveStateFile(backupdir string, state State) error {
+	err := os.MkdirAll(backupdir, 0755)
 	if err != nil {
 		return err
 	}
 
-	f, err := os.Create(fmt.Sprintf("%s/state.toml", dir))
+	f, err := os.Create(fmt.Sprintf("%s/state.toml", backupdir))
 	if err != nil {
 		return err
 	}
