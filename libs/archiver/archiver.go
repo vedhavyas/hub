@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -34,17 +35,17 @@ func main() {
 			{
 				Name:        "backup",
 				Aliases:     []string{"b"},
-				Usage:       "archiver backup src dst",
+				Usage:       "archiver backup src backupDir",
 				Description: "Backup using tar and gzip.",
-				ArgsUsage:   "Takes src and dst folder.",
+				ArgsUsage:   "Takes src and backUp folder.",
 				Action: func(context *cli.Context) error {
 					args := context.Args()
-					src, dst := args.Get(0), args.Get(1)
-					if src == "" || dst == "" {
-						return fmt.Errorf("src or dst is empty")
+					src, backupDir := args.Get(0), args.Get(1)
+					if src == "" || backupDir == "" {
+						return fmt.Errorf("src or backupDir is empty")
 					}
 
-					state, err := loadStateFile(dst)
+					state, err := loadStateFile(backupDir)
 					if err != nil {
 						state = State{
 							Backups: map[string][]string{},
@@ -52,13 +53,13 @@ func main() {
 					}
 
 					state.IsBackupRunning = true
-					err = saveStateFile(dst, state)
+					err = saveStateFile(backupDir, state)
 					if err != nil {
 						return err
 					}
 
 					log.Print("test")
-					yearWeek, tarFileName, err := backup(src, dst)
+					yearWeek, tarFileName, err := backup(src, backupDir)
 					if err != nil {
 						return err
 					}
@@ -66,7 +67,23 @@ func main() {
 					state.LastSuccessfulBackup = time.Now().UTC()
 					state.IsBackupRunning = false
 					state.Backups[yearWeek] = append(state.Backups[yearWeek], tarFileName)
-					return saveStateFile(dst, state)
+					return saveStateFile(backupDir, state)
+				},
+			},
+			{
+				Name:        "restore",
+				Aliases:     []string{"r"},
+				Usage:       "archiver restore src backupDir",
+				Description: "Restore using tar and gzip.",
+				ArgsUsage:   "Takes src and backUp folder.",
+				Action: func(context *cli.Context) error {
+					args := context.Args()
+					src, backupDir := args.Get(0), args.Get(1)
+					if src == "" || backupDir == "" {
+						return fmt.Errorf("src or backupDir is empty")
+					}
+
+					return restore(backupDir, src)
 				},
 			},
 		},
@@ -79,11 +96,84 @@ func main() {
 	}
 }
 
-func backup(src, dst string) (yearWeek, time string, err error) {
+func restore(backupDir, src string) error {
 	// (no trailing / for both src and dest)
-	src, dst = strings.TrimSuffix(src, "/"), strings.TrimSuffix(dst, "/")
+	src, backupDir = strings.TrimSuffix(src, "/"), strings.TrimSuffix(backupDir, "/")
+	yearWeek, backups, err := findLatestBackup(backupDir)
+	if err != nil {
+		return err
+	}
+
+	err = ensureSrcIsEmpty(src)
+	if err != nil {
+		return err
+	}
+
+	log.Print("starting restore...")
+	for _, backup := range backups {
+		tarfile := fmt.Sprintf("%s/%s/%s.tgz", backupDir, yearWeek, backup)
+		log.Printf("restoring %s...", tarfile)
+		err = restoreTar(tarfile)
+		if err != nil {
+			return fmt.Errorf("failed to restore[%s]: %v", tarfile, err)
+		}
+	}
+	log.Print("restore done.")
+	return nil
+}
+
+func restoreTar(tarFile string) error {
+	cmd := exec.Command("tar",
+		"-vv", "--extract",
+		fmt.Sprintf("--file=%s", tarFile),
+		"--listed-incremental=/dev/null",
+		"--directory=/")
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func ensureSrcIsEmpty(src string) error {
+	err := os.MkdirAll(src, 0755)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.ReadDir(1)
+	if err == io.EOF {
+		return nil
+	}
+
+	return fmt.Errorf("src directory must be empty")
+}
+
+func findLatestBackup(backupDir string) (yearWeek string, backups []string, err error) {
+	state, err := loadStateFile(backupDir)
+	if err != nil {
+		return yearWeek, nil, fmt.Errorf("failed to load back up state: %v", err)
+	}
+
+	yearWeek, _ = getYearWeekAndTime()
+	backups, ok := state.Backups[yearWeek]
+	if ok {
+		return yearWeek, backups, nil
+	}
+
+	// TODO: decrement week and check the older back up until max week stored.
+	return yearWeek, nil, fmt.Errorf("no backup found")
+}
+
+func backup(src, backupDir string) (yearWeek, time string, err error) {
+	// (no trailing / for both src and dest)
+	src, backupDir = strings.TrimSuffix(src, "/"), strings.TrimSuffix(backupDir, "/")
 	yearWeek, time = getYearWeekAndTime()
-	wd := fmt.Sprintf("%s/%s", dst, yearWeek)
+	wd := fmt.Sprintf("%s/%s", backupDir, yearWeek)
 
 	// fetch next state file
 	stateFile, exists, err := fetchNextStateFile(wd, time)
