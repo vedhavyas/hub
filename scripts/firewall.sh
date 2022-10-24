@@ -4,19 +4,8 @@
 systemctl disable ufw.service
 apt purge ufw -y
 
-# enable ip forwarding
-sed -i 's/.*net.ipv4.ip_forward.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
-
-# disable ipv6
-if ! (grep -iq "net.ipv6.conf.all.disable_ipv6" /etc/sysctl.conf && sed -i 's/.*net.ipv6.conf.all.disable_ipv6.*/net.ipv6.conf.all.disable_ipv6=1/' /etc/sysctl.conf); then
-  echo "net.ipv6.conf.all.disable_ipv6=1" >> /etc/sysctl.conf
-fi
-
-# VM Overcommit Memory
-# from https://gitlab.com/cyber5k/mistborn/-/blob/master/scripts/subinstallers/iptables.sh
-if ! (grep -iq "vm.overcommit_memory" /etc/sysctl.conf && sed -i 's/.*vm.overcommit_memory.*/vm.overcommit_memory=1/' /etc/sysctl.conf); then
-  echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
-fi
+# systctl conf
+cp "${CONF_DIR}"/sysctl.conf /etc/sysctl.conf
 
 # Force re-read of sysctl.conf
 sysctl -p /etc/sysctl.conf
