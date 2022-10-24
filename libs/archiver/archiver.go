@@ -140,6 +140,10 @@ func cleanup(state State, backupDir string) error {
 	return saveStateFile(backupDir, state)
 }
 
+// we use directory as / since we created with full path and tar tries to recreate it as is
+// https://stackoverflow.com/questions/3153683/how-do-i-exclude-absolute-paths-for-tar may help if you want to exclude
+// path
+
 func restore(backupDir, src string) error {
 	// (no trailing / for both src and dest)
 	src, backupDir = strings.TrimSuffix(src, "/"), strings.TrimSuffix(backupDir, "/")

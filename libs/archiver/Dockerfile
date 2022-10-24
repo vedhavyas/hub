@@ -1,11 +1,11 @@
-FROM golang:alpine as builder
+FROM golang:bullseye as builder
 
 RUN mkdir -p /go/archiver
 WORKDIR /go/archiver
 COPY . .
 RUN go build ./...
 
-FROM alpine
+FROM debian:bullseye
 
 COPY --from=builder /go/archiver/archiver /app/archiver
 
