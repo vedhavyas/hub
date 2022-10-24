@@ -52,8 +52,8 @@ backup)
 restore)
   shift
   data="${1:-hub}"
-  run_script archiver restore "$DATA_DIR" $HUB_DIR/backups/"${data}" || { hub notify "Hub updates" "Appdata restore failed!"; }
-  hub notify "Hub updates" "Appdata restore successful!"
+  run_script archiver restore "$DATA_DIR" $HUB_DIR/backups/"${data}" || { hub notify "Hub updates" "Hub restore failed!"; }
+  hub notify "Hub updates" "Hub restore successful!"
   ;;
 
 # notify title message
