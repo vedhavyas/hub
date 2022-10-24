@@ -174,7 +174,7 @@ func loadSystemdUnits(session Remote) error {
 		}
 	}
 
-	dailyScripts := []string{"backup", "certbot"}
+	dailyScripts := []string{"certbot"}
 	for _, script := range dailyScripts {
 		res, err = session.RunCmd(fmt.Sprintf("systemctl reenable hub-script@%s.service", script))
 		if err != nil {

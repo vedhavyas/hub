@@ -105,9 +105,9 @@ services:
     networks:
       - docker-direct
     volumes:
-      - $DATA_DIR:/src
-      - $HUB_DIR/backups/hub:/backup
-    command: backup /src /backup
+      - $DATA_DIR:$DATA_DIR
+      - $HUB_DIR/backups/hub:$HUB_DIR/backups/hub
+    command: backup $DATA_DIR $HUB_DIR/backups/hub
     deploy:
       restart_policy:
         condition: unless-stopped

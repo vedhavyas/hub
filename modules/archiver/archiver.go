@@ -15,6 +15,7 @@ import (
 
 // DefaultRetentionWeeks number of weeks backups are kept
 const DefaultRetentionWeeks = 4
+const MinimumTimeToBackupInHrs = 12
 
 // we are doing an incremental backups using tar
 // restoring would be just extracting from the oldest archive
@@ -61,7 +62,7 @@ func main() {
 						log.Print("initiating backup dir...")
 					}
 
-					if time.Now().UTC().Sub(state.LastSuccessfulBackup) < 6*time.Hour {
+					if time.Now().UTC().Sub(state.LastSuccessfulBackup) < MinimumTimeToBackupInHrs*time.Hour {
 						log.Print("skipping backup...")
 						return nil
 					}
