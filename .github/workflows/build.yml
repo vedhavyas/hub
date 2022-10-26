@@ -1,7 +1,7 @@
 # Workflow builds docker images of libs and pushes images to docker hub
 on:
   schedule:
-    - cron: '0 0 * * *'  # every day at midnight
+    - cron: '0 0 * * SUN'  # every sunday at 12
   workflow_dispatch:
   push:
 name: Build
