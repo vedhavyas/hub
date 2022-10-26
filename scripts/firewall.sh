@@ -89,6 +89,12 @@ for port in ${ports[*]} ; do
   iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport "${port}" -j DNAT --to 10.10.2.5:"${port}"
 done
 
+# port forward to certbot
+ports=(80 443)
+for port in ${ports[*]} ; do
+  iptables -t nat -A PREROUTING -i "${eth0}" -p tcp --dport "${port}" -j DNAT --to 10.10.2.7:"${port}"
+done
+
 # port forward host to qbittorrent
 source "${DATA_DIR}"/mullvad/mullvad.env
 PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}

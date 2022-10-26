@@ -97,6 +97,7 @@ func main() {
 					}
 
 					log.Print("cleaning up...")
+					defer log.Print("done.")
 					return cleanup(state, backupDir)
 				},
 			},

@@ -8,7 +8,7 @@ import (
 
 func SyncGateway(gateway Remote, init bool) error {
 	log.Infof("Syncing %s files...\n", gateway.connection.Name)
-	fileData, err := staticFS.ReadFile("scripts/gateway_exit_node.sh")
+	fileData, err := staticFS.ReadFile("scripts/gateway/gateway.sh")
 	if err != nil {
 		return err
 	}
@@ -18,7 +18,7 @@ func SyncGateway(gateway Remote, init bool) error {
 		return err
 	}
 
-	fileData, err = staticFS.ReadFile("systemd/gateway_exit_node.service")
+	fileData, err = staticFS.ReadFile("systemd/gateway/gateway.service")
 	if err != nil {
 		return err
 	}

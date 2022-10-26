@@ -79,7 +79,7 @@ func SyncHub(remote Remote, init bool) error {
 	}
 
 	// copy systemd unit files
-	_, err = remote.RunCmd("cp /opt/hub/systemd/* /etc/systemd/system/")
+	_, err = remote.RunCmd("cp /opt/hub/systemd/hub-* /etc/systemd/system/")
 	if err != nil {
 		return fmt.Errorf("failed to create sym links for systemd unit files: %v", err)
 	}
@@ -149,6 +149,10 @@ func loadSystemdUnits(session Remote) error {
 			continue
 		}
 
+		if !strings.HasPrefix(file.Name(), "hub-") {
+			continue
+		}
+
 		unitNames = append(unitNames, file.Name())
 	}
 
@@ -172,24 +176,6 @@ func loadSystemdUnits(session Remote) error {
 		if err != nil {
 			return fmt.Errorf("%v(%v)", string(res), err)
 		}
-	}
-
-	dailyScripts := []string{"certbot"}
-	for _, script := range dailyScripts {
-		res, err = session.RunCmd(fmt.Sprintf("systemctl reenable hub-script@%s.service", script))
-		if err != nil {
-			return fmt.Errorf("%v(%v)", string(res), err)
-		}
-
-		res, err = session.RunCmd(fmt.Sprintf("systemctl reenable hub-daily@%s.timer", script))
-		if err != nil {
-			return fmt.Errorf("%v(%v)", string(res), err)
-		}
-	}
-
-	res, err = session.RunCmd("systemctl restart 'hub-*.timer'")
-	if err != nil {
-		return fmt.Errorf("%v(%v)", string(res), err)
 	}
 
 	return nil

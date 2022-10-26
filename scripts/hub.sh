@@ -37,10 +37,6 @@ status)
   systemctl list-units 'hub-*' docker.service
   docker compose ls
   ;;
-certbot )
-  run_script certbot || { hub notify "Hub updates" "Certbot renewal failed!"; }
-  hub notify "Hub updates" "Certbot renewal successful!"
-  ;;
 # notify title message
 notify )
   shift

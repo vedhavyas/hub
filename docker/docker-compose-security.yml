@@ -111,3 +111,19 @@ services:
     environment:
       - SRC=$DATA_DIR
       - BACKUP=$HUB_DIR/backups/hub
+
+  certbot:
+    image: vedhavyas/certbot:latest
+    container_name: certbot
+    hostname: certbot
+    pull_policy: always
+    networks:
+      docker-direct:
+        ipv4_address: 10.10.2.7
+    volumes:
+      - ${DATA_DIR}/certbot/certs:/etc/letsencrypt
+      - ${DATA_DIR}/certbot/logs:/var/log/letsencrypt
+    restart: unless-stopped
+    environment:
+      - ADMIN_EMAIL=$SERVER_DOMAIN_EMAIL
+      - DOMAINS=mail.$SERVER_DOMAIN
