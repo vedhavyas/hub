@@ -52,7 +52,6 @@ func splitDomains(domains string) []string {
 }
 
 func issueCertDomain(domain, adminEmail string) error {
-	// certonly  -d mail."${SERVER_DOMAIN}" -m "${SERVER_DOMAIN_EMAIL}" --non-interactive --agree-tos
 	cmd := exec.Command(
 		"certbot",
 		"certonly",

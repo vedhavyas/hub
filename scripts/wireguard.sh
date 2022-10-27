@@ -80,7 +80,7 @@ PrivateKey = $(wg genkey | tee "wgclient_$CLIENT_NAME.key")
 PublicKey = $(wg pubkey < wghub.key)
 PresharedKey = $(cat wgpsk.key)
 AllowedIPs = $WG_CLIENT_ALLOWED_IPS
-Endpoint = $SERVER_DOMAIN:$WG_HUB_PORT
+Endpoint = $DOMAIN:$WG_HUB_PORT
 PersistentKeepalive = 25
 EOF
 }

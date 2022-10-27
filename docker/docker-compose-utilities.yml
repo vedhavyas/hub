@@ -48,14 +48,14 @@ services:
       - SYMFONY__ENV__SERVER_NAME="My bookmarks"
       - SYMFONY__ENV__FOSUSER_REGISTRATION=false
       - SYMFONY__ENV__FOSUSER_CONFIRMATION=false
-      - SYMFONY__ENV__MAILER_HOST
-      - SYMFONY__ENV__MAILER_PORT
-      - SYMFONY__ENV__MAILER_AUTH_MODE
-      - SYMFONY__ENV__MAILER_ENCRYPTION
-      - SYMFONY__ENV__MAILER_USER
+      - SYMFONY__ENV__MAILER_HOST=mail.$DOMAIN
+      - SYMFONY__ENV__MAILER_PORT=587
+      - SYMFONY__ENV__MAILER_AUTH_MODE="login
+      - SYMFONY__ENV__MAILER_ENCRYPTION="tls
+      - SYMFONY__ENV__MAILER_USER=wallabag@$DOMAIN
       - SYMFONY__ENV__MAILER_PASSWORD
-      - SYMFONY__ENV__FROM_EMAIL
-      - SYMFONY__ENV__TWOFACTOR_SENDER
+      - SYMFONY__ENV__FROM_EMAIL=wallabag@$DOMAIN
+      - SYMFONY__ENV__TWOFACTOR_SENDER=wallabag@$DOMAIN
     volumes:
       - '$DATA_DIR/wallabag/data:/var/www/wallabag/data'
       - '$DATA_DIR/wallabag/images:/var/www/wallabag/web/assets/images'
@@ -146,8 +146,8 @@ services:
     image: kimai/kimai2:apache
     hostname: kimai
     environment:
-      - ADMINMAIL
-      - ADMINPASS
+      - ADMINMAIL=$KIMAI_ADMINMAIL
+      - ADMINPASS=$KIMA_ADMINPASS
       - DATABASE_URL=mysql://kimai:kimai@mysql/kimai
       - TRUSTED_HOSTS=kimai.hub,localhost,127.0.0.1
     depends_on:

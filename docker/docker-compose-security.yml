@@ -47,7 +47,7 @@ services:
       - PIHOLE_DNS_=unbound
       - WEBTHEME="default-dark"
       - WEBPASSWORD=pihole
-      - ADMIN_EMAIL=${PIHOLE_ADMIN_EMAIL}
+      - ADMIN_EMAIL
     volumes:
       - '$DATA_DIR/pihole/etc-pihole:/etc/pihole'
       - '$DATA_DIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
@@ -74,12 +74,12 @@ services:
       - ADMIN_TOKEN=admin
       - SIGNUPS_VERIFY=true
       - INVITATIONS_ALLOWED=true
-      - SMTP_HOST
-      - SMTP_FROM=$BITWARDEN_SMTP_FROM
-      - SMTP_FROM_NAME
-      - SMTP_PORT
-      - SMTP_SSL
-      - SMTP_USERNAME
+      - SMTP_HOST=mail.$DOMAIN
+      - SMTP_FROM=bitwarden@$DOMAIN
+      - SMTP_FROM_NAME=Bitwarden
+      - SMTP_PORT=587
+      - SMTP_SSL="true
+      - SMTP_USERNAME=bitwarden@$DOMAIN
       - SMTP_PASSWORD
     healthcheck:
       test: curl -f http://bitwarden:80 &> /dev/null && echo "OK" || exit 1
@@ -125,5 +125,5 @@ services:
       - ${DATA_DIR}/certbot/logs:/var/log/letsencrypt
     restart: unless-stopped
     environment:
-      - ADMIN_EMAIL=$SERVER_DOMAIN_EMAIL
-      - DOMAINS=mail.$SERVER_DOMAIN
+      - ADMIN_EMAIL
+      - DOMAINS=mail.$DOMAIN
