@@ -50,8 +50,8 @@ services:
       - SYMFONY__ENV__FOSUSER_CONFIRMATION=false
       - SYMFONY__ENV__MAILER_HOST=mail.$DOMAIN
       - SYMFONY__ENV__MAILER_PORT=587
-      - SYMFONY__ENV__MAILER_AUTH_MODE="login
-      - SYMFONY__ENV__MAILER_ENCRYPTION="tls
+      - SYMFONY__ENV__MAILER_AUTH_MODE=login
+      - SYMFONY__ENV__MAILER_ENCRYPTION=tls
       - SYMFONY__ENV__MAILER_USER=wallabag@$DOMAIN
       - SYMFONY__ENV__MAILER_PASSWORD
       - SYMFONY__ENV__FROM_EMAIL=wallabag@$DOMAIN
@@ -147,7 +147,7 @@ services:
     hostname: kimai
     environment:
       - ADMINMAIL=$KIMAI_ADMINMAIL
-      - ADMINPASS=$KIMA_ADMINPASS
+      - ADMINPASS=$KIMAI_ADMINPASS
       - DATABASE_URL=mysql://kimai:kimai@mysql/kimai
       - TRUSTED_HOSTS=kimai.hub,localhost,127.0.0.1
     depends_on:
