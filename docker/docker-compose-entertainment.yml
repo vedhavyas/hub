@@ -24,7 +24,7 @@ services:
       docker-vpn:
         ipv4_address: 10.10.3.2
     healthcheck:
-      test: '[[ "$$(curl https://icanhazip.com)" != "${HOST_IP}" ]] && echo "OK" || exit 1'
+      test: 'HOST_IP="${HOST_IP}"; [[ -n $${HOST_IP} && "$$(curl -s https://icanhazip.com)" != "$${HOST_IP}" ]] && echo "OK" || { echo "VPN failed"; exit 1; }'
       interval: 15s
     labels:
       caddy: qbittorrent.hub
