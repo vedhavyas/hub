@@ -1,0 +1,119 @@
+version: "3.9"
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  immich-server:
+    container_name: immich_server
+    hostname: immich_server
+    image: altran1502/immich-server:latest
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "./start-server.sh"]
+    networks:
+      - docker-direct
+    volumes:
+      - $HUB_DIR/media/photos:/usr/src/app/upload
+    env_file:
+      - ${CONF_DIR}/immich.conf
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=IMMICH_JWT_SECRET
+    depends_on:
+      - immich-redis
+      - immich-postgres
+
+  immich-microservices:
+    container_name: immich_microservices
+    hostname: immich_microservices
+    image: altran1502/immich-server:latest
+    entrypoint: ["/bin/sh", "./start-microservices.sh"]
+    networks:
+      - docker-direct
+    volumes:
+      - $HUB_DIR/media/photos:/usr/src/app/upload
+    env_file:
+      - ${CONF_DIR}/immich.conf
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=IMMICH_JWT_SECRET
+    depends_on:
+      - immich-redis
+      - immich-postgres
+    restart: unless-stopped
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    hostname: immich_machine_learning
+    image: altran1502/immich-machine-learning:latest
+    networks:
+      - docker-direct
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    volumes:
+      - $HUB_DIR/media/photos:/usr/src/app/upload
+    env_file:
+      - ${CONF_DIR}/immich.conf
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=IMMICH_JWT_SECRET
+    depends_on:
+      - immich-postgres
+    restart: unless-stopped
+
+  immich-redis:
+    container_name: immich_redis
+    hostname: immich_redis
+    image: redis:6.2
+    restart: unless-stopped
+    volumes:
+      - $DATA_DIR/immich/redis/:/data
+    networks:
+      - docker-direct
+
+  immich-postgres:
+    container_name: immich_postgres
+    hostname: immich_postgres
+    image: postgres:14
+    networks:
+      - docker-direct
+    environment:
+      POSTGRES_PASSWORD: immich
+      POSTGRES_USER: immich
+      POSTGRES_DB: immich
+      PG_DATA: /var/lib/postgresql/data
+    volumes:
+      - $DATA_DIR/immich/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  immich-web:
+    image: altran1502/immich-web:latest
+    container_name: immich_web
+    hostname: immich_web
+    entrypoint: [ "/bin/sh", "./entrypoint.sh" ]
+    env_file:
+      - ${CONF_DIR}/immich.conf
+    environment:
+      - JWT_SECRET=IMMICH_JWT_SECRET
+    restart: unless-stopped
+    networks:
+      - docker-direct
+
+  immich-proxy:
+    hostname: immich_proxy
+    container_name: immich_proxy
+    image: altran1502/immich-proxy:latest
+    networks:
+      # have to use static ip since the android app
+      # built with flutter http client doesn't support self-signed yet
+      # https://github.com/immich-app/immich/issues/765
+      docker-direct:
+        ipv4_address: 10.10.2.8
+    depends_on:
+      - immich-server
+    restart: unless-stopped
+    labels:
+      caddy: photos.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
