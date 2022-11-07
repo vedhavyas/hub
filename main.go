@@ -158,13 +158,32 @@ func main() {
 				Usage: "Restart hub services",
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
-						Name:     "service",
-						Aliases:  []string{"s"},
-						Required: true,
+						Name:    "service",
+						Aliases: []string{"s"},
+					},
+					&cli.StringSliceFlag{
+						Name:    "container",
+						Aliases: []string{"c"},
 					},
 				},
 				Action: func(context *cli.Context) error {
-					return RestartServices(hub, context.StringSlice("service")...)
+					services := context.StringSlice("service")
+					if len(services) > 0 {
+						err = RestartServices(hub, services...)
+						if err != nil {
+							return err
+						}
+					}
+
+					containers := context.StringSlice("container")
+					if len(containers) > 0 {
+						err = RestartDockerContainers(hub, containers)
+						if err != nil {
+							return err
+						}
+					}
+
+					return nil
 				},
 			},
 

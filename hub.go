@@ -290,3 +290,7 @@ func ExecMail(hub Remote, args ...string) error {
 func AddWireguardPeer(hub Remote, name, gateway string) error {
 	return hub.RunCmdToLog(fmt.Sprintf("hub wireguard %s %s", name, gateway))
 }
+
+func RestartDockerContainers(hub Remote, containers []string) error {
+	return hub.RunCmdToLog(fmt.Sprintf("docker restart %s", strings.Join(containers, " ")))
+}
