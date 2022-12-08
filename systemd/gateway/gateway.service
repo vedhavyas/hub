@@ -7,6 +7,7 @@ After=network-online.target
 Type=oneshot
 ExecStart=/usr/sbin/gateway
 RemainAfterExit=true
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
