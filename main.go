@@ -81,7 +81,7 @@ func main() {
 
 			{
 				Name:  "reboot",
-				Usage: "Reboot services",
+				Usage: "Reboot system",
 				Subcommands: []*cli.Command{
 					{
 						Name:        "hub",
