@@ -1,0 +1,42 @@
+version: "3.9"
+
+networks:
+  docker-vpn:
+    external: true
+
+services:
+  kavita:
+    image: kizaing/kavita:latest
+    container_name: kavita
+    networks:
+      - docker-vpn
+    volumes:
+      - $DATA_DIR/kavita:/kavita/config
+      - $HUB_DIR/media/books/:/books
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:5000 || exit 1
+      interval: 300s
+      retries: 3
+      start_period: 30s
+      timeout: 15s
+    labels:
+      caddy: books.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5000}}"
+
+  kavitaemail:
+    image: kizaing/kavitaemail:latest
+    container_name: kavitaemail
+    networks:
+      - docker-vpn
+    environment:
+      - SMTP_HOST=mail.$DOMAIN
+      - SMTP_PORT=587
+      - SMTP_USER=kavita@$DOMAIN
+      - SMTP_PASS=$KAVITA_SMTP_PASSWORD
+      - SEND_ADDR=kavita@$DOMAIN
+      - DISP_NAME=Kavita
+      - ALLOW_SENDTO=false
+    restart: unless-stopped
+
