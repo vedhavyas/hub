@@ -2,12 +2,12 @@ mod types;
 
 use crate::types::{AuthenticatedUser, Item, Items};
 use chrono::{DateTime, Days, Utc};
-use log::{debug, info, Level};
+use log::{debug, info};
 use reqwest::blocking::Client;
 use std::env;
 
 fn main() -> Result<(), Error> {
-    simple_logger::init_with_level(Level::Info).unwrap();
+    simple_logger::init_with_env().unwrap();
     let emby_host = env::var("EMBY_HOST").map_err(|_| Error::MissingEmbyHost)?;
     let username = env::var("EMBY_USERNAME").map_err(|_| Error::MissingEmbyUsername)?;
     let pwd = env::var("EMBY_PWD").map_err(|_| Error::MissingEmbyPassword)?;
@@ -136,7 +136,7 @@ impl MediaCleaner {
                 if let Some(watched_time) = item.user_data.last_played_date {
                     let res = watched_time.le(&self.time_threshold);
                     if res {
-                        info!("Movie marked for delete: {}", item.name);
+                        debug!("Movie marked for delete: {}", item.name);
                     }
                     res
                 } else {
@@ -180,7 +180,7 @@ impl MediaCleaner {
                 let values: Vec<(String, String, Vec<Item>)> = seasons
                     .into_iter()
                     .filter_map(|season| {
-                        debug!("Checking TV Show season: {}", season.name);
+                        debug!("Checking TV Show {}: {}", series, season.name);
                         if season.can_delete && !season.user_data.is_favorite {
                             self.fetch_items(Some(&season.id), Some("Episode"))
                                 .map(|items| (series.clone(), season.name, items))
@@ -196,17 +196,17 @@ impl MediaCleaner {
             .flat_map(|(series, season, episodes)| {
                 episodes
                     .into_iter()
-                    .filter_map(|episode| {
+                    .filter_map(|mut episode| {
                         if episode.can_delete
                             && episode.user_data.played
                             && !episode.user_data.is_favorite
                         {
                             if let Some(watched_time) = episode.user_data.last_played_date {
                                 if watched_time.le(&self.time_threshold) {
-                                    info!(
-                                        "{}-{}-{} marked for delete",
-                                        series, season, episode.name
-                                    );
+                                    let name =
+                                        format!("{} - {} - {}", series, season, episode.name);
+                                    debug!("Deleting: {name}",);
+                                    episode.name = name;
                                     return Some(episode);
                                 }
                             }

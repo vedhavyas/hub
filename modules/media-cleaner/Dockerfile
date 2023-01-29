@@ -21,4 +21,6 @@ COPY --from=builder /media-cleaner/target/release/media-cleaner /media-cleaner
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh /media-cleaner
 
+ENV RUST_LOG=info
+
 ENTRYPOINT /entrypoint.sh
