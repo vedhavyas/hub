@@ -14,3 +14,4 @@
 !.env.vault
 
 .env*
+/modules/media-cleaner/target/

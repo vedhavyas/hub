@@ -177,13 +177,11 @@ services:
     hostname: media-cleaner
     networks:
       - docker-vpn
-    volumes:
-      - $HUB_DIR/media/downloads:/downloads
     environment:
-      - EMBY_USER
-      - EMBY_PASSWD_HASH
-      - EMBY_ACCESS_TOKEN
-      - EMBY_USER_KEY
+      - EMBY_HOST=http://emby:8096
+      - EMBY_USERNAME
+      - EMBY_PWD
+      - DELETE_THRESHOLD_IN_DAYS
     depends_on:
       - emby
 
