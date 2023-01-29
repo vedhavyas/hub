@@ -5,20 +5,23 @@ use chrono::{DateTime, Days, Utc};
 use log::{debug, info};
 use reqwest::blocking::Client;
 use std::env;
+use std::env::VarError;
 
 fn main() -> Result<(), Error> {
     simple_logger::init_with_env().unwrap();
-    let emby_host = env::var("EMBY_HOST").map_err(|_| Error::MissingEmbyHost)?;
-    let username = env::var("EMBY_USERNAME").map_err(|_| Error::MissingEmbyUsername)?;
-    let pwd = env::var("EMBY_PWD").map_err(|_| Error::MissingEmbyPassword)?;
-    let threshold = env::var("DELETE_THRESHOLD_IN_DAYS")
-        .map_err(|_| Error::InvalidTimeThreshold)?
-        .parse()
-        .map_err(|_| Error::InvalidTimeThreshold)?;
+    let emby_host = env::var("EMBY_HOST")?;
+    let username = env::var("EMBY_USERNAME")?;
+    let pwd = env::var("EMBY_PWD")?;
 
-    let time_threshold = Utc::now()
-        .checked_sub_days(Days::new(threshold))
-        .ok_or(Error::InvalidTimeThreshold)?;
+    let time_threshold = env::var("DELETE_THRESHOLD_IN_DAYS")?
+        .parse()
+        .map_err(|_| Error::InvalidTimeThreshold)
+        .and_then(
+            |threshold| match Utc::now().checked_sub_days(Days::new(threshold)) {
+                None => Err(Error::InvalidTimeThreshold),
+                Some(threshold) => Ok(threshold),
+            },
+        )?;
 
     let client = MediaCleaner::new(emby_host, &username, &pwd, time_threshold)?;
 
@@ -26,29 +29,33 @@ fn main() -> Result<(), Error> {
     info!("Movies to delete: {:?}", movies_to_delete.len());
     client
         .delete_items(movies_to_delete)
-        .map_err(Error::FailedToDeleteMovies)?;
+        .map_err(Error::DeleteMovies)?;
 
     let episodes_to_delete = client.fetch_episodes_to_delete()?;
     info!("Episodes to delete: {:?}", episodes_to_delete.len());
     client
         .delete_items(episodes_to_delete)
-        .map_err(Error::FailedToDeleteTvShows)?;
+        .map_err(Error::DeleteTvShows)?;
     Ok(())
 }
 
 #[derive(Debug)]
 enum Error {
-    MissingEmbyUsername,
-    MissingEmbyPassword,
-    MissingEmbyHost,
-    FailedToAuthenticate(reqwest::Error),
-    FailedToGetMoviesId,
-    FailedToGetMovies(reqwest::Error),
+    Argument(VarError),
     InvalidTimeThreshold,
-    FailedToGetTvShowsId,
-    FailedToGetTvShows(reqwest::Error),
-    FailedToDeleteMovies(reqwest::Error),
-    FailedToDeleteTvShows(reqwest::Error),
+    Authentication(reqwest::Error),
+    GetMoviesId,
+    GetMovies(reqwest::Error),
+    GetTvShowsId,
+    GetTvShows(reqwest::Error),
+    DeleteMovies(reqwest::Error),
+    DeleteTvShows(reqwest::Error),
+}
+
+impl From<VarError> for Error {
+    fn from(value: VarError) -> Self {
+        Error::Argument(value)
+    }
 }
 
 struct MediaCleaner {
@@ -74,9 +81,8 @@ impl MediaCleaner {
             .query(&queries)
             .form(&form)
             .send()
-            .map_err(Error::FailedToAuthenticate)?
-            .json::<AuthenticatedUser>()
-            .map_err(Error::FailedToAuthenticate)?;
+            .and_then(|resp| resp.json::<AuthenticatedUser>())
+            .map_err(Error::Authentication)?;
 
         Ok(Self {
             client,
@@ -87,14 +93,12 @@ impl MediaCleaner {
     }
 
     fn fetch_movies_to_delete(&self) -> Result<Vec<Item>, Error> {
-        let top_items = self
-            .fetch_items(None, None)
-            .map_err(Error::FailedToGetMovies)?;
+        let top_items = self.fetch_items(None, None).map_err(Error::GetMovies)?;
         let movies_parent_id = top_items
             .iter()
             .find(|item| item.name == "Movies")
             .map(|item| item.id.to_string())
-            .ok_or(Error::FailedToGetMoviesId)?;
+            .ok_or(Error::GetMoviesId)?;
 
         debug!("Found Movies parentId: {}", movies_parent_id);
 
@@ -102,19 +106,19 @@ impl MediaCleaner {
             .iter()
             .find(|item| item.name == "Collections")
             .map(|item| item.id.to_string())
-            .ok_or(Error::FailedToGetMoviesId)?;
+            .ok_or(Error::GetMoviesId)?;
 
         debug!("Found Collections parentId: {}", collections_parent_id);
 
         let fav_collection_movies = self
             .fetch_items(Some(&collections_parent_id), None)
-            .map_err(Error::FailedToGetMovies)?
+            .map_err(Error::GetMovies)?
             .into_iter()
             .filter(|item| item.user_data.is_favorite)
             .flat_map(|item| {
                 debug!("Fetching favourite Boxset: {}", item.name);
                 self.fetch_items(Some(&item.id), Some("Movie"))
-                    .map_err(Error::FailedToGetMovies)
+                    .map_err(Error::GetMovies)
             })
             .flatten()
             .map(|item| item.id)
@@ -123,7 +127,7 @@ impl MediaCleaner {
         debug!("Filtering favourite Movies...");
         let movies = self
             .fetch_items(Some(&movies_parent_id), Some("Movie"))
-            .map_err(Error::FailedToGetMovies)?
+            .map_err(Error::GetMovies)?
             .into_iter()
             .filter(|item| {
                 item.can_delete
@@ -149,20 +153,18 @@ impl MediaCleaner {
     }
 
     fn fetch_episodes_to_delete(&self) -> Result<Vec<Item>, Error> {
-        let top_items = self
-            .fetch_items(None, None)
-            .map_err(Error::FailedToGetTvShows)?;
+        let top_items = self.fetch_items(None, None).map_err(Error::GetTvShows)?;
         let series_parent_id = top_items
             .iter()
             .find(|item| item.name == "TV shows")
             .map(|item| item.id.to_string())
-            .ok_or(Error::FailedToGetTvShowsId)?;
+            .ok_or(Error::GetTvShowsId)?;
 
         debug!("Found TV Shows parentId: {}", series_parent_id);
 
         let episodes = self
             .fetch_items(Some(&series_parent_id), Some("Series"))
-            .map_err(Error::FailedToGetTvShows)?
+            .map_err(Error::GetTvShows)?
             .into_iter()
             // filter series
             .filter_map(|item| {
