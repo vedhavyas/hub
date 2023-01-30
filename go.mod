@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/melbahja/goph v1.3.0
 	github.com/sirupsen/logrus v1.9.0
-	github.com/urfave/cli/v2 v2.24.1
+	github.com/urfave/cli/v2 v2.24.2
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 )
 
