@@ -1,0 +1,32 @@
+# https://github.com/searxng/searxng/blob/master/searx/settings.yml for all possible values
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "Hub Search"
+  enable_metrics: true
+
+search:
+  # Filter results. 0: None, 1: Moderate, 2: Strict
+  safe_search: 0
+  # Existing autocomplete backends: "dbpedia", "duckduckgo", "google", "yandex",
+  # "seznam", "startpage", "swisscows", "qwant", "wikipedia" - leave blank to turn it off
+  # by default.
+  autocomplete: "google"
+  # minimun characters to type before autocompleter starts
+  autocomplete_min: 4
+  # Default search language - leave blank to detect from browser information or
+  # use codes from 'languages.py'
+  default_lang: "en"
+
+server:
+  base_url: https://search.hub  # Possible values: false or "https://example.org/location".
+  limiter: false  # rate limit the number of request on the instance, block some bots
+  # Proxying image results through searx
+  image_proxy: true
+
+redis:
+  url: redis://redis:6379/0
+
+ui:
+  static_use_hash: true
