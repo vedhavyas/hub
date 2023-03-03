@@ -50,7 +50,8 @@ hosts = 0.0.0.0:5232
 [auth]
 # Authentication method
 type = radicale_imap
-imap_host = mail.vedhavyas.dev:993
+imap_host = mail.vedhavyas.dev:143
+imap_security = starttls
 
 # Htpasswd filename
 #htpasswd_filename = /etc/radicale/users
