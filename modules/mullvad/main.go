@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
@@ -16,6 +17,8 @@ import (
 func main() {
 	acc := os.Getenv("MULLVAD_ACCOUNT")
 	// citycode is {country_code}-{city_code} from relay
+	// or, it could be just country_code
+	// use ',' to add multiple codes.
 	// if set as "random" then we pick a random one form the all relays
 	cityCode := os.Getenv("MULLVAD_CITY_CODE")
 
@@ -54,9 +57,11 @@ func main() {
 		for _, r := range relayMap {
 			relays = append(relays, r...)
 		}
-
 	default:
-		relays = relayMap[cityCode]
+		cityCodes := strings.Split(cityCode, ",")
+		for _, code := range cityCodes {
+			relays = append(relays, relayMap[code]...)
+		}
 	}
 
 	if len(relays) < 1 {
@@ -170,11 +175,14 @@ func wireguardRelays() (relays map[string][]Relay, err error) {
 			continue
 		}
 
-		code := fmt.Sprintf("%s-%s", r.CountryCode, r.CityCode)
-		relays[code] = append(relays[code], Relay{
+		country := r.CountryCode
+		city := fmt.Sprintf("%s-%s", country, r.CityCode)
+		relay := Relay{
 			Endpoint: fmt.Sprintf("%s:51820", r.Ipv4AddrIn),
 			Pubkey:   r.Pubkey,
-		})
+		}
+		relays[country] = append(relays[country], relay)
+		relays[city] = append(relays[city], relay)
 	}
 
 	return relays, nil
