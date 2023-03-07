@@ -134,7 +134,7 @@ services:
     image: searxng/searxng:latest
     restart: unless-stopped
     networks:
-      - docker-vpn
+      - docker-direct
     environment:
       - SEARXNG_SECRET
     volumes:
@@ -150,4 +150,16 @@ services:
       caddy: search.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  searxng-redis:
+    image: redis:latest
+    container_name: searxng-redis
+    hostname: searxng-redis
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - $DATA_DIR/searxng/redis/:/data
+    networks:
+      - docker-direct
+    command: redis-server --appendonly yes
 

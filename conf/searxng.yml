@@ -26,7 +26,7 @@ server:
   image_proxy: true
 
 redis:
-  url: redis://redis:6379/0
+  url: redis://searxng-redis:6379/0
 
 ui:
   static_use_hash: true
