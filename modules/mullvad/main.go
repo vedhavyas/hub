@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
 	"strings"
-
-	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
+	"time"
 )
 
 func main() {
@@ -154,15 +154,20 @@ type Relay struct {
 }
 
 func wireguardRelays() (relays map[string][]Relay, err error) {
-	url := "https://api.mullvad.net/www/relays/wireguard/"
+	url := "https://api-www.mullvad.net/www/relays/all/"
 	var response []struct {
-		CountryCode string `json:"country_code"`
-		CityCode    string `json:"city_code"`
-		Active      bool   `json:"active"`
-		Owned       bool   `json:"owned"`
-		Ipv4AddrIn  string `json:"ipv4_addr_in"`
-		PortSpeed   int    `json:"network_port_speed"`
-		Pubkey      string `json:"pubkey"`
+		CountryCode    string `json:"country_code"`
+		CityCode       string `json:"city_code"`
+		Active         bool   `json:"active"`
+		Owned          bool   `json:"owned"`
+		Ipv4AddrIn     string `json:"ipv4_addr_in"`
+		PortSpeed      int    `json:"network_port_speed"`
+		Pubkey         string `json:"pubkey"`
+		Type           string `json:"type"`
+		StatusMessages []struct {
+			Message   string    `json:"message"`
+			Timestamp time.Time `json:"timestamp"`
+		} `json:"status_messages"`
 	}
 	err = call("GET", url, "", nil, &response)
 	if err != nil {
@@ -171,7 +176,7 @@ func wireguardRelays() (relays map[string][]Relay, err error) {
 
 	relays = make(map[string][]Relay)
 	for _, r := range response {
-		if !r.Active || r.PortSpeed < 10 || !r.Owned {
+		if !r.Active || r.PortSpeed < 10 || !r.Owned || r.Type != "wireguard" || len(r.StatusMessages) > 0 {
 			continue
 		}
 
