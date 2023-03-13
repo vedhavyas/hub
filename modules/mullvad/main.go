@@ -81,7 +81,7 @@ func main() {
 
 	// add port
 	fmt.Println("Adding port...")
-	port := try(addPort(data.AuthToken, pub.String(), cityCode))
+	port := try(addPort(data.AuthToken, pub.String(), relay.CityCode))
 
 	// create wg conf
 	fmt.Println("Writing conf...")
@@ -149,6 +149,7 @@ func login(acc string) (ld AccountData, err error) {
 }
 
 type Relay struct {
+	CityCode string `json:"city"`
 	Endpoint string `json:"ipv4_addr_in"`
 	Pubkey   string `json:"pubkey"`
 }
@@ -183,6 +184,7 @@ func wireguardRelays() (relays map[string][]Relay, err error) {
 		country := r.CountryCode
 		city := fmt.Sprintf("%s-%s", country, r.CityCode)
 		relay := Relay{
+			CityCode: city,
 			Endpoint: fmt.Sprintf("%s:51820", r.Ipv4AddrIn),
 			Pubkey:   r.Pubkey,
 		}
