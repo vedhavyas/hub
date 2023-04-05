@@ -6,7 +6,7 @@ networks:
 
 services:
   jupyterhub:
-    image: jupyterhub/jupyterhub:latest
+    image: vedhavyas/jupyterhub:latest
     container_name: jupyterhub
     restart: unless-stopped
     networks:
