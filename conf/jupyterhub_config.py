@@ -44,7 +44,7 @@ c.DockerSpawner.volumes = {"jupyterhub-user-{username}": notebook_dir}
 c.DockerSpawner.remove = True
 
 # For debugging arguments passed to spawned containers
-c.DockerSpawner.debug = True
+c.DockerSpawner.debug = False
 
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = "jupyterhub"
