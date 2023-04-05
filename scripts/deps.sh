@@ -9,7 +9,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt update -y
 apt upgrade -y
 apt full-upgrade -y
-apt install fuse git man unzip jq apt-transport-https ca-certificates curl software-properties-common -y
+apt install fuse3 git man unzip jq apt-transport-https ca-certificates curl software-properties-common -y
 apt install traceroute -y
 apt install wireguard qrencode -y
 apt install wait-for-it -y

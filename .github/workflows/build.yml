@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        build: [mullvad, radicale, webdav, media-cleaner, archiver, certbot]
+        build: [mullvad, radicale, webdav, media-cleaner, archiver, certbot, jupyterhub]
     runs-on: ${{ matrix.os }}
     env:
       DOCKER_USERNAME: ${{ secrets.docker_username }}

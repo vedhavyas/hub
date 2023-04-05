@@ -49,9 +49,9 @@ services:
     image: altran1502/immich-machine-learning:release
     networks:
       - docker-direct
-    entrypoint: ["/bin/sh", "./entrypoint.sh"]
     volumes:
       - $HUB_DIR/media/photos:/usr/src/app/upload
+      - $DATA_DIR/immich/model_cache/:/cache
     env_file:
       - ${CONF_DIR}/immich.conf
     environment:
@@ -96,6 +96,19 @@ services:
     environment:
       - JWT_SECRET=IMMICH_JWT_SECRET
     restart: unless-stopped
+    networks:
+      - docker-direct
+
+  immich_typesense:
+    container_name: immich_typesense
+    hostname: immich_typesense
+    image: typesense/typesense:0.24.1
+    environment:
+      - TYPESENSE_API_KEY=abcde
+      - TYPESENSE_DATA_DIR=/data
+    restart: unless-stopped
+    volumes:
+      - $DATA_DIR/immich/typesense/:/data
     networks:
       - docker-direct
 

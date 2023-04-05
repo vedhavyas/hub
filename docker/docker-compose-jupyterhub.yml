@@ -1,0 +1,31 @@
+version: "3"
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  jupyterhub:
+    image: jupyterhub/jupyterhub:latest
+    container_name: jupyterhub
+    restart: unless-stopped
+    networks:
+      - docker-direct
+    volumes:
+      - $CONF_DIR/jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      - $DATA_DIR/jupyterhub/:/data"
+    environment:
+      JUPYTERHUB_ADMIN: vedhavyas
+      # All containers will join this network
+      DOCKER_NETWORK_NAME: docker-direct
+      # JupyterHub will spawn this Notebook image for users
+      DOCKER_NOTEBOOK_IMAGE: jupyter/base-notebook:latest
+      # Notebook directory inside user image
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work
+      # Using this run command
+      DOCKER_SPAWN_CMD: start-singleuser.sh
+    labels:
+      caddy: jupyter.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"

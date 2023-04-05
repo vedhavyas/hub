@@ -9,7 +9,6 @@ Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
 ExecStartPre=+/sbin/hub run-script pre-mount
 ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --buffer-size 128M \
---fast-list \
 --dir-cache-time 1440h \
 --auto-confirm \
 --allow-other \
@@ -26,7 +25,7 @@ ExecStart=/usr/bin/rclone mount hub-crypt: /hub \
 --vfs-read-chunk-size 2G \
 --vfs-used-is-size
 TimeoutStartSec=10min
-ExecStop=+/usr/bin/fusermount -uz /hub
+ExecStop=+/usr/bin/fusermount3 -uz /hub
 Restart=on-failure
 User=docker
 Group=docker

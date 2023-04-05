@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # ensure unmount
-fusermount -uz /hub
+fusermount3 -uz /hub
 
 # delete
 rm -rf /hub
