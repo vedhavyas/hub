@@ -21,3 +21,20 @@ services:
       caddy: serge-ai.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8008}}"
+
+  chat-gpt:
+    image: ghcr.io/mckaywrigley/chatbot-ui:main
+    container_name: chat-gpt
+    restart: unless-stopped
+    networks:
+      - docker-direct
+    environment:
+      - OPENAI_API_KEY
+      - OPENAI_ORGANIZATION
+      - DEFAULT_MODEL=gpt-4
+      - GOOGLE_API_KEY
+      - GOOGLE_CSE_ID
+    labels:
+      caddy: chat-gpt.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
