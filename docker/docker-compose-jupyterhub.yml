@@ -14,7 +14,7 @@ services:
     volumes:
       - $CONF_DIR/jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
-      - $DATA_DIR/jupyterhub:/data:rw"
+      - $DATA_DIR/jupyterhub:/data:rw
     environment:
       JUPYTERHUB_ADMIN: vedhavyas
       # All containers will join this network
