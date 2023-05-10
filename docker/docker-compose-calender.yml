@@ -5,37 +5,6 @@ networks:
     external: true
 
 services:
-  radicale:
-    image: vedhavyas/radicale:latest
-    container_name: radicale
-    hostname: radicale
-    init: true
-    read_only: true
-    user: $PUID:$PGID
-    networks:
-      - docker-direct
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - SETUID
-      - SETGID
-      - CHOWN
-      - KILL
-    healthcheck:
-      test: curl -f http://127.0.0.1:5232 || exit 1
-      interval: 30s
-      retries: 3
-    restart: unless-stopped
-    volumes:
-      - $DATA_DIR/radicale/data:/data
-      - $CONF_DIR/radicale_config:/config/config
-    labels:
-      caddy: radicale.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 5232}}"
-
   calender:
     image: 'bloben/app:latest'
     container_name: calender
