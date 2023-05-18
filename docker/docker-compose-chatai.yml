@@ -29,6 +29,7 @@ services:
     networks:
       - docker-direct
     environment:
+#      - 'OPENAI_API_HOST=http://ai:8080'
       - OPENAI_API_KEY
       - OPENAI_ORGANIZATION
       - DEFAULT_MODEL=gpt-4
@@ -38,3 +39,20 @@ services:
       caddy: chat-gpt.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+
+  ai:
+    image: quay.io/go-skynet/local-ai:latest
+    container_name: ai
+    restart: unless-stopped
+    networks:
+      - docker-direct
+    environment:
+      - DEBUG=false
+      - MODELS_PATH=/models
+    volumes:
+      - $DATA_DIR/local-ai/models:/models:cached
+    command: [ "/usr/bin/local-ai" ]
+    labels:
+      caddy: ai.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"

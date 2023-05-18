@@ -174,3 +174,27 @@ services:
       caddy: webdav.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  cyberchef:
+    image: mpepping/cyberchef:latest
+    container_name: cyberchef
+    restart: unless-stopped
+    hostname: cyberchef
+    networks:
+      - docker-direct
+    labels:
+      caddy: cyberchef.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8000}}"
+
+  ittools:
+    container_name: it-tools
+    image: corentinth/it-tools:latest
+    restart: unless-stopped
+    hostname: it-tools
+    networks:
+      - docker-direct
+    labels:
+      caddy: it-tools.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 80}}"
