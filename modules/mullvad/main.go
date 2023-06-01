@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -29,14 +28,14 @@ func main() {
 	// login
 	data := try(login(acc))
 
-	// remove all ports
-	for _, port := range data.Account.CityPorts {
-		fmt.Printf("Removing port[%v] in City[%s]\n", port.Port, port.CityCode)
-		err := removePort(data.AuthToken, port.Port, port.CityCode)
-		if err != nil {
-			panic(err)
-		}
-	}
+	//// remove all ports
+	//for _, port := range data.Account.CityPorts {
+	//	fmt.Printf("Removing port[%v] in City[%s]\n", port.Port, port.CityCode)
+	//	err := removePort(data.AuthToken, port.Port, port.CityCode)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//}
 
 	// remove all peers
 	for _, peer := range data.Account.WgPeers {
@@ -79,9 +78,9 @@ func main() {
 	fmt.Println("Adding peer...")
 	peerAddr := try(addPeer(data.AuthToken, pub.String()))
 
-	// add port
-	fmt.Println("Adding port...")
-	port := try(addPort(data.AuthToken, pub.String(), relay.CityCode))
+	//// add port
+	//fmt.Println("Adding port...")
+	//port := try(addPort(data.AuthToken, pub.String(), relay.CityCode))
 
 	// create wg conf
 	fmt.Println("Writing conf...")
@@ -91,7 +90,7 @@ func main() {
 
 	// create env file
 	fmt.Println("Writing envs...")
-	if err := createEnvFile(peerAddr, port); err != nil {
+	if err := createEnvFile(peerAddr, 0); err != nil {
 		panic(err)
 	}
 }
@@ -106,7 +105,7 @@ AllowedIPs = 0.0.0.0/0
 Endpoint = %s
 PersistentKeepalive = 25
 `, priv, peerPub, peerEndpoint)
-	return ioutil.WriteFile("/data/mullvad.conf", []byte(data), 0777)
+	return os.WriteFile("/data/mullvad.conf", []byte(data), 0777)
 }
 
 func createEnvFile(ifAddr string, port int) error {
@@ -114,7 +113,7 @@ func createEnvFile(ifAddr string, port int) error {
 MULLVAD_VPN_ID_ADDR=%s
 MULLVAD_VPN_FORWARDED_PORT=%d
 `, ifAddr, port)
-	return ioutil.WriteFile("/data/mullvad.env", []byte(data), 0777)
+	return os.WriteFile("/data/mullvad.env", []byte(data), 0777)
 }
 
 func try[T any](res T, err error) T {
