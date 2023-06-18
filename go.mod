@@ -3,7 +3,7 @@ module hub
 go 1.19
 
 require (
-	github.com/BurntSushi/toml v1.2.1
+	github.com/BurntSushi/toml v1.3.2
 	github.com/melbahja/goph v1.3.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/urfave/cli/v2 v2.25.1
