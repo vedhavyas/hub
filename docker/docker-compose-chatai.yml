@@ -6,7 +6,7 @@ networks:
 
 services:
   serge:
-    image: 'ghcr.io/nsarrazin/serge:latest'
+    image: 'ghcr.io/serge-chat/serge:latest'
     container_name: serge
     expose:
       # expose this port as this is not done in the original docker file
