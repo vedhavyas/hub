@@ -217,6 +217,7 @@ services:
     volumes:
       - $DATA_DIR/syncthing/config:/config
       - $HUB_DIR/media/downloads/games:/games
+      - $HUB_DIR/backups/obsidian:/obsidian
     labels:
       caddy: syncthing.hub
       caddy.tls: internal
