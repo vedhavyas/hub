@@ -1,0 +1,29 @@
+version: "3.9"
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  ferdium-server:
+    image: ferdium/ferdium-server:latest
+    container_name: ferdium-server
+    networks:
+      - docker-direct
+    environment:
+      - APP_URL=https://ferdium.hub
+      - DB_CONNECTION=sqlite
+      - IS_CREATION_ENABLED=true
+      - IS_DASHBOARD_ENABLED=true
+      - IS_REGISTRATION_ENABLED=true
+      - DATA_DIR=/data
+      - PUID
+      - PGID
+    volumes:
+      - $DATA_DIR/ferdium/data:/data
+      - $DATA_DIR/ferdium/recipes:/app/recipes
+    restart: unless-stopped
+    labels:
+      caddy: ferdium.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3333}}"
