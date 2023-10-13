@@ -11,6 +11,7 @@ services:
     networks:
       - docker-direct
     environment:
+      - NODE_ENV=production
       - APP_URL=https://ferdium.hub
       - DB_CONNECTION=sqlite
       - IS_CREATION_ENABLED=true
