@@ -1,0 +1,26 @@
+version: "3.9"
+
+networks:
+  docker-direct:
+    external: true
+
+services:
+  devnet-node:
+    image: ghcr.io/subspace/node:snapshot-2023-oct-14
+    volumes:
+      - $DATA_DIR/Subspace/devnet/node:/var/subspace:rw
+    networks:
+      - docker-direct
+    user: $PUID:$PGID
+    restart: unless-stopped
+    command: [
+      "--chain", "devnet",
+      "--base-path", "/var/subspace",
+      "--execution", "wasm",
+      "--port", "30333",
+      "--name", "invincible",
+    ]
+    healthcheck:
+      timeout: 5s
+      interval: 30s
+      retries: 5
