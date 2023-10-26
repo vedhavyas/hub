@@ -6,7 +6,7 @@ networks:
 
 services:
   subspace-devnet-node:
-    image: ghcr.io/subspace/node:snapshot-2023-oct-14
+    image: ghcr.io/subspace/node:snapshot-2023-oct-25
     volumes:
       - $DATA_DIR/Subspace/devnet/node:/var/subspace:rw
     networks:
@@ -16,7 +16,6 @@ services:
     command: [
       "--chain", "devnet",
       "--base-path", "/var/subspace",
-      "--execution", "wasm",
       "--port", "30333",
       "--name", "invincible",
     ]
