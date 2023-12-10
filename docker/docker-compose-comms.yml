@@ -44,3 +44,21 @@ services:
       caddy: rss.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
+
+  pairdrop:
+    image: lscr.io/linuxserver/pairdrop:latest
+    container_name: pairdrop
+    hostname: pairdrop
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+      - WS_FALLBACK=true
+      - DEBUG_MODE=true
+    networks:
+      - docker-direct
+    labels:
+      caddy: pairdrop.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
