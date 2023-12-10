@@ -12,7 +12,11 @@ services:
     restart: unless-stopped
     entrypoint: ["/bin/sh", "./start-server.sh"]
     networks:
-      - docker-direct
+      # have to use static ip since the android app
+      # built with flutter http client doesn't support self-signed yet
+      # https://github.com/immich-app/immich/issues/765
+      docker-direct:
+        ipv4_address: 10.10.2.8
     volumes:
       - $HUB_DIR/media/photos:/usr/src/app/upload
     env_file:
@@ -23,6 +27,10 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
+    labels:
+      caddy: photos.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3001}}"
 
   immich-microservices:
     container_name: immich_microservices
@@ -86,19 +94,6 @@ services:
       - $DATA_DIR/immich/postgres:/var/lib/postgresql/data
     restart: unless-stopped
 
-  immich-web:
-    image: altran1502/immich-web:release
-    container_name: immich_web
-    hostname: immich_web
-    entrypoint: [ "/bin/sh", "./entrypoint.sh" ]
-    env_file:
-      - ${CONF_DIR}/immich.conf
-    environment:
-      - JWT_SECRET=IMMICH_JWT_SECRET
-    restart: unless-stopped
-    networks:
-      - docker-direct
-
   immich_typesense:
     container_name: immich_typesense
     hostname: immich_typesense
@@ -111,22 +106,3 @@ services:
       - $DATA_DIR/immich/typesense/:/data
     networks:
       - docker-direct
-
-  immich-proxy:
-    hostname: immich_proxy
-    container_name: immich_proxy
-    image: altran1502/immich-proxy:release
-    networks:
-      # have to use static ip since the android app
-      # built with flutter http client doesn't support self-signed yet
-      # https://github.com/immich-app/immich/issues/765
-      docker-direct:
-        ipv4_address: 10.10.2.8
-    depends_on:
-      - immich-server
-    restart: unless-stopped
-    labels:
-      caddy: photos.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 8080}}"
-
