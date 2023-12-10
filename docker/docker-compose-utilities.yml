@@ -198,3 +198,22 @@ services:
       caddy: it-tools.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
+
+  ssh-server-goland:
+    image: lscr.io/linuxserver/openssh-server:latest
+    container_name: goland-ssh
+    hostname: goland-ssh
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+      - SUDO_ACCESS=false
+      - PASSWORD_ACCESS=true
+      - USER_PASSWORD=goland
+      - USER_NAME=goland
+    networks:
+      docker-direct:
+        ipv4_address: 10.10.2.9
+    volumes:
+      - $DATA_DIR/goland-ssh/config:/config
