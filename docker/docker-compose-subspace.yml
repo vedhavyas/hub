@@ -1,24 +1,30 @@
 version: "3.9"
 
 networks:
-  docker-direct:
+  docker-vpn:
     external: true
 
 services:
-  subspace-devnet-node:
-    image: ghcr.io/subspace/node:snapshot-2023-oct-25
+  subspace-gemini-3g-node:
+    image: ghcr.io/subspace/node:gemini-3g-2023-dec-01
     volumes:
-      - $DATA_DIR/Subspace/devnet/node:/var/subspace:rw
+      - $DATA_DIR/Subspace/gemini-3g/node:/var/subspace:rw
     networks:
-      - docker-direct
+      - docker-vpn
     user: $PUID:$PGID
     restart: unless-stopped
     command: [
-      "--chain", "devnet",
+      "--chain", "gemini-3g",
       "--base-path", "/var/subspace",
       "--port", "30333",
+      "--no-private-ipv4",
       "--name", "invincible",
+      "--",
+      "--chain", "gemini-3g",
+      "--domain-id", "1",
     ]
+    profiles:
+      - donotstart
     healthcheck:
       timeout: 5s
       interval: 30s
