@@ -1,0 +1,8 @@
+{
+  "sdpSemantics": "unified-plan",
+  "iceServers": [
+    {
+      "urls": "turn:turnserver:3478"
+    }
+  ]
+}

@@ -56,9 +56,33 @@ services:
       - TZ
       - WS_FALLBACK=true
       - DEBUG_MODE=true
+      - RTC_CONFIG=/etc/pairdrop/rtc_config.json
     networks:
       - docker-direct
+    volumes:
+      - $CONF_DIR/rtc_config.json:/etc/pairdrop/rtc_config.json
     labels:
       caddy: pairdrop.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+
+  turnserver:
+    image: coturn/coturn:latest
+    container_name: turnserver
+    hostname: turnserver
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - $CONF_DIR/turnserver.conf:/etc/coturn/turnserver.conf
+      - "${DATA_DIR}/turnserver/data/:/var/db/"
+      - "${DATA_DIR}/turnserver/log:/var/log/"
+      - "${DATA_DIR}/turnserver/run:/var/run/"
+    networks:
+      docker-direct:
+        ipv4_address: 10.10.2.10
+    expose:
+      - "10000-20000"
+    labels:
+      caddy: turnserver.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3478}}"
