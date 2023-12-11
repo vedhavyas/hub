@@ -217,3 +217,22 @@ services:
         ipv4_address: 10.10.2.9
     volumes:
       - $DATA_DIR/goland-ssh/config:/config
+
+  git:
+    image: gogs/gogs:latest
+    container_name: git
+    hostname: git
+    restart: unless-stopped
+    volumes:
+      - $DATA_DIR/gogs/data:/data/gogs
+      - $HUB_DIR/apdata/gogs/repository:/data/git/gogs-repositories
+    environment:
+      - RUN_CROND=true
+      - BACKUP_INTERVAL=7d
+      - BACKUP_RETENTION=365d
+    networks:
+      - docker-direct
+    labels:
+      caddy: git.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
