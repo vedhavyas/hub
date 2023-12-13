@@ -74,7 +74,6 @@ services:
     user: $PUID:$PGID
     volumes:
       - $CONF_DIR/turnserver.conf:/etc/coturn/turnserver.conf
-      - "${DATA_DIR}/turnserver/data/:/var/db/"
       - "${DATA_DIR}/turnserver/log:/var/log/"
       - "${DATA_DIR}/turnserver/run:/var/run/"
     networks:
