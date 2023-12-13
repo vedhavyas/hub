@@ -2,7 +2,7 @@
   "sdpSemantics": "unified-plan",
   "iceServers": [
     {
-      "urls": "turn:turnserver:3478",
+      "urls": "turn:10.10.2.10:3478",
       "username": "turn",
       "credential": "turn"
     }
