@@ -8,9 +8,9 @@ services:
   immich-server:
     container_name: immich_server
     hostname: immich_server
-    image: altran1502/immich-server:release
+    image: ghcr.io/immich-app/immich-server:release
     restart: unless-stopped
-    entrypoint: ["/bin/sh", "./start-server.sh"]
+    command: [ "start.sh", "immich" ]
     networks:
       # have to use static ip since the android app
       # built with flutter http client doesn't support self-signed yet
@@ -19,6 +19,7 @@ services:
         ipv4_address: 10.10.2.8
     volumes:
       - $HUB_DIR/media/photos:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - ${CONF_DIR}/immich.conf
     environment:
@@ -35,12 +36,13 @@ services:
   immich-microservices:
     container_name: immich_microservices
     hostname: immich_microservices
-    image: altran1502/immich-server:release
-    entrypoint: ["/bin/sh", "./start-microservices.sh"]
+    image: ghcr.io/immich-app/immich-server:release
+    command: [ "start.sh", "microservices" ]
     networks:
       - docker-direct
     volumes:
       - $HUB_DIR/media/photos:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - ${CONF_DIR}/immich.conf
     environment:
@@ -54,7 +56,7 @@ services:
   immich-machine-learning:
     container_name: immich_machine_learning
     hostname: immich_machine_learning
-    image: altran1502/immich-machine-learning:release
+    image: ghcr.io/immich-app/immich-machine-learning:release
     networks:
       - docker-direct
     volumes:
@@ -82,7 +84,7 @@ services:
   immich-postgres:
     container_name: immich_postgres
     hostname: immich_postgres
-    image: postgres:14
+    image: tensorchord/pgvecto-rs:pg14-v0.1.11
     networks:
       - docker-direct
     environment:
@@ -93,16 +95,3 @@ services:
     volumes:
       - $DATA_DIR/immich/postgres:/var/lib/postgresql/data
     restart: unless-stopped
-
-  immich_typesense:
-    container_name: immich_typesense
-    hostname: immich_typesense
-    image: typesense/typesense:0.24.1
-    environment:
-      - TYPESENSE_API_KEY=abcde
-      - TYPESENSE_DATA_DIR=/data
-    restart: unless-stopped
-    volumes:
-      - $DATA_DIR/immich/typesense/:/data
-    networks:
-      - docker-direct

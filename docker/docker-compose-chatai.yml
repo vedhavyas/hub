@@ -5,23 +5,6 @@ networks:
     external: true
 
 services:
-  serge:
-    image: 'ghcr.io/serge-chat/serge:latest'
-    container_name: serge
-    expose:
-      # expose this port as this is not done in the original docker file
-      - 8008
-    restart: unless-stopped
-    networks:
-      - docker-direct
-    volumes:
-      - $DATA_DIR/serge-ai/weights:/usr/src/app/weights
-      - $DATA_DIR/serge-ai/data:/data/db
-    labels:
-      caddy: serge-ai.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 8008}}"
-
   chat-gpt:
     image: ghcr.io/mckaywrigley/chatbot-ui:main
     container_name: chat-gpt

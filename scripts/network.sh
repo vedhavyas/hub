@@ -2,7 +2,7 @@
 
 # prune all docker related data
 docker ps -aq | xargs docker stop
-docker system prune -a -f --volumes
+#docker system prune -a -f --volumes
 
 # pihole is not running yet if this was a restart
 rm /etc/resolv.conf
