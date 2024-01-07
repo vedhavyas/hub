@@ -236,3 +236,29 @@ services:
       caddy: git.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
+
+  pdf-backend:
+    image: 'thecodingmachine/gotenberg:8'
+    container_name: gotenberg
+    hostname: gotenberg
+    restart: unless-stopped
+    networks:
+      - docker-direct
+    labels:
+      caddy: pdf-backend.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+  pdf:
+    image: techblog/gotenbergui
+    container_name: gotenbergui
+    hostname: gotenbergui
+    restart: unless-stopped
+    networks:
+      - docker-direct
+    environment:
+      - 'GOTENBERG_API_ADDRESS=https://pdf-backend.hub'
+    labels:
+      caddy: pdf.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
