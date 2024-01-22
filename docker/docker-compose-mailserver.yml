@@ -1,6 +1,8 @@
 version: "3.9"
 
 networks:
+  docker-direct-static:
+    external: true
   docker-direct:
     external: true
 
@@ -33,7 +35,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 1m
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.5
         aliases:
           - mail.$DOMAIN
@@ -78,7 +80,7 @@ services:
     hostname: certbot
     pull_policy: always
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.7
     volumes:
       - ${DATA_DIR}/certbot/certs:/etc/letsencrypt

@@ -1,6 +1,8 @@
 version: "3.9"
 
 networks:
+  docker-direct-static:
+    external: true
   docker-direct:
     external: true
   docker-vpn:
@@ -13,9 +15,9 @@ services:
     restart: unless-stopped
     hostname: caddy
     environment:
-      - CADDY_INGRESS_NETWORKS=docker-direct,docker-vpn
+      - CADDY_INGRESS_NETWORKS=docker-direct,docker-vpn,docker-direct-static,docker-vpn-static
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.4
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -29,7 +31,7 @@ services:
     restart: unless-stopped
     hostname: unbound
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.3
 
   pihole:
@@ -38,7 +40,7 @@ services:
     image: pihole/pihole:latest
     restart: unless-stopped
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.2
     depends_on:
       - unbound

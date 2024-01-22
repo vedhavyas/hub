@@ -3,6 +3,8 @@ version: "3.9"
 networks:
   docker-direct:
     external: true
+  docker-direct-static:
+    external: true
 
 services:
   immich-server:
@@ -15,7 +17,7 @@ services:
       # have to use static ip since the android app
       # built with flutter http client doesn't support self-signed yet
       # https://github.com/immich-app/immich/issues/765
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.8
     volumes:
       - $HUB_DIR/media/photos:/usr/src/app/upload

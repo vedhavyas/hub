@@ -1,6 +1,8 @@
 version: "3.9"
 
 networks:
+  docker-direct-static:
+    external: true
   docker-direct:
     external: true
   docker-vpn:
@@ -77,7 +79,7 @@ services:
       - "${DATA_DIR}/turnserver/log:/var/log/"
       - "${DATA_DIR}/turnserver/run:/var/run/"
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.10
     expose:
       - "10000-20000"
