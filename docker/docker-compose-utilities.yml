@@ -3,6 +3,8 @@ version: "3.9"
 networks:
   docker-direct:
     external: true
+  docker-direct-static:
+    external: true
 
 services:
   filebrowser:
@@ -213,7 +215,7 @@ services:
       - USER_PASSWORD=goland
       - USER_NAME=goland
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.9
     volumes:
       - $DATA_DIR/goland-ssh/config:/config
@@ -228,8 +230,6 @@ services:
       - $HUB_DIR/apdata/gogs/repository:/data/git/gogs-repositories
     environment:
       - RUN_CROND=true
-      - BACKUP_INTERVAL=7d
-      - BACKUP_RETENTION=365d
     networks:
       - docker-direct
     labels:

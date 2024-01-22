@@ -106,7 +106,7 @@ func connectToRemote(conn Connection) (Remote, error) {
 		Auth:    auth,
 		Timeout: goph.DefaultTimeout,
 		Callback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			log.Debugf("Checking host %s at %s with key: %v", hostname, remote.String(), key.Type())
+			log.Infof("Checking host %s at %s with key: %v", hostname, remote.String(), key.Type())
 			return nil
 		},
 	})

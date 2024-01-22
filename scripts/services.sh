@@ -1,5 +1,27 @@
 #!/bin/zsh
 
+# Connect all the containers from $1 network to $2
+function connect_networks() {
+  # Check if two arguments are given
+  if [ $# -ne 2 ]; then
+    echo "Two arguments required: connect_networks network1 network2"
+    return 1
+  fi
+
+  network1=$1
+  network2=$2
+
+  # Get all containers in network1
+  # shellcheck disable=SC2207
+  containers=($(docker network inspect -f '{{range .Containers}}{{.Name}} {{end}}' "$network1"))
+
+  # Loop through the containers
+  for container in "${containers[@]}"; do
+    echo "Connecting container $container to network $network2..."
+    docker network connect "$network2" "$container" && echo "Connected container $container to network $network2"
+  done
+}
+
 function security_pre_up() {
   # add dns record for caddy reverse proxy
     mkdir -p "${DATA_DIR}/pihole/etc-dnsmasq.d/"
@@ -60,6 +82,8 @@ start|restart)
 post-start)
   post=${service}_post_up
   command -v "$post" >/dev/null && $post
+  connect_networks docker-vpn-static docker-vpn
+  connect_networks docker-direct-static docker-direct
   hub notify "Hub updates" "${service} successfully started"
   ;;
 stop)

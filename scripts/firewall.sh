@@ -41,7 +41,7 @@ iptables -A FORWARD -i wg-hub -j ACCEPT
 iptables -A FORWARD -o wg-hub -j ACCEPT
 
 # forward packets from docker-direct and docker-vpn to any network
-networks=( docker-direct docker-vpn )
+networks=( docker-direct docker-direct-static docker-vpn docker-vpn-static )
 for network in "${networks[@]}" ; do
   inf="br-${$(docker network inspect -f {{.Id}} "${network}"):0:12}"
   iptables -A FORWARD -i "${inf}" -j ACCEPT

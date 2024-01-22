@@ -3,6 +3,8 @@
 # prune all docker related data
 docker ps -aq | xargs docker stop
 #docker system prune -a -f --volumes
+docker network prune -f
+docker container prune -f
 
 # pihole is not running yet if this was a restart
 rm /etc/resolv.conf
@@ -17,11 +19,17 @@ ip link set wg-hub up || true
 # generate wireguard server hub
 hub run-script wireguard
 
-# setup docker direct network
-docker network create --subnet 10.10.2.0/24 --ip-range 10.10.2.200/25 docker-direct &> /dev/null
+# setup docker direct static network
+docker network create --subnet 10.10.2.0/25 docker-direct-static
+
+# setup docker direct static network
+docker network create --subnet 10.10.2.128/25 docker-direct
+
+# setup docker vpn static network
+docker network create --subnet 10.10.3.0/25 docker-vpn-static
 
 # setup docker vpn network
-docker network create --subnet 10.10.3.0/24 --ip-range 10.10.3.200/25 docker-vpn &> /dev/null
+docker network create --subnet 10.10.3.128/25 docker-vpn
 
 # setup mullvad interface
 # create mullvad conf and open tunnel
@@ -39,3 +47,7 @@ for gateway in $gateways ; do
     setup-network gateway-"${gateway:l}" "${(P)address}" "${(P)port}" \
     "${(P)pv_key}" "${(P)gateway_pub_key}" "${(P)pre_shared_key}"
 done
+
+# login to docker
+echo "Logging into docker..."
+docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"

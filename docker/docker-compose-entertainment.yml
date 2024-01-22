@@ -3,13 +3,17 @@ version: "3.9"
 networks:
   docker-vpn:
     external: true
+  docker-vpn-static:
+    external: true
   docker-direct:
+    external: true
+  docker-direct-static:
     external: true
 
 services:
   qbittorrent:
     container_name: qbittorrent
-    image: cr.hotio.dev/hotio/qbittorrent:latest
+    image: ghcr.io/hotio/qbittorrent:latest
     hostname: qbittorrent
     environment:
       - PUID
@@ -21,7 +25,7 @@ services:
       - $HUB_DIR/media/downloads/incomplete:/config/downloads/temp
       - $HUB_DIR/media:/data
     networks:
-      docker-vpn:
+      docker-vpn-static:
         ipv4_address: 10.10.3.2
     healthcheck:
       test: 'HOST_IP="${HOST_IP}"; [[ -n $${HOST_IP} && "$$(curl -s https://icanhazip.com)" != "$${HOST_IP}" ]] && echo "OK" || { echo "VPN failed"; exit 1; }'
@@ -44,7 +48,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: cr.hotio.dev/hotio/prowlarr:nightly
+    image: ghcr.io/hotio/prowlarr:nightly
     networks:
       - docker-vpn
     restart: unless-stopped
@@ -212,7 +216,7 @@ services:
       - PGID
       - TZ
     networks:
-      docker-direct:
+      docker-direct-static:
         ipv4_address: 10.10.2.6
     volumes:
       - $DATA_DIR/syncthing/config:/config
