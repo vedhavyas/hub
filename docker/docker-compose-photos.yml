@@ -3,8 +3,6 @@ version: "3.9"
 networks:
   docker-direct:
     external: true
-  docker-direct-static:
-    external: true
 
 services:
   immich-server:
@@ -14,11 +12,7 @@ services:
     restart: unless-stopped
     command: [ "start.sh", "immich" ]
     networks:
-      # have to use static ip since the android app
-      # built with flutter http client doesn't support self-signed yet
-      # https://github.com/immich-app/immich/issues/765
-      docker-direct-static:
-        ipv4_address: 10.10.2.8
+      - docker-direct
     volumes:
       - $HUB_DIR/media/photos:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -53,6 +47,7 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
+      - immich-server
     restart: unless-stopped
 
   immich-machine-learning:
@@ -86,7 +81,7 @@ services:
   immich-postgres:
     container_name: immich_postgres
     hostname: immich_postgres
-    image: tensorchord/pgvecto-rs:pg14-v0.1.11
+    image: tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
     networks:
       - docker-direct
     environment:
