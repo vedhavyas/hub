@@ -240,7 +240,10 @@ impl MediaCleaner {
         include_item_types: Option<&str>,
     ) -> Result<Vec<Item>, reqwest::Error> {
         let mut queries = Self::common_url_queries(Some(&self.auth.access_token));
-        queries.push(("Fields", "BasicSyncInfo,CanDelete"));
+        queries.push((
+            "Fields",
+            "BasicSyncInfo,CanDelete,UserDataLastPlayedDate,UserDataPlayCount",
+        ));
         queries.push(("StartIndex", "0"));
 
         if let Some(include_item_type) = include_item_types {
