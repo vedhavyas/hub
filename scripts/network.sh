@@ -3,6 +3,8 @@
 # prune all docker related data
 docker ps -aq | xargs docker stop
 #docker system prune -a -f --volumes
+# update all images
+docker images --format "{{.Repository}}:{{.Tag}}" | xargs -L1 docker pull
 docker network prune -f
 docker container prune -f
 

@@ -18,7 +18,11 @@ function connect_networks() {
   # Loop through the containers
   for container in "${containers[@]}"; do
     echo "Connecting container $container to network $network2..."
-    docker network connect "$network2" "$container" && echo "Connected container $container to network $network2"
+    if [ "$container" = "mailserver" ]; then
+      docker network connect --alias mail."$DOMAIN" "$network2" "$container" && echo "Connected container $container to network $network2"
+    else
+      docker network connect "$network2" "$container" && echo "Connected container $container to network $network2"
+    fi
   done
 }
 
