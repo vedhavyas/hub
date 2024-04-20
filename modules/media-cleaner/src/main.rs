@@ -6,6 +6,7 @@ use log::{debug, info};
 use reqwest::blocking::Client;
 use std::env;
 use std::env::VarError;
+use thiserror::Error;
 
 fn main() -> Result<(), Error> {
     simple_logger::init_with_env().unwrap();
@@ -39,16 +40,25 @@ fn main() -> Result<(), Error> {
     Ok(())
 }
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 enum Error {
+    #[error("Invalid argument: {0}")]
     Argument(VarError),
+    #[error("Invalid time threshold")]
     InvalidTimeThreshold,
+    #[error("Authentication: {0}")]
     Authentication(reqwest::Error),
+    #[error("Get Movies Id")]
     GetMoviesId,
+    #[error("Get Movies: {0}")]
     GetMovies(reqwest::Error),
+    #[error("Get TV shows Id")]
     GetTvShowsId,
+    #[error("Get TV Shows: {0}")]
     GetTvShows(reqwest::Error),
+    #[error("Delete Movies: {0}")]
     DeleteMovies(reqwest::Error),
+    #[error("Delete TV shows: {0}")]
     DeleteTvShows(reqwest::Error),
 }
 
