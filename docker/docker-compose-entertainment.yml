@@ -186,6 +186,8 @@ services:
       - EMBY_USERNAME
       - EMBY_PWD
       - DELETE_THRESHOLD_IN_DAYS
+    volumes:
+      - $HUB_DIR/media/downloads:/downloads
     depends_on:
       - emby
 
