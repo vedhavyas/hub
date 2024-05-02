@@ -19,7 +19,8 @@ RUN apt-get update && apt-get install -y cron
 WORKDIR /
 COPY --from=builder /media-cleaner/target/release/media-cleaner /media-cleaner
 COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh /media-cleaner
+COPY ./download-cleaner.sh /download-cleaner.sh
+RUN chmod +x /entrypoint.sh /media-cleaner /download-cleaner.sh
 
 ENV RUST_LOG=info
 
