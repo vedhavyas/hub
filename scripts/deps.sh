@@ -47,7 +47,11 @@ mkdir -p /etc/docker
 cat > /etc/docker/daemon.json << EOF
 {
     "bridge": "none",
-    "iptables": false
+    "iptables": false,
+    "log-opts": {
+        "max-size": "10m",
+        "max-file": "5"
+    }
 }
 EOF
 
