@@ -29,6 +29,27 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3001}}"
 
+  immich-microservices:
+    container_name: immich_microservices
+    hostname: immich_microservices
+    image: ghcr.io/immich-app/immich-server:release
+    command: [ "start.sh", "microservices" ]
+    networks:
+      - docker-direct
+    volumes:
+      - $HUB_DIR/media/photos:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - ${CONF_DIR}/immich.conf
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=IMMICH_JWT_SECRET
+    depends_on:
+      - immich-redis
+      - immich-postgres
+      - immich-server
+    restart: unless-stopped
+
   immich-machine-learning:
     container_name: immich_machine_learning
     hostname: immich_machine_learning
