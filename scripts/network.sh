@@ -3,8 +3,8 @@
 # stop any running containers just in case
 docker ps -aq | xargs docker stop
 
-# update all images
-docker images --format "{{.Repository}}:{{.Tag}}" | xargs -L1 docker pull
+# update all the tagged docker images
+docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | xargs -L1 docker pull
 docker network prune -f
 docker container prune -f
 
