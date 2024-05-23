@@ -237,27 +237,20 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3000}}"
 
-  pdf-backend:
-    image: 'thecodingmachine/gotenberg:8'
-    container_name: gotenberg
-    hostname: gotenberg
-    restart: unless-stopped
-    networks:
-      - docker-direct
-    labels:
-      caddy: pdf-backend.hub
-      caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 3000}}"
-
   pdf:
-    image: techblog/gotenbergui
-    container_name: gotenbergui
-    hostname: gotenbergui
+    image: frooodle/s-pdf:latest
+    container_name: sterling_pdf
+    hostname: sterling_pdf
     restart: unless-stopped
     networks:
       - docker-direct
+    volumes:
+      - $HUB_DIR/apdata/sterling-pdf/training_data:/usr/share/tessdata
+      - $DATA_DIR/sterling-pdf/configs:/configs
     environment:
-      - 'GOTENBERG_API_ADDRESS=https://pdf-backend.hub'
+      - DOCKER_ENABLE_SECURITY=false
+      - INSTALL_BOOK_AND_ADVANCED_HTML_OPS=true
+      - LANGS=en_US
     labels:
       caddy: pdf.hub
       caddy.tls: internal
