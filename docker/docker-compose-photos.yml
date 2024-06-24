@@ -10,7 +10,6 @@ services:
     hostname: immich_server
     image: ghcr.io/immich-app/immich-server:release
     restart: unless-stopped
-    command: [ "start.sh", "immich" ]
     networks:
       - docker-direct
     volumes:
@@ -28,27 +27,6 @@ services:
       caddy: photos.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 3001}}"
-
-  immich-microservices:
-    container_name: immich_microservices
-    hostname: immich_microservices
-    image: ghcr.io/immich-app/immich-server:release
-    command: [ "start.sh", "microservices" ]
-    networks:
-      - docker-direct
-    volumes:
-      - $HUB_DIR/media/photos:/usr/src/app/upload
-      - /etc/localtime:/etc/localtime:ro
-    env_file:
-      - ${CONF_DIR}/immich.conf
-    environment:
-      - NODE_ENV=production
-      - JWT_SECRET=IMMICH_JWT_SECRET
-    depends_on:
-      - immich-redis
-      - immich-postgres
-      - immich-server
-    restart: unless-stopped
 
   immich-machine-learning:
     container_name: immich_machine_learning
@@ -89,8 +67,15 @@ services:
       POSTGRES_USER: immich
       POSTGRES_DB: immich
       PG_DATA: /var/lib/postgresql/data
+      POSTGRES_INITDB_ARGS: '--data-checksums'
     volumes:
       - $DATA_DIR/immich/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready --dbname='${DB_DATABASE_NAME}' || exit 1; Chksum="$$(psql --dbname='${DB_DATABASE_NAME}' --username='${DB_USERNAME}' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      start_interval: 30s
+      start_period: 5m
+    command: ["postgres", "-c" ,"shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
