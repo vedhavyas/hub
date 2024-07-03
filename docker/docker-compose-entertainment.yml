@@ -262,3 +262,26 @@ services:
       caddy: my-spotify.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 80}}"
+
+  youtube-downloader:
+    image: tzahi12345/youtubedl-material:nightly
+    container_name: youtube-downloader
+    hostname: youtube-downloader
+    restart: unless-stopped
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - ytdl_use_local_db='true'
+      - write_ytdl_config='true'
+    networks:
+      - docker-vpn
+    volumes:
+      - $DATA_DIR/youtube-downloader/appdata:/app/appdata
+      - $HUB_DIR/media/downloads/youtube/audio:/app/audio
+      - $HUB_DIR/media/downloads/youtube/video:/app/video
+      - $DATA_DIR/youtube-downloader/subscriptions:/app/subscriptions
+      - $DATA_DIR/youtube-downloader/users:/app/users
+    labels:
+      caddy: youtube.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 17442}}"
