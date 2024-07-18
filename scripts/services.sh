@@ -55,21 +55,22 @@ function mailserver_post_up() {
   wait-for-it -t 60 10.10.2.5:993 || exit 1
 }
 
-#function entertainment_pre_up() {
-#  test -f "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf && sed -i 's/Session\\Port=.*/Session\\Port='"${PEER_PORT}"'/' "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf
-#}
+function entertainment_pre_up() {
+  test -f "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf && sed -i 's/Session\\Port=.*/Session\\Port='"${PEER_PORT}"'/' "${DATA_DIR}"/qbittorrent/config/qBittorrent.conf
+}
 
 function entertainment_post_up() {
   # wait for qbittorrent
   wait-for-it -t 60 10.10.3.2:8080 || exit 1
-#  wait-for-it -t 60 10.10.3.2:"${PEER_PORT}" || exit 1
+  wait-for-it -t 60 10.10.3.2:"${PEER_PORT}" || exit 1
 }
 
 action=$1
 service=$2
 
 source "${DATA_DIR}"/mullvad/mullvad.env
-PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
+#PEER_PORT=${MULLVAD_VPN_FORWARDED_PORT}
+PEER_PORT=49912
 
 HOST_IP=$(curl https://icanhazip.com)
 export HOST_IP
