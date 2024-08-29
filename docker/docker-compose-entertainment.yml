@@ -285,3 +285,24 @@ services:
       caddy: youtube.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 17442}}"
+
+  ariang:
+    image: hurlenko/aria2-ariang:latest
+    container_name: ariang
+    hostname: ariang
+    restart: unless-stopped
+    environment:
+      - RPC_SECRET=NOBODYKNOWSME
+      - PGID
+      - PUID
+      - ARIA2RPCPORT=443
+    networks:
+      - docker-vpn
+    volumes:
+      - $DATA_DIR/ariang/conf:/aria2/conf
+      - $HUB_DIR/media/downloads/ariang:/aria2/data
+    labels:
+      caddy: download.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
