@@ -134,6 +134,27 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 7878}}"
 
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr:latest
+    hostname: autobrr
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    user: $PUID:$PGID
+    environment:
+      - TZ
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA_DIR/autobrr/config:/config
+    healthcheck:
+      test: curl -f http://autobrr:7474 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: autobrr.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 7474}}"
+
   emby:
     image: emby/embyserver:latest
     container_name: emby
