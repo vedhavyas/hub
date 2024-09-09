@@ -18,9 +18,9 @@ services:
       - BROWSER_WEB_URL=http://chrome:9222
       - OPENAI_API_KEY
       - DATA_DIR=/data
-      - NEXTAUTH_SECRET=super_random_string
+      - NEXTAUTH_SECRET
       - NEXTAUTH_URL=https://hoarder.hub
-      - MEILI_MASTER_KEY=another_random_string
+      - MEILI_MASTER_KEY
     labels:
       caddy: hoarder.hub
       caddy.tls: internal
@@ -48,6 +48,6 @@ services:
       - docker-direct
     environment:
       - MEILI_NO_ANALYTICS=true
-      - MEILI_MASTER_KEY=another_random_string
+      - MEILI_MASTER_KEY
     volumes:
       - $DATA_DIR/meilisearch/data:/meili_data
