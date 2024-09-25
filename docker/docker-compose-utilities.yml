@@ -12,6 +12,7 @@ services:
     image: filebrowser/filebrowser:v2
     restart: unless-stopped
     hostname: filebrowser
+    command: ["--token-expiration-time=240h"]
     volumes:
       - '$HUB_DIR/:/srv/hub'
       - '$DATA_DIR/:/srv/data'
