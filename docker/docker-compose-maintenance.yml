@@ -16,7 +16,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
-    command: --cleanup --interval=43200 --monitor-only
+    command: --cleanup --interval=604800 --monitor-only
     networks:
       - docker-direct
     environment:
