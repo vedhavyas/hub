@@ -26,7 +26,7 @@ services:
     labels:
       caddy: photos.hub
       caddy.tls: internal
-      caddy.reverse_proxy: "{{upstreams 3001}}"
+      caddy.reverse_proxy: "{{upstreams 2283}}"
 
   immich-machine-learning:
     container_name: immich_machine_learning
