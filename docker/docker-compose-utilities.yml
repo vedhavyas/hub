@@ -256,3 +256,11 @@ services:
       caddy: pdf.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  moonbeam-destake:
+    image: vedhavyas/moonbeam-destake:latest
+    container_name: moonbeam-destake
+    hostname: moonbeam-destake
+    restart: unless-stopped
+    networks:
+      - docker-direct
