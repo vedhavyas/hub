@@ -67,6 +67,9 @@ done
 # mark all outgoing connections from docker-vpn(10.10.3.0/24) to use mullvad routing table
 iptables -A PREROUTING -t nat -s 10.10.3.0/24 -j MARK --set-mark 100
 
+# mark all outgoing connections from docker-india(10.10.6.0/24) to use india routing table
+iptables -A PREROUTING -t nat -s 10.10.6.0/24 -j MARK --set-mark 101
+
 # add postup iptable rules if any
 "${DATA_DIR}"/wireguard/post_up.sh
 

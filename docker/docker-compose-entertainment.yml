@@ -9,6 +9,8 @@ networks:
     external: true
   docker-direct-static:
     external: true
+  docker-india:
+    external: true
 
 services:
   qbittorrent:
@@ -326,4 +328,27 @@ services:
       caddy: download.hub
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  jiotv:
+    image: ghcr.io/jiotv-go/jiotv_go:latest
+    container_name: jiotv
+    hostname: jiotv
+    restart: unless-stopped
+    environment:
+      - JIOTV_PATH_PREFIX=/app/.jiotv_go
+      - TZ=Asia/Kolkata
+      - JIOTV_DRM=false
+      - JIOTV_EPG=true
+      - JIOTV_DISABLE_LOGOUT=false
+      - JIOTV_TITLE=JioTV
+      - JIOTV_DEBUG=true
+    networks:
+      - docker-india
+      - docker-vpn
+    volumes:
+      - $DATA_DIR/jiotv/conf:/app/.jiotv_go
+    labels:
+      caddy: jiotv.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 5001}}"
 

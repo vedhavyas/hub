@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     hostname: caddy
     environment:
-      - CADDY_INGRESS_NETWORKS=docker-direct,docker-vpn,docker-direct-static,docker-vpn-static
+      - CADDY_INGRESS_NETWORKS=docker-direct,docker-vpn,docker-direct-static,docker-vpn-static,docker-india
     networks:
       docker-direct-static:
         ipv4_address: 10.10.2.4
