@@ -33,6 +33,10 @@ docker network create --subnet 10.10.3.0/25 docker-vpn-static
 # setup docker vpn network
 docker network create --subnet 10.10.3.128/25 docker-vpn
 
+# setup docker india network
+# since 4 and 5 are given to gateway
+docker network create --subnet 10.10.6.128/25 docker-india
+
 # setup mullvad interface
 # create mullvad conf and open tunnel
 hub run-script mullvad setup-network
