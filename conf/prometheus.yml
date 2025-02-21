@@ -15,3 +15,7 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['node-exporter:9100', 'cadvisor:8080']
+
+  - job_name: 'scraparr'
+    static_configs:
+      - targets: [ 'scraparr:7100' ]

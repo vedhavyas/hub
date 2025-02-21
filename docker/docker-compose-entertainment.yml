@@ -157,6 +157,24 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 7474}}"
 
+  scraparr:
+    container_name: scraparr
+    image: ghcr.io/thecfu/scraparr:latest
+    hostname: scraparr
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    user: $PUID:$PGID
+    environment:
+      - TZ
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA_DIR/scraparr/config.yaml:/scraparr/config/config.yaml
+    labels:
+      caddy: scraparr.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 7100}}"
+
   emby:
     image: emby/embyserver:latest
     container_name: emby
