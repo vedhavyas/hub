@@ -16,10 +16,13 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
-    command: --cleanup --interval=604800 --monitor-only
     networks:
       - docker-direct
     environment:
+      - TZ
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_MONITOR_ONLY=true
+      - WATCHTOWER_SCHEDULE=0 0 12 * * SUN
       - WATCHTOWER_NOTIFICATIONS_HOSTNAME=Hub
       - WATCHTOWER_NO_STARTUP_MESSAGE=true
       - WATCHTOWER_ROLLING_RESTART=false
