@@ -49,7 +49,7 @@ hosts = 0.0.0.0:5232
 
 [auth]
 # Authentication method
-type = radicale_imap
+type = imap
 imap_host = mail.vedhavyas.dev:143
 imap_security = starttls
 
