@@ -46,13 +46,18 @@ services:
       - unbound
       - caddy
     environment:
-      - PIHOLE_DNS_=unbound
-      - WEBTHEME="default-dark"
-      - WEBPASSWORD=pihole
-      - ADMIN_EMAIL
+      - TZ
+      - FTLCONF_dns_upstreams=unbound
+      - FTLCONF_dns_listeningMode=SINGLE
+      - FTLCONF_webserver_domain=pihole.hub
+      - FTLCONF_webserver_port=80
+      - FTLCONF_webserver_api_password=pihole
+      - FTLCONF_misc_dnsmasq_lines=address=/host.hub/10.10.1.1;address=/mailserver.hub/10.10.2.5;address=/hub/10.10.2.4
     volumes:
       - '$DATA_DIR/pihole/etc-pihole:/etc/pihole'
-      - '$DATA_DIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+    cap_add:
+      # Optional, if Pi-hole should get some more processing time
+      - SYS_NICE
     labels:
       caddy: pihole.hub
       caddy.tls: internal

@@ -165,6 +165,10 @@ services:
       - docker-vpn
     restart: unless-stopped
     user: $PUID:$PGID
+    depends_on:
+      - sonarr
+      - radarr
+      - prowlarr
     environment:
       - TZ
     volumes:

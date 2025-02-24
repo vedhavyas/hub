@@ -26,17 +26,6 @@ function connect_networks() {
   done
 }
 
-function security_pre_up() {
-  # add dns record for caddy reverse proxy
-    mkdir -p "${DATA_DIR}/pihole/etc-dnsmasq.d/"
-    custom_records="${DATA_DIR}/pihole/etc-dnsmasq.d/03-hub-dns.conf"
-    cat > "${custom_records}" << EOF
-address=/host.hub/10.10.1.1
-address=/mailserver.hub/10.10.2.5
-address=/hub/10.10.2.4
-EOF
-}
-
 function security_post_up() {
   # wait until dns starts
   wait-for-it -t 120 10.10.2.2:53 || exit 1
