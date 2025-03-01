@@ -358,7 +358,7 @@ services:
     restart: unless-stopped
     environment:
       - JIOTV_PATH_PREFIX=/app/.jiotv_go
-      - TZ=Asia/Kolkata
+      - TZ
       - JIOTV_DRM=false
       - JIOTV_EPG=true
       - JIOTV_DISABLE_LOGOUT=false

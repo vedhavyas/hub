@@ -19,7 +19,6 @@ chown docker:docker "${DATA_DIR}"
 
 PUID=$(id -u docker)
 PGID=$(id -g docker)
-TZ=UTC
 set +a
 
 function run_script() {
