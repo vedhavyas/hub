@@ -2,7 +2,7 @@
 echo "Running download-cleaner"
 
 echo "deleting files that are older than 7 days"
-find /downloads -type f -mtime +7 -exec rm -rf {} \;
+find /downloads -type f -mtime +4 -exec echo "Deleting {}" \; -exec rm -rf {} \;
 
 echo "deleting the empty directories"
 while [ "$(find /downloads -mindepth 2 -type d \( -path '/downloads/games/.stfolder' -prune \) -o -type d -empty -exec echo {} \; | wc -l)" -gt 0 ]
