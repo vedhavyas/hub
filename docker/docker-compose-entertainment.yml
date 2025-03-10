@@ -179,6 +179,31 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 7100}}"
 
+  recommendarr:
+    container_name: recommendarr
+    image: tannermiddleton/recommendarr:latest
+    hostname: recommendarr
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    depends_on:
+      - sonarr
+      - radarr
+      - emby
+    environment:
+      - NODE_ENV=production
+      - DOCKER_ENV=true
+      - PORT=3000
+      - PUBLIC_URL=https://recommendations.hub
+      - FORCE_SECURE_COOKIES=true
+    volumes:
+      - $DATA_DIR/recommendarr/:/app/server/data
+    labels:
+      caddy: recommendations.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+
   emby:
     image: emby/embyserver:latest
     container_name: emby
