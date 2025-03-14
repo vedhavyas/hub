@@ -136,6 +136,32 @@ services:
       caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 7878}}"
 
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr:latest
+    hostname: bazarr
+    networks:
+      - docker-vpn
+    restart: unless-stopped
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    depends_on:
+      - sonarr
+      - radarr
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA_DIR/bazarr/:/config
+      - $HUB_DIR/media/:/data
+    healthcheck:
+      test: curl -f http://bazarr:6767 &> /dev/null && echo "OK" || exit 1
+      interval: 15s
+    labels:
+      caddy: bazarr.hub
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 6767}}"
+
   autobrr:
     container_name: autobrr
     image: ghcr.io/autobrr/autobrr:latest
